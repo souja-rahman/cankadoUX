@@ -1,0 +1,164 @@
+{% extends "dashboard/adminLayout.html" %}  
+{% block page_id %}reminderGrade{% endblock %}
+{% load url from future %}
+{% block content %}
+
+<div class="span9">
+	<input type="hidden" id="csrf" value="{{csrf_token}}">
+	<div class="row-fluid" style="padding-top:27px;margin-bottom:5px;">
+		<div class="span12">
+			<div class="newbreadcrumb flat">
+				<a href="{% url 'adminTreatList' %}" >Admin</a>
+				<a class="active">Patient Reminder Grade</a>
+
+			</div>
+
+		</div>
+	</div>
+
+	<div class="widget" style="padding-bottom:0px;">	
+		<div class="widget-header">			
+			<h3>Patient Reminder Grade</h3>
+		</div>
+		<div class="widget-content">
+			<div class="row-fluid">
+				<table class="footable table-bordered">
+					<thead>
+						<tr>
+							<th>Question</th>
+							<th>Reminder</th>
+							<th>Action</th>
+						</tr>
+					</thead>
+					<tbody id="reminderList">
+						<tr>
+							<td>
+								<select id="grade">
+									{% for rk,rv in reminderQuestions.items %}
+									{% if rk != 6 %}
+									<option value="{{rk}}">{{rv.en}}</option>
+									{% endif %}
+									{% endfor %}
+								</select>
+							</td>
+							<td class="span10">
+								<textarea id="reminderContent" class="span12" rows="4"></textarea>
+							</td>
+							<td class="span2">
+								<button class="btn btn-info btn-mini btn-block reminderAddBtn">Add</button>
+							</td>
+						</tr>
+						{% for reminder in reminders %}
+						{% if reminder.grade != 6 %}
+						<tr>
+							<td ><strong>{{reminder.getQuestion}}</strong></td>
+							<td class="reminder preLineWhiteSpace">{% autoescape off %}{{reminder.reminder}}{% endautoescape %}</td>
+							<td>
+								<button class="btn btn-info btn-mini btn-block reminderEditBtn" pk="{{reminder.id}}">Edit</button>
+								<!--<button class="btn btn-danger btn-mini btn-block reminderDelBtn" pk="{{reminder.id}}">Delete</button>-->
+							</td>
+						</tr>
+						{% endif %}
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% endblock %}
+
+{% block bottomScripts %}
+<script>
+	$('.reminderAddBtn').click(function(e) {
+		e.preventDefault();
+		var btn = $(this);
+		var reminder = $('#reminderContent').val();
+		var grade = $('#grade').val();
+		var csrf = $('#csrf').val();
+		if (reminder === '') {
+			bootbox.alert('Reminder content is empty!!');
+			return;
+		}
+		btn.attr('disabled', 'disabled')
+		$.ajax({
+			url: '/adminremindergrade/',
+			type: 'POST',
+			data: {csrfmiddlewaretoken: csrf, reminder: reminder, grade: grade},
+		})
+			.done(function(data) {
+				btn.removeAttr('disabled');
+				bootbox.alert(data.message, function() {
+					window.location.reload();
+				});
+			})
+			.fail(function() {
+				btn.removeAttr('disabled');
+				bootbox.alert('An error occured, please try again!!');
+			})
+	});
+
+	$('.reminderEditBtn').click(function(e) {
+		e.preventDefault();
+		var btn = $(this);
+		var id = btn.attr('pk');
+		var csrf = $('#csrf').val();
+		var reminder = btn.parents('tr').find('.reminder');
+		if (btn.html() == 'Edit') {
+			reminder.attr('contenteditable', 'true');
+			reminder.focus();
+			btn.html('Save');
+		}
+		else {
+			if (reminder.html() === '') {
+				bootbox.alert('Reminder is empty!!!', function() {
+					reminder.focus();
+				});
+				return;
+			}
+			var content = reminder.text();
+			btn.attr('disabled', 'disabled');
+			$.ajax({
+				url: '/admineditremindergrade/',
+				type: 'POST',
+				data: {csrfmiddlewaretoken: csrf, reminder:content, grade: id},
+			})
+				.done(function() {
+					btn.removeAttr('disabled');
+					bootbox.alert('Reminder saved successfully!!', function() {
+						window.location.reload();
+					});
+				})
+				.fail(function() {
+					btn.removeAttr('disabled');
+					bootbox.alert('An error occured, please try again!!', function() {
+						reminder.focus();
+					});
+				})
+		}
+	});
+	$('.reminderDelBtn').click(function(e) {
+		e.preventDefault();
+		var btn = $(this);
+		var id = btn.attr('pk');
+		var csrf = $('#csrf').val();
+		bootbox.confirm('Are you sure to delete this reminder', function(result) {
+			if (result) {
+				$.ajax({
+					url: '/admindeleteremindergrade/',
+					type: 'POST',
+					data: {csrfmiddlewaretoken: csrf, grade: id},
+				})
+					.done(function() {
+						btn.parents('tr').remove();
+					})
+					.fail(function() {
+						btn.removeAttr('disabled');
+						bootbox.alert('An error occured, please try again!!');
+					})
+			}
+		})
+	});
+</script>
+{% endblock %}

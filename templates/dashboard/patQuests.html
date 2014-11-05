@@ -1,0 +1,657 @@
+{% load templateUtils %}
+{% load poll_extras %}
+
+{% load i18n %}
+
+<input id="csrf_token" type="hidden" value="{{csrf_token}}">
+<input id="timeInS" type="hidden" value="{{CtimeInS}}">
+<input id="dateInS" type="hidden" value="{{today|getTimeIS}}">
+<input id="recommendation" type="hidden" value="">
+{% if quests.MEDICINE_QUESTS or quests.MEDICINE_QUESTS_NO_TIME or quests.SIDEEFFECT_QUESTS or quests.ALERT_MSG.0 %}
+
+
+
+{% for medicine in quests.MEDICINE_QUESTS %}
+{% for times in medicine.1 %}
+
+{% with value=medicine.2 %}
+
+{% with drugObj=medicine.0|getTDrugObj %}
+
+{% with date=user|getDrugTakeTime:drugObj %}
+<div class="row-fluid questBox notSorted INQBox AEQ" time="{{times}}" {% if drugObj.timeNotRequired %}kados="{{times|possibleKados:'NTDI'}}"{% else %}kados="{{times|possibleKados:'DI'}}"{% endif %} drug="{{medicine.0}}">
+     <input type="hidden" class="questDrug" value="{{drugObj.id}}">
+	<input type="hidden" class="ptime" value="{{times}}">
+	<input type="hidden" class="qty" value="">
+	<input type="hidden" class="ttime" value="">
+	<input type="hidden" class="questtime" value="">
+	<input type="hidden" class="reminder1" value="">
+	<input type="hidden" class="reminder2" value="">
+	<input type="hidden" class="reminder4" value="">
+	<input type="hidden" class="reminder5" value="">
+	<input type="hidden" class="reminder6" value="">
+	<input type="hidden" class="personalDiary" value="">
+	<input type="hidden" class="no_kado" value="">
+
+	<div class="BOX-CONT">
+		<div class="TBOX">
+			<div class="LBOX dialBOX orgLBOX">
+				<img class="questKadoLogo" src="{{ STATIC_URL }}kadoLogos/newLogo.png">
+				<div class="questKado">
+					<input class="dial" {% if drugObj.timeNotRequired %}value="{{times|possibleKados:'NTDI'}}"{% else %}value="{{times|possibleKados:'DI'}}"{% endif %} type="text" data-width="100" data-height="100" data-skin="tron" data-thickness=".3" data-fgColor="#4a7089" data-readOnly="true"  data-min="0" data-max="{{times|maxKados:'DI'}}">
+				</div>
+			</div>
+			<div class="RBOX rb"></div>
+			<div class="RBOXc v1scroll rb">
+				<p class="questMedImage">
+					<img src="{{user|getMedicineImage:drugObj.drugname}}" alt="">
+				</p>
+				<p class="questMediName">{{medicine.3}}</p>
+				<p class="questMediDate"><i class="fa">{{times|getWeekDayFromSec}}</i>  {{times|getDateFromSec}} Uhr</p>
+				<p class="questMediTime"><i class="fa fa-clock-o"></i> 
+					{% if drugObj.timeNotRequired %}
+					{%blocktrans%}Ganzer Tag{%endblocktrans%} 
+					{% else %}
+					{{date|getTimeFromSeconds:times}} {{drugObj.drugTime|getDrugTimeStatus:'de'}}
+					{% endif %}
+				</p>
+				<p class="questMediQty"><i class="fa icon-pill"></i> <span style="font-size: 20px">{{medicine.4}}</span> <span style="font-size: 14px;">{{medicine.5}}</span></p>
+				<p class="questMediAbrt"><button class="btn abtrtBtn btn-mini">Abbrechen</button></p>
+
+
+			</div>
+		</div>
+
+		<div class="BBOX bb pCOlor"></div>
+		<div class="BBOXlc"> <span class="BBOXlcSpan">{%blocktrans%}Einnahme{%endblocktrans%}</span> </div>
+		<div class="BBOXrc ">
+			<div class="row-fluid" style="height: 100%">
+
+				<div class="questionP Qs Q1">
+					<div class="questionSpan">
+						<p class="question">{%blocktrans%}Möchten Sie diese Einnahme dokumentieren?{%endblocktrans%}</p>
+						<p class="questionBtns">
+							<button class="btn questBtn YesBtn">{%blocktrans%}Ja{%endblocktrans%}</button><button class="btn questBtn NoBtn">{%blocktrans%}Nein{%endblocktrans%}</button>
+						</p>
+					</div>
+				</div>	
+				<div class="questionP Q Q2">
+					<div class="questionSpan">
+						<p class="question v1scroll">{%blocktrans%}Haben Sie{%endblocktrans%} {{medicine.3}} {%blocktrans%}eingenommen?{%endblocktrans%}</p>
+						<p class="questionBtns">
+							<button class="btn questBtn YesBtn">{%blocktrans%}Ja{%endblocktrans%}</button><button class="btn questBtn NoBtn">{%blocktrans%}Nein{%endblocktrans%}</button>
+						</p>
+					</div>
+				</div>		
+				<div class="questionP Q Q3">
+					<div class="questionSpan">
+						<p class="question v1scroll">{%blocktrans%}Haben Sie{%endblocktrans%} {{medicine.4}} {{medicine.5}} {%blocktrans%}eingenommen?{%endblocktrans%}</p>
+						<p class="questionBtns">
+							<button class="btn questBtn YesBtn" drug="{{medicine.4}}">{%blocktrans%}Ja{%endblocktrans%}</button><button class="btn questBtn NoBtn">{%blocktrans%}Nein{%endblocktrans%}</button>
+						</p>
+					</div>
+				</div>	
+				<div class="questionP Q Q4">
+					<div class="questionSpan">
+						<p class="question v1scroll">
+							{%blocktrans%}Wie viele Tabletten haben Sie eingenommen?{%endblocktrans%} <br>
+							<input type="number" min="0" class="drugQty" placeholder="Menge" value="{{medicine.4}}">
+						</p>
+						<p class="questionBtns">
+							<button class="btn singleBtn questBtn YesBtn">{%blocktrans%}weiter{%endblocktrans%}</button>
+							<!--									<button class="btn questBtn NoBtn">Nein</button>-->
+						</p>
+					</div>
+				</div>	
+				<div class="questionP Q Q5">
+					<div class="questionSpan">
+						<div class="question v1scroll">
+
+							<span style="margin-bottom: 15px">{%blocktrans%}Wann haben Sie das Medikament eingenommen?{%endblocktrans%}</span>
+							<hr style="margin: 10px 0px 10px 0px;">
+							<div class="subQuestion intakeTime" >
+								<div>
+
+
+									<div class="conswitch tiny">
+										<input type="radio" name="{{times}}" value="1">
+										<label>
+											<span class="fa-stack">
+												<!--<i class="fa fa-circle-o fa-stack-2x"></i>-->
+												<i class="fa fa-times fa-stack-1x"></i>
+												<i class="fa fa-check fa-stack-1x"></i>
+											</span>
+										</label>
+									</div>
+
+									<span class="switchLabel">
+										{%blocktrans%}Pünktlich{%endblocktrans%}
+									</span>
+								</div>
+							</div>
+							<div class="subQuestion intakeTime" >
+								<div>
+									<div class="conswitch tiny">
+										<input type="radio" name="{{times}}" value="2"> 
+										<label>
+											<span class="fa-stack">
+												<!--<i class="fa fa-circle-o fa-stack-2x"></i>-->
+												<i class="fa fa-times fa-stack-1x"></i>
+												<i class="fa fa-check fa-stack-1x"></i>
+											</span>
+										</label>
+									</div>
+
+									<div class="switchLabel">
+										{%blocktrans%}Mehr als eine halbe Stunde vor oder nach dem geplanten Einnahmezeitpunkt{%endblocktrans%} 
+									</div>
+								</div>
+							</div>
+							<div class="subQuestion intakeTime" >
+								<div>
+									<div class="conswitch tiny">
+										<input type="radio" name="{{times}}" value="3"> 
+										<label>
+											<span class="fa-stack">
+												<!--<i class="fa fa-circle-o fa-stack-2x"></i>-->
+												<i class="fa fa-times fa-stack-1x"></i>
+												<i class="fa fa-check fa-stack-1x"></i>
+											</span>
+										</label>
+									</div>
+
+									<div class="switchLabel">
+										{%blocktrans%}Mehr als zwei Stunden vor oder nach dem geplanten Einnahmezeitpunkt{%endblocktrans%}
+									</div>
+								</div>
+							</div>
+							<div class="subQuestion intakeTime" >
+								<div>
+									<div class="conswitch tiny">
+										<input type="radio" name="{{times}}" value="4"> 
+										<label>
+											<span class="fa-stack">
+												<!--<i class="fa fa-circle-o fa-stack-2x"></i>-->
+												<i class="fa fa-times fa-stack-1x"></i>
+												<i class="fa fa-check fa-stack-1x"></i>
+											</span>
+										</label>
+									</div>
+
+									<div class="switchLabel">
+										{%blocktrans%}Mehr als ein Tag vor oder nach dem geplanten Einnahmezeitpunkt{%endblocktrans%}
+									</div>
+								</div>
+							</div>
+						</div>
+						<p class="questionBtns">
+							<button class="btn singleBtn questBtn YesBtn" time="{{times}}">{%blocktrans%}Bestätigen{%endblocktrans%}</button>
+							<!--									<button class="btn questBtn NoBtn">Nein</button>-->
+						</p>
+					</div>
+				</div>	
+				<div class="questionP Q Q6">
+					<div class="questionSpan ">
+						<p class="question intRecm v1scroll">
+							<strong>{%blocktrans%}Haben Sie die folgenden Hinweise beachtet?{%endblocktrans%}</strong> <br>
+							{{user|getRecommendation}}
+						</p>
+						<p class="questionBtns">
+							<button class="btn questBtn YesBtn">{%blocktrans%}Ja{%endblocktrans%}</button><button class="btn questBtn NoBtn">{%blocktrans%}Nein{%endblocktrans%}</button>
+						</p>
+					</div>
+				</div>	
+				<div class="questionP Q Q7">
+					<div class="questionSpan">
+						<p class="question v1scroll">
+							{%blocktrans%}Möchten Sie einen Eintrag in Ihr Tagebuch vornehmen?{%endblocktrans%}
+							<span class="subQuestion">{%blocktrans%}Hinweis: Das Tagebuch dient ausschließlich Ihrer persönlichen Aufzeichnung. 
+								Ihr Arzt erhält keinen Einblick {%endblocktrans%}</span>
+						</p>
+						<p class="questionBtns">
+							<button class="btn questBtn YesBtn">{%blocktrans%}Ja{%endblocktrans%}</button><button class="btn questBtn NoBtn">{%blocktrans%}Nein{%endblocktrans%}</button>
+						</p>
+					</div>
+				</div>	
+				<div class="questionP Q Q8">
+					<div class="questionSpan">
+						<p class="question finalQuestion">
+							<img class="questKadoLogo" src="{{ STATIC_URL }}kadoLogos/newLogo.png">
+							<img class="questKadoLogo wiltedImg" src="{{ STATIC_URL }}img/logo.png">
+							<span class="questKado">
+								<input class=" dial noQuest" {% if drugObj.timeNotRequired %}value="{{times|possibleKados:'NTDI'}}"{% else %}value="{{times|possibleKados:'DI'}}"{% endif %} type="text" data-width="100" data-height="100" data-skin="tron" data-thickness=".3" data-fgColor="#4a7089" data-readOnly="true"  data-min="0" data-max="{{times|maxKados:'DI'}}">
+							</span>
+							<span class="slidekadoTxt">
+								{%blocktrans%}Sie haben{%endblocktrans%} <span class="noQuestTxt">{% if drugObj.timeNotRequired %}{{times|possibleKados:'NTDI'}}{% else %}{{times|possibleKados:'DI'}}{% endif %}</span> {%blocktrans%}KADOs gesammelt.{%endblocktrans%}
+							</span>
+						</p>
+						<p class="questionBtns ">
+							<button class="btn pull-right singleBtn closeBtn questBtn">{%blocktrans%}Schließen{%endblocktrans%}</button>
+						</p>
+					</div>
+				</div>	
+				<!--DIARY-->
+				<div class="questionP Q Q9">  
+					<div class="questionSpan">
+						<div class="SEOptions">
+							<span>{%blocktrans%}Tagebucheintrag{%endblocktrans%}</span>
+							<!--<button class="pull-right btn questBtn abbrfromText">Abbrechen</button>-->
+						</div>
+						<p class="question diaryQuestion">
+							<textarea class="diaryEntryTA"></textarea>
+						</p>
+						<p class="questionBtns">
+							<button class="btn singleBtn YesBtn questBtn">{%blocktrans%}Speichern{%endblocktrans%}</button>
+						</p>
+					</div>
+				</div>	
+			</div>
+		</div>
+	</div>
+
+</div>
+
+
+
+{% endwith %}
+{% endwith %}
+{% endwith %}
+
+{% empty %}
+{% endfor %}
+{% empty %}
+{% endfor %}
+
+<!--hiding side EFFECT QUEST-->
+{% for q in quests.SIDEEFFECT_QUESTS|groupByDate %}
+<div class="row-fluid questBox notSorted AEQBox SEQ" time="{{q.0|getTimeIS}}" ses="{% for se in q.1 %}{{se.id}}{% if not forloop.last %}, {% endif %}{% endfor %}" kados="{{q.0|possibleKados:'AE'}}">
+	<div class="BOX-CONT">
+		<div class="TBOX">
+			<div class="LBOX dialBOX orgLBOX">
+				<img class="questKadoLogo" src="{{ STATIC_URL }}kadoLogos/newLogo.png">
+				<div class="questKado">
+					<input class="dial" value="{{q.0|possibleKados:'AE'}}" type="text" data-width="100" data-height="100" data-skin="tron" data-thickness=".3" data-fgColor="#4a7089" data-readOnly="true"  data-min="0" data-max="{{times|maxKados:'AE'}}">
+				</div>
+			</div>
+			<div class="RBOX rb"></div>
+			<div class="RBOXc rb v1scroll">
+				<p class="questMediName">{%blocktrans%}Nebenwirkungen für das folgende Datum{%endblocktrans%}</p>
+				<p class="questMediDate"><i class="fa">{{q.0|getWeekDayFromDate}}</i>  {{q.0|date:'d.m.Y'}}</p>
+				<!--<p class="questMediAbrt"><button class="btn abtrtBtn btn-mini">Abbrechen</button></p>-->
+			</div>
+
+		</div>
+
+		<div class="BBOX bb sCOlor"></div>
+		<div class="BBOXlc"> <span class="BBOXlcSpan">{%blocktrans%}Nebenwirkungen{%endblocktrans%}</span> </div>
+		<div class="BBOXrc ">
+			<div class="row-fluid" style="height: 100%">
+
+				<div class="questionP Qs Q1">
+					<div class="questionSpan">
+						<p class="question">{%blocktrans%}Möchten Sie Nebenwirkungen dokumentieren?{%endblocktrans%}</p>
+						<p class="questionBtns">
+							<button class="btn questBtn YesBtn">{%blocktrans%}Ja{%endblocktrans%}</button>
+							<button class="btn questBtn NoBtn">{%blocktrans%}Nein{%endblocktrans%}</button>
+						</p>
+					</div>
+				</div>
+				<div class="questionP Q Q2" style="">
+					<div class="questionSpan" style="">
+						<p class="question">
+							{%blocktrans%}Sind bei Ihnen Nebenwirkungen aufgetreten?{%endblocktrans%}
+						</p>
+						<p class="questionBtns">
+							<button class="btn questBtn YesBtn" activeSe="">{%blocktrans%}Ja{%endblocktrans%}</button>
+							<button class="btn questBtn NoBtn">{%blocktrans%}Nein{%endblocktrans%}</button>
+						</p>
+					</div>
+				</div>	
+				<!--unselected side Effects-->
+				<div class="questionP Q Q3">
+					<div class="infoContent">
+						<p>
+							<strong>{%blocktrans%}Nebenwirkungen{%endblocktrans%}:</strong>
+						</p>
+						<p>{%blocktrans%}Wählen Sie aus dieser Liste Nebenwirkungen aus, die neu aufgetreten sind, bzw. die Sie derzeit noch nicht dokumentieren.{%endblocktrans%}</p>
+					</div>
+
+					<div class="questionSpan SE  ">
+						<div class="sideEffectsSEQ unselected v1scroll">
+							<div class="SEOptions">
+								<span class="visible-tablet"> {%blocktrans%}Nicht gewählte Nebenwirkungen{%endblocktrans%}</span>
+								<span class="hidden-tablet"> {%blocktrans%}Liste der nicht gewählten Nebenwirkungen{%endblocktrans%}</span>
+								<button class="pull-right btn questBtn abbrTOdocList hidden-tablet">{%blocktrans%}Abbrechen{%endblocktrans%}</button>
+								<button class="pull-right btn btn-mini questBtn abbrTOdocList visible-tablet">{%blocktrans%}Abbrechen{%endblocktrans%}</button>
+							</div>
+							{% for se in q.1 %}			
+							<div class="sideEffectSEQ" data-se="{{se.pat_term}}">
+								<div class="seTitleSEQ" seID="{{se.id}}" >
+									<span class="fa-stack">
+										<i class="fa fa-circle-o fa-stack-2x"></i>
+										<i class="fa fa-plus fa-stack-1x"></i>
+										<i class="fa fa-check fa-stack-1x"></i>
+									</span>
+
+									<div class="seTitleTxt">{{se.pat_term}}</div>
+								</div>
+								<div class="infoContent">
+									<p>
+										<strong>{{se.pat_term}}</strong>
+									</p>
+									<p>
+										{{se.pat_termdefinition}}
+									</p>
+
+									<p>{{se.pat_term}}</p>
+									{% if se.grade1_sideeffecttype %}
+									<p><strong>Leicht : </strong></p>
+									<p>{{se.grade1_sideeffecttype}}</p>
+									{% endif %}
+									{% if se.grade2_sideeffecttype %}
+									<p><strong>Mittel : </strong></p>
+									<p>{{se.grade2_sideeffecttype}}</p>
+									{% endif %}
+									{% if se.grade3_sideeffecttype %}
+									<p><strong> Schwer : </strong></p>
+									<p>{{se.grade3_sideeffecttype}}</p>
+									{% endif %}
+									{% if se.grade4_sideeffecttype %}
+									<p><strong>Sehr schwer : </strong></p>
+									<p>{{se.grade4_sideeffecttype}}</p>
+									{% endif %}
+								</div>
+								<div class="seGraadesSEQ">
+									<!--Keine-->
+									<span class="seGradItmSEQ">
+										<input  name="SEType{{se.id}}" value="" se="{{se.id}}" type="radio" class="checkbox seRadio">
+										<label class="seGradLblSEQ keine">{%blocktrans%}Keine{%endblocktrans%}</label>
+									</span>
+									<!--Grade 1-->
+									<span class="seGradItmSEQ">{% if se.grade1_sideeffecttype %}
+										<input name="SEType{{se.id}}" value="{{se.grade1_id}}" se="{{se.id}}" type="radio" class="checkbox seRadio">
+										<label class="seGradLblSEQ" setype="{{se.grade1_id}}">Leicht</label>
+										<span class="seGradDefSEQ">{{se.grade1_sideeffecttype}}</span>
+										{% endif %}</span>
+									<!--Grade 2-->
+									<span class="seGradItmSEQ">{% if se.grade2_sideeffecttype %}
+										<input name="SEType{{se.id}}" value="{{se.grade2_id}}" se="{{se.id}}" type="radio" class="checkbox seRadio">
+										<label class="seGradLblSEQ" setype="{{se.grade2_id}}">Mittel</label>
+										<span class="seGradDefSEQ">{{se.grade2_sideeffecttype}}</span>
+										{% endif %}</span>
+									<!--Grade 3-->
+									<span class="seGradItmSEQ">{% if se.grade3_sideeffecttype %}
+										<input name="SEType{{se.id}}" value="{{se.grade3_id}}" se="{{se.id}}" type="radio" class="checkbox seRadio">
+										<label class="seGradLblSEQ" setype="{{se.grade3_id}}">Schwer</label>
+										<span class="seGradDefSEQ">{{se.grade3_sideeffecttype}}</span>
+										{% endif %}</span>
+									<!--Grade 4-->
+									<span class="seGradItmSEQ">{% if se.grade4_sideeffecttype %}
+										<input name="SEType{{se.id}}" value="{{se.grade4_id}}" se="{{se.id}}" type="radio" class="checkbox seRadio">
+										<label class="seGradLblSEQ" setype="{{se.grade4_id}}">Sehr schwer</label>
+										<span class="seGradDefSEQ">{{se.grade4_sideeffecttype}}</span>
+										{% endif %}</span>
+								</div>
+
+							</div>
+							{% endfor %}
+
+							<div class="sideEffectSEQ splSE splSE0" data-se="Sonstige Nebenwirkung">
+								<div class="seTitleSEQ" seID="sse">
+									<span class="fa-stack">
+										<i class="fa fa-circle-o fa-stack-2x"></i>
+										<i class="fa fa-plus fa-stack-1x"></i>
+										<i class="fa fa-check fa-stack-1x"></i>
+									</span>
+									<div class="seTitleTxt">{%blocktrans%}Sonstige Nebenwirkung{%endblocktrans%}</div>
+
+								</div>
+								<div class="infoContent">
+									<p>
+										<strong>{%blocktrans%}Sonstige Nebenwirkungen{%endblocktrans%} </strong>
+									</p>
+									<p>
+										{%blocktrans%}Sollten Sie Beschwerden haben, die nicht aufgeführt sind, so klären Sie diese bitte umgehend mit Ihrem Arzt ab.{%endblocktrans%}
+									</p>
+
+								</div>
+								<div class="seGraadesSEQ">
+
+									<!--Keine-->
+									<span class="seGradItmSEQ spk">
+										<input name="SEType" value="" se="sse" type="radio" class="checkbox seRadio">
+										<label class="seGradLblSEQ keine">{%blocktrans%}Keine{%endblocktrans%}</label>
+									</span>
+
+									<span class="seGradItmSEQ spMa">
+										<input name="SEType" value="y" se="sse" type="radio" class="checkbox seRadio">
+										<label class="seGradLblSEQ spMalbl">{%blocktrans%}Mit Arzt abgeklart{%endblocktrans%}</label>
+										<span class="seGradDefSEQ">{%blocktrans%}Mit Arzt abgeklart{%endblocktrans%}</span>
+									</span>
+
+									<span class="seGradItmSEQ spNMa">
+										<input name="SEType" value="n" se="sse" type="radio" class="checkbox seRadio">
+										<label class="seGradLblSEQ spNMalbl">{%blocktrans%}Nicht Mit Arzt abgeklart{%endblocktrans%}</label>
+										<span class="seGradDefSEQ">{%blocktrans%}Nicht Mit Arzt abgeklart{%endblocktrans%}</span>
+									</span>
+
+								</div>
+
+							</div>
+							<!--									<div class="sideEffectSEQ splSE splSE1" data-se="Sonstige Nebenwirkung">
+																	<div class="seTitleSEQ" seID="1">
+																		<span class="fa-stack">
+																			<i class="fa fa-circle-o fa-stack-2x"></i>
+																			<i class="fa fa-plus fa-stack-1x"></i>
+																			<i class="fa fa-check fa-stack-1x"></i>
+																		</span>
+																		<div class="seTitleTxt">Sonstige Nebenwirkung</div>
+							
+																	</div>
+																	<div class="infoContent">
+																		<p>
+																			<strong>Sonstige Nebenwirkungen </strong>
+																		</p>
+																		<p>
+																			 Sollten Sie Beschwerden haben, die nicht aufgeführt sind, so klären Sie diese bitte umgehend mit Ihrem Arzt ab.
+																		</p>
+							
+																	</div>
+																	<div class="seGraadesSEQ">
+							
+																		Keine
+																		<span class="seGradItmSEQ spk">
+																			<input name="SEType" value="" se="sse" type="radio" class="checkbox seRadio">
+																			<label class="seGradLblSEQ keine">Keine</label>
+																		</span>
+							
+																		<span class="seGradItmSEQ spMa">
+																			<input name="SEType" value="1" se="sse" type="radio" class="checkbox seRadio">
+																			<label class="seGradLblSEQ spMalbl">Mit Arzt abgeklart</label>
+																			<span class="seGradDefSEQ">Mit Arzt abgeklart</span>
+																		</span>
+							
+																		<span class="seGradItmSEQ spNMa">
+																			<input name="SEType" value="0" se="sse" type="radio" class="checkbox seRadio">
+																			<label class="seGradLblSEQ spNMalbl">Nicht Mit Arzt abgeklart</label>
+																			<span class="seGradDefSEQ">Nicht Mit Arzt abgeklart</span>
+																		</span>
+							
+																	</div>
+							
+																</div>-->
+
+						</div>
+
+
+					</div>
+				</div>	
+				<!--DOCUMENTED SES-->
+				<div class="questionP Q Q4">
+					<div class="questionSpan SE  ">
+						<div class="sideEffectsSEQ documentedSEs v1scroll">
+						</div>
+						<p class="questionBtns">
+							<button class="btn questBtn NoBtn hidden-tablet btn-small">
+								<i class="fa fa-plus"></i>
+								{%blocktrans%}Weitere Nebenwirkung{%endblocktrans%}
+							</button>
+							<button class="btn questBtn YesBtn disabled hidden-tablet btn-small">
+								<i class="fa fa-check"></i>
+								{%blocktrans%}Eingabe Abschließen{%endblocktrans%}
+							</button>
+
+							<button class="btn btn-mini questBtn NoBtn visible-tablet">
+								<i class="fa fa-plus"></i>
+								{%blocktrans%}Weitere Nebenwirkung{%endblocktrans%}
+							</button>
+							<button class="btn btn-mini questBtn YesBtn disabled visible-tablet">
+								<i class="fa fa-check"></i>
+								{%blocktrans%}Eingabe Abschließen{%endblocktrans%}
+							</button>
+
+
+
+						</p>
+					</div>
+				</div>	
+
+				<div class="questionP Q Q5">
+					<div class="questionSpan">
+						<p class="question v1scroll">
+							{%blocktrans%}Möchten Sie einen Tagebucheintrag hinzufügen?{%endblocktrans%}
+						</p>
+						<p class="questionBtns">
+							<button class="btn questBtn YesBtn">{%blocktrans%}Ja{%endblocktrans%}</button><button class="btn questBtn NoBtn">{%blocktrans%}Nein{%endblocktrans%}</button>
+						</p>
+					</div>
+				</div>	
+
+
+				<!--DIARY-->
+				<div class="questionP Q Q6"> 
+					<div class="infoContent">
+						<p>
+							<strong>{%blocktrans%}Tagebucheintrag{%endblocktrans%} : </strong>
+						</p>
+						<p>
+							{%blocktrans%}Der Tagebucheintrag kann nur von Ihnen eingesehen werden. Ihr Arzt hat keinen Zugriff auf die hier eingetragenen Inhalte.{%endblocktrans%}
+						</p>
+						<p>
+							{%blocktrans%}Sie können die Einträge allerdings über die Kalenderansicht ausdrucken und so beispielsweise als Gedankenstütze zu Ihrem nächsten Arzbesuch mitnehmen.{%endblocktrans%}
+						</p>
+					</div>
+					<div class="questionSpan">
+						<div class="SEOptions">
+							<span>{%blocktrans%}Tagebucheintrag{%endblocktrans%}</span>
+							<!--<button class="pull-right btn questBtn abbrfromText">Abbrechen</button>-->
+						</div>
+						<p class="question diaryQuestion">
+
+							<textarea class="diaryEntryTA"></textarea>
+						</p>
+						<p class="questionBtns">
+							<button class="btn YesBtn singleBtn questBtn">{%blocktrans%}Speichern{%endblocktrans%}</button>
+						</p>
+					</div>
+				</div>	
+
+				<div class="questionP Q Q7">
+					<div class="questionSpan">
+						<p class="question finalQuestion">
+							<img class="questKadoLogo" src="{{ STATIC_URL }}kadoLogos/newLogo.png">
+							<img class="questKadoLogo wiltedImg" src="{{ STATIC_URL }}img/logo.png">
+
+							<span class="questKado">
+								<input class="dial noQuest" value="{{q.0|possibleKados:'AE'}}" type="text" data-width="100" data-height="100" data-skin="tron" data-thickness=".3" data-fgColor="#4a7089" data-readOnly="true"  data-min="0" data-max="{{times|maxKados:'AE'}}">
+							</span>
+							<span class="slidekadoTxt slidekadoTxt1">
+								{%blocktrans%}Sie haben{%endblocktrans%} <span class="noQuestTxt">{{q.0|possibleKados:'AE'}}</span> {%blocktrans%}KADOs gesammelt{%endblocktrans%}.
+							</span>
+							<span class="slidekadoTxt slidekadoTxt2" style="display:none;">
+								{%blocktrans%}Ihre Nebenwirkungen für	den	heutigen	Tag	wurden gespeichert.	Diese Angaben können Sie den ganzen	Tag	noch ändern.{%endblocktrans%}
+							</span>
+						</p>
+						<p class="questionBtns ">
+							<button class="btn pull-right singleBtn closeBtn questBtn">{%blocktrans%}Schließen{%endblocktrans%}</button>
+						</p>
+					</div>
+				</div>	
+
+			</div>
+		</div>
+		<div class="infoLBOX sCOlor v1scroll">
+			<div class="infocontent"></div>
+
+		</div>
+	</div>
+
+</div>
+
+
+
+{% endfor %}
+
+{% for reminder in quests.ALERT_MSG.0 %}
+<div class="row-fluid questBox ALQ" time="0" kados="{{quests.ALERT_MSG.1}}" seTime="{{reminder.seQuestDate}}">
+	{% if not reminder.is_seQuest %}
+	<input type="hidden" class="questDrug" value="{{reminder.drugTaken.id}}">
+	<input type="hidden" class="ptime" value="{{reminder.drugTime|getTimeIS}}">
+	{% endif %}
+	<div class="BOX-CONT">
+		<div class="TBOX">
+			<div class="LBOX dialBOX orgLBOX">
+				<img class="questKadoLogo" src="{{ STATIC_URL }}kadoLogos/newLogo.png">
+				<div class="questKado">
+					<input class="dial" value="{{quests.ALERT_MSG.1}}" type="text" data-width="100" data-height="100" data-skin="tron" data-thickness=".3" data-fgColor="#4a7089" data-readOnly="true"  data-min="0" data-max="{{quests.ALERT_MSG.1}}">
+				</div>
+			</div>
+			<div class="RBOX rb"></div>
+			<div class="RBOXc rb v1scroll">
+				<div class="questMediName">
+					<span class="..subQuestion preLineWhiteSpace" style="font-weight: normal;">{% autoescape off %}{% if reminder.recommendation %}{{reminder.recommendation}}{% else %}{{reminder.reminder.reminder}}{% endif %}{% endautoescape %}</span>
+				</div>
+				<p class="questMediAbrt"><button class="btn abtrtBtn btn-mini">{%blocktrans%}Abbrechen{%endblocktrans%}</button></p>
+			</div>
+		</div>
+
+		<div class="BBOX bb aCOlor"></div>
+		<div class="BBOXlc"> <span class="BBOXlcSpan">
+				<!--Einnahme-->
+			</span> </div>
+		<div class="BBOXrc ">
+			<div class="row-fluid" style="height: 100%">
+
+				<div class="questionP Qs Q1">
+					<div class="questionSpan">
+						<p class="question v1scroll">{{reminder.reminder.getQuestionDe}}</p>
+						<p class="questionBtns">
+							<button class="btn questBtn closeBtn singleBtn reminderUpdateBtn" reminderId="{{reminder.id}}">{%blocktrans%}Bestätigen{%endblocktrans%}</button>
+							<!--									<button class="btn questBtn NoBtn">Nein</button>-->
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+{% endfor %}
+{% if moreQuests %}
+<a style="display: none" class="nextQset" href="/patient/getQuest/?latestQTime={{latestQTime}}&sortby={{request.GET.sortby}}">next</a>
+{%else%}
+<script>
+	$('.ALQ').show()
+</script>
+
+	
+{% endif %}
+
+{% else %}
+<!--<div class="alert alert-info">
+	Hier finden Sie ihre Therapie-Erinnerung und  andere Benachrichtigungen!-->
+{% endif %}
+
+
+<!--<script src="{{ STATIC_URL }}js/quest.js"></script>-->

@@ -1,0 +1,60 @@
+{% extends "dashboard/pharmacistLayout.html" %}
+{% block custom_css %}
+{% endblock %}
+{% load templateUtils %}
+{% load url from future %}
+{% block page_id %}{% if treatment.status == 'apr' %}approved{% elif treatment.status == 'w' %}pending{% elif treatment.status == 'dec' %}declined{% elif treatment.status == 'arc' %}archived{% endif %}{% endblock %}
+{% block content %}
+<div class="span9">	
+	<div class="row-fluid" style="padding-top:27px;">
+      <div class="span12">
+        {% with status=treatment|getCurrentStatusAuditor %}
+	        <div class="newbreadcrumb flat">
+	            <a href="{% url 'auditor:dashboard' %}">Treatment List</a> 
+	            <a href="{{status.url}}">{{status.status}} Treatments</a>
+	            <a class="active">{{treatment.name}}</a>                              
+	        </div>
+        {% endwith %}    
+   		</div>
+  </div>	
+  
+  <div class="row-fluid tlistnew logohead" >
+	  <div class="row-fluid">
+      <div class="span2">
+          <img src="{{user.pharma.logo}}" alt="" class="logoimg" >
+      </div>
+      <div class="span6">
+          <h3>{{user.pharma.company}}</h3>
+          <h5>{{user.userprofile.first_name}}</h5>
+      </div>
+	    <div class="span4" style="margin-top:10px;">
+
+		      <div class="row-fluid infbox">
+		          <div class="span8"><p class="pull-right">Approved Treatments :</p></div><div class="span4"> <span class="badge badge-success">{{user.getApprovedTreatment}}</span> </div>
+		      </div>
+		      <div class="row-fluid infbox">
+		          <div class="span8"><p class="pull-right">Pending Treatments  :</p></div><div class="span4"> <span class="badge badge-warning">{{user.getPendingTreatment}}</span> <br></div>
+		      </div>
+		      <div class="row-fluid infbox">
+		          <div class="span8"><p class="pull-right">Declined Treatments :</p></div><div class="span4"> <span class="badge badge-important">{{user.getDeclinedTreatment}}</span></div>
+		      </div>
+		      <div class="row-fluid infbox">
+		          <div class="span8"><p class="pull-right">Archived Treatments :</p></div><div class="span4"> <span class="badge badge-inverse">{{user.getArchivedTreatment}}</span></div>
+		      </div>
+		  </div>
+	</div>
+</div>
+	<h1 class="page-title">{{treatment.name}}</h1>
+	<!-- ============================= Treatment Details widget start ============================= -->
+  {% include 'dashboard/treatmentDetailsEnglish.html' %}
+  <!-- ============================= Treatment Details widget end ============================= -->
+</div>
+{% endblock %}	 
+{% block bottomScripts %}
+<script>
+$(document).ready(function(){
+	$(".comments").css("display","none");
+});
+
+</script>
+{% endblock %}

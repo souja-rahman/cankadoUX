@@ -1,0 +1,189 @@
+{% extends "dashboard/adminLayout.html" %}
+{% block page_id %}{% if not treatment %}Tassign{% else %}Tlist{% endif %}{% endblock %}
+{% load templateUtils %}
+{% block content %}
+<div class="span9">
+    <div class="row-fluid" style="padding-top:27px;margin-bottom:5px;">
+        <div class="span12">
+            <div class="newbreadcrumb flat">
+                <a href="/admin/treatment/list/" >Admin</a>
+                <a href="/admin/treatment/list/" >Treatments</a>
+                <a href="#" class="active"> {% if treatment %}{{treatment.name}}{% else %}Add Treatment{% endif %}</a>
+            </div>
+
+        </div>
+    </div>
+
+    {% if treatment.status == 'd' or not treatment %}
+    {% include 'dashboard/treatmentDetailsEdit.html' %}
+    {% else %}
+    <div class="widget" style="padding-bottom:0px;">	
+        <div class="widget-header">			
+            <h3>{{treatment.name}}</h3>
+        </div>
+        <div class="widget-content">
+            <form class="form-horizontal">
+                <div class="control-group">
+                    <label class="control-label" >Treatment Name</label>
+                    <div class="controls">
+                        <input type="text" id="treatment_name" readonly value="{{treatment.name}}">
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" >Internal Name</label>
+                    <div class="controls">
+                        <input type="text" id="internal_treatment_name" readonly value="{{treatment.internal_name|default:''}}">
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" >Days in cycle</label>
+                    <div class="controls">
+                        <input type="number" min="0" max="28" step="1" id="days" readonly value="{{treatment.days|default:'28'}}">
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label" >Auditor</label>
+                    <div class="controls">
+                        <input type="text" readonly value="{{treatment.getPharmacistTreatment|default:'Nobody'}}">
+                    </div>
+                </div>
+                <hr>                
+                </div>
+                </div>
+
+                {% include 'dashboard/treatmentDetailsEnglish.html' %}
+                {% endif %}
+
+                {% if treatment %}
+                <input type="hidden" id="csrf" value="{{csrf_token}}">
+
+                
+                <div class="widget" style="padding-bottom:0px;">    
+                    <div class="widget-header">         
+                        <h3>Short Description</h3>
+                        {% if treatment.status == 'd' %}
+                        <button class="btn btn-info pull-right btn-small descriptionBtn" style="margin-top:5px;margin-right:5px;">{% if treatment.short_description %}Edit{% else %}Save{% endif %}</button>
+                        {% endif %}
+                    </div>      
+                    <div class="widget-content">
+                        <div class="row-fluid">
+                            <form class="span12 ">
+                                <div class="control-group">
+                                    <label class="control-label"><strong>Description</strong></label>
+                                    <div class="controls">
+                                        <textarea id="description"  {% if treatment.status != 'd' %}readonly="true"{% endif %}  rows="8" style="width:97%;resize:none;border: 1px solid #ddd;">{{treatment.short_description|default:''}}</textarea>
+                                    </div>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+    
+                <div class="widget" style="padding-bottom:0px;">    
+                    <div class="widget-header">         
+                        <h3>Intake Recommendation</h3>
+                        {% if treatment.status == 'd' %}
+                        <button class="btn btn-info pull-right btn-small recommendationBtn" style="margin-top:5px;margin-right:5px;">{% if treatment.recommendation %}Edit{% else %}Save{% endif %}</button>
+                        {% endif %}
+                    </div>      
+                    <div class="widget-content">
+                        <div class="row-fluid">
+                            <form class="span12 ">
+                                <div class="control-group">
+                                    <label class="control-label"><strong>Recommendation</strong></label>
+                                    <div class="controls">
+                                        <textarea id="recommendation"  {% if treatment.status != 'd' %}readonly="true"{% endif %}  rows="8" style="width:97%;resize:none;border: 1px solid #ddd;">{{treatment.recommendation|default:''}}</textarea>
+                                    </div>
+                                </div>
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="widget" style="padding-bottom:0px;">	
+                    <div class="widget-header">			
+                        <h3>Auditor Comment (Revision {{treatment.revision.revision_num|default:treatment.revision_num}})</h3>
+                    </div>		
+                    <div class="widget-content">
+                        <div class="row-fluid">
+
+
+                            <form class="span12 " method="POST" id="treatmentApproveForm">
+                                {% csrf_token %}
+                                <div class="control-group">
+                                    <label class="control-label"><strong>Auditor Comment (Revision {{treatment.revision.revision_num|default:treatment.revision_num}})</strong></label>
+                                    <div class="controls">
+                                        <textarea name="comment"  readonly="true"  rows="8" style="width:97%;resize:none;border: 1px solid #ddd;">{{treatment.getPharmacistTreatmentAprvDecComment|default:' '}}</textarea>
+                                    </div>
+                                </div>
+
+
+
+
+                            </form>
+
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+        </div>
+        {% endblock %}
+        {% block bottomScripts %}
+        <script>
+            $('.recommendationBtn').click(function(e) {
+                e.preventDefault();
+                var recommendation = $('#recommendation').val();
+                var csrf = $('#csrf').val();
+                if (recommendation === ''){
+                    bootbox.alert('Intake Recommendation is empty!!', function(){
+                        $('#recommendation').focus();
+                    });
+                    return false;
+                }
+                $.ajax({
+                    url: '/admin/save/recommendation/{{treatment.id}}/',
+                    type: 'POST',
+                    data: {recommendation: recommendation, csrfmiddlewaretoken:csrf},
+                })
+                .done(function() {
+                    bootbox.alert('Intake Recommendation saved successfully!!', function(){
+                        window.location.reload();
+                    });
+                })
+                .fail(function() {
+                    bootbox.alert('An error occured while saving, please try again!!');
+                })
+                
+            });
+
+            $('.descriptionBtn').click(function(e) {
+                e.preventDefault();
+                var description = $('#description').val();
+                var csrf = $('#csrf').val();
+                if (description === ''){
+                    bootbox.alert('Description is empty!!', function(){
+                        $('#description').focus();
+                    });
+                    return false;
+                }
+                $.ajax({
+                    url: '/admin/save/description/{{treatment.id}}/',
+                    type: 'POST',
+                    data: {description: description, csrfmiddlewaretoken:csrf},
+                })
+                .done(function() {
+                    bootbox.alert('Description saved successfully!!', function(){
+                        window.location.reload();
+                    });
+                })
+                .fail(function() {
+                    bootbox.alert('An error occured while saving, please try again!!');
+                })
+                
+            });
+        </script>
+        {% endblock %}

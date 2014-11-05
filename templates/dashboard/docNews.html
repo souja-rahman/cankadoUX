@@ -1,0 +1,201 @@
+{% extends "dashboard/docLayout.html" %} 
+{% load i18n %}
+{% load templateUtils %}
+{% block custom_css %}
+<style>
+
+	.cbox{
+		min-height: 50px;
+		margin: 10px;
+		width: 95%;
+		border-radius: 5px;
+		-webkit-box-shadow: 0px 0px 12px 1px rgba(0,0,0,0.1);
+		-moz-box-shadow: 0px 0px 12px 1px rgba(0,0,0,0.1);
+		box-shadow: 0px 0px 12px 1px rgba(0,0,0,0.1);
+		background: rgba(255,255,255,1);
+		background: -moz-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(246,246,246,1) 47%, rgba(237,237,237,1) 100%);
+		background: -webkit-gradient(left top, left bottom, color-stop(0%, rgba(255,255,255,1)), color-stop(47%, rgba(246,246,246,1)), color-stop(100%, rgba(237,237,237,1)));
+		background: -webkit-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(246,246,246,1) 47%, rgba(237,237,237,1) 100%);
+		background: -o-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(246,246,246,1) 47%, rgba(237,237,237,1) 100%);
+		background: -ms-linear-gradient(top, rgba(255,255,255,1) 0%, rgba(246,246,246,1) 47%, rgba(237,237,237,1) 100%);
+		background: linear-gradient(to bottom, rgba(255,255,255,1) 0%, rgba(246,246,246,1) 47%, rgba(237,237,237,1) 100%);
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#ededed', GradientType=0 );
+		border: 1px solid rgba(0,0,0,0.2);
+		cursor: pointer;
+	} 
+	.cbox_clicked{
+		min-height: 50px;
+		margin: 10px;
+		width: 95%;
+		border-radius: 0px;
+		background: rgba(220,220,220,1);
+		cursor: pointer;
+		border: 1px solid rgba(0,0,0,0.2);
+	} 
+	.ibox{
+		min-height: 50px !important; 
+		font-size: 33px;       
+		border-top-left-radius: 0px;
+		border-bottom-left-radius: 0px;
+		text-align: center;
+		padding-top: 18px;
+		background: rgba(147,206,222,1);
+		background: -moz-linear-gradient(top, rgba(147,206,222,1) 0%, rgba(117,189,209,1) 41%, rgba(73,165,191,1) 100%);
+		background: -webkit-gradient(left top, left bottom, color-stop(0%, rgba(147,206,222,1)), color-stop(41%, rgba(117,189,209,1)), color-stop(100%, rgba(73,165,191,1)));
+		background: -webkit-linear-gradient(top, rgba(147,206,222,1) 0%, rgba(117,189,209,1) 41%, rgba(73,165,191,1) 100%);
+		background: -o-linear-gradient(top, rgba(147,206,222,1) 0%, rgba(117,189,209,1) 41%, rgba(73,165,191,1) 100%);
+		background: -ms-linear-gradient(top, rgba(147,206,222,1) 0%, rgba(117,189,209,1) 41%, rgba(73,165,191,1) 100%);
+		background: linear-gradient(to bottom, rgba(147,206,222,1) 0%, rgba(117,189,209,1) 41%, rgba(73,165,191,1) 100%);
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#93cede', endColorstr='#49a5bf', GradientType=0 );
+
+	}
+	.ibox_clicked{
+		min-height: 50px !important;        
+		border-top-left-radius: 0px;
+		border-bottom-left-radius: 0px;
+		text-align: center;
+		padding-top: 18px;
+		background: rgba(147,206,222,1);
+		font-size: 33px; 
+
+	}
+	.icontent{
+		padding-top: 3px;
+
+	}
+	.icontent h5{
+		margin: 0px 0px;
+	}
+	.icontent p{
+		margin: 0 0 3px;
+	}
+	.close{
+		position: relative;
+		right: 3px;
+	}
+	.mrbtn{
+		float: right;
+		font-size: 8px;
+		width: 50px;
+		background: #DDD;
+		text-align: center;
+		border-top-left-radius: 5px;
+		border-top-right-radius: 5px;
+		margin-top: -12px;
+		height: 14px;
+		border: 1px solid #BEBEBE;
+	}
+	.islide{
+		border-top: 1px solid rgba(0,0,0,0.2);
+		display: none;
+		min-height: 50px;
+		-webkit-box-shadow: inset 0px 0px 13px -2px rgba(0,0,0,0.2);
+		-moz-box-shadow: inset 0px 0px 13px -2px rgba(0,0,0,0.2);
+		box-shadow: inset 0px 0px 13px -2px rgba(0,0,0,0.2);
+		background: rgba(237,237,237,1);
+		background: -moz-linear-gradient(top, rgba(237,237,237,1) 0%, rgba(246,246,246,1) 53%, rgba(255,255,255,1) 100%);
+		background: -webkit-gradient(left top, left bottom, color-stop(0%, rgba(237,237,237,1)), color-stop(53%, rgba(246,246,246,1)), color-stop(100%, rgba(255,255,255,1)));
+		background: -webkit-linear-gradient(top, rgba(237,237,237,1) 0%, rgba(246,246,246,1) 53%, rgba(255,255,255,1) 100%);
+		background: -o-linear-gradient(top, rgba(237,237,237,1) 0%, rgba(246,246,246,1) 53%, rgba(255,255,255,1) 100%);
+		background: -ms-linear-gradient(top, rgba(237,237,237,1) 0%, rgba(246,246,246,1) 53%, rgba(255,255,255,1) 100%);
+		background: linear-gradient(to bottom, rgba(237,237,237,1) 0%, rgba(246,246,246,1) 53%, rgba(255,255,255,1) 100%);
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ededed', endColorstr='#ffffff', GradientType=0 );
+	}
+	.islide p{
+		padding: 20px;
+		margin-bottom: 0px;
+	}
+	.islide_clicked{
+		border-top: 1px solid rgba(0,0,0,0.2);
+		display: none;
+		min-height: 50px;
+		background: rgba(237,237,237,1);
+
+	}
+	.islide_clicked p{
+		padding: 20px;
+		margin-bottom: 0px;
+	}
+	.widget-content{
+		min-height: 400px;
+	}
+	.widget{
+		margin-top: 10px;
+	}
+</style>
+{% endblock %}	
+{% block content %}
+<div class="span9">
+	<div class="widget widget-table">
+		<div class="widget-header">
+			<h3><i class="fa fa-users"></i>&nbsp;&nbsp;News</h3>
+		</div>
+		{% if news %}
+		<div class="widget-content">
+			{% for data in news %}
+			<div class="row-fluid cbox {% if user|newsStatus:data %}cbox_clicked{% endif %}">
+				<div class="row-fluid cbox_inner" news="{{data.id}}">
+					<div class="span2 ibox">
+						<i class="icon-syringe" style="margin-left: -22px;"></i>
+					</div>
+					<div class="span9 icontent">
+						<h5>{{data.title}}</h5>
+						<p>{{data.treatment.short_description|default:'*No description available.'}}</p>  
+						<div class="mrbtn">
+							<i class="fa fa-angle-double-down fa-2x "></i>
+						</div>
+					</div>
+				</div>
+				<div class="islide">
+					{% autoescape off %}
+					{% if data.treatment.getPhysicianWiki %}
+					<center><a ttarget="wiki" href="{{data.treatment.getPhysicianWikiUrl}}" class='btn btn-large btn-inverse'>{%blocktrans%}Vorschau{%endblocktrans%}</a></center>
+					{% else %}
+					<p style="color:#0088cc; text-align: center"> * {%blocktrans%}Keine Beschreibung.{%endblocktrans%}</p>
+					{% endif %}
+
+					{% endautoescape %}
+				</div>
+			</div>            
+			{% endfor %}
+		</div>
+		{% else %}
+		<div class="alert alert-info">
+			{%blocktrans%}No News Available!!{%endblocktrans%}
+		</div>
+		{% endif %}
+	</div>
+</div>
+{% endblock %}
+{% block bottomScripts %}
+<script>
+
+	$(".cbox_inner").click(function() {
+		var newsId = $(this).attr('news');
+		$.ajax({
+			url: '/doctor/read/news/',
+			type: 'GET',
+			data: {newsId: newsId},
+		})
+			.done(function(data) {
+				if (data.success) {
+					if (data.count > 0) {
+						$('#newsNotification').html(data.count);
+					}
+					else {
+						$('#newsNotification').hide();
+					}
+				}
+			})
+			.fail(function(data) {
+				console.log(data);
+			})
+
+		$(this).parent().removeClass("cbox").addClass("cbox_clicked");
+		$(".ibox").removeClass("ibox").addClass("ibox_clicked");
+		$(".islide").removeClass("islide").addClass("islide_clicked");
+		$(this).parents(".cbox_clicked").find(".islide_clicked").slideToggle();
+
+	});
+</script>
+{% endblock %}

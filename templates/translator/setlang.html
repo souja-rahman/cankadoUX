@@ -1,0 +1,35 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dummy Set Language</title>
+  <link href="/static/css/bootstrap-3.min.css" rel="stylesheet">
+</head>
+<body>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <small>Dummy View, Can be set to AJAX, Sub-Domain redirects etc</small>
+
+        <br>
+
+        {% get_available_languages as LANGUAGES %}
+        <small>Available languages are {{LANGUAGES}} </small>
+
+         <form action="/translator/set_language/" method="GET">
+          <select name="language">
+            {% for lang in LANGUAGES %}
+              <option value="{{ lang.0 }}">{{ lang.1 }}</option>
+            {% endfor %}
+          </select>
+          <input type="submit" value="Go" />
+        </form>
+
+      </div>
+    </div>
+  </div>
+  
+</body>
+</html>

@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+{% load cms_tags sekizai_tags %}
+{% load templateUtils %}
+<html lang="en">
+
+	<head>
+
+		<meta charset="utf-8">
+		<title> Cankado Wiki : {% page_attribute "page_title" %}</title>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">    
+
+
+		{% render_block "css" %}
+		<!-- CSS files -->
+		<link href="{{ STATIC_URL }}css/bootstrap.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/bootstrap-responsive.min.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/alveolae.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/fa/css/font-awesome.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/conkado/style.css" rel="stylesheet">
+		<!--     <link href="{{ STATIC_URL }}css/jquery-ui.css" rel="stylesheet"> -->
+		<!--     <link href="{{ STATIC_URL }}css/footable.core.min.css" rel="stylesheet"> -->
+		<!--     <link href="{{ STATIC_URL }}css/footable.standalone.min.css" rel="stylesheet"> -->
+		<!--     <link href="{{ STATIC_URL }}css/bootstrap-datetimepicker.min.css" rel="stylesheet"> -->
+		<!--     <link href="{{ STATIC_URL }}css/jquery.mCustomScrollbar.css" rel="stylesheet"> -->
+		<!--     <link href="{{ STATIC_URL }}css/main.css" rel="stylesheet"> -->
+		<link href="{{ STATIC_URL }}css/adlayout.css" rel="stylesheet"> 
+		<link href="{{ STATIC_URL }}css/cmsWikiLayout.css" rel="stylesheet">
+		<!-- favicon -->
+		<link rel="apple-touch-icon-precomposed" sizes="144x144" href="{{ STATIC_URL }}img/apple-touch-icon-144-precomposed.png">
+		<link rel="shortcut icon" href="{{ STATIC_URL }}img/favicon.ico">   
+		<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.min.js"></script>
+		<!-- Javascript files -->
+		<!--[if lt IE 9]>
+		 <script src="{{ STATIC_URL }}/js/html5.js"></script>
+		 <script src="{{ STATIC_URL }}/js/selectivizr.js"></script>
+		 <script src="{{ STATIC_URL }}/js/css3-mediaqueries.js"></script>          
+		 <![endif]-->
+
+		{% block custom_css %}{% endblock %}
+		<style>
+			#main-content
+			{
+				width: 94%;
+				margin-left: 3%;
+				padding-top: 0px !important;
+				margin-bottom: 50px;
+				min-height: 1000px;
+			}
+			#cms_toolbar .cms_toolbar {
+
+				top: -100px !important;
+				display: none;
+			}
+			.navbar-fixed-top
+			{
+				z-index: 10300000;
+			}
+			body
+			{
+				/*background-color: #F0F5FF;*/
+				background-color:#fff; 
+				background-image:none;
+			}
+			.cms_toolbar-item
+			{
+				display: none;
+			}
+			.cms_btn-publish, cms_btn-publish-active, cms_publish-page
+			{
+				display: none !important;
+			}
+			.cms_toolbar-item-cms-mode-switcher
+			{
+				display: block
+			}
+			#cms_toolbar .cms_toolbar{
+				position: relative;
+			}
+			#cms_toolbar .cms_toolbar-trigger{
+				display: none;
+			}
+			.cms_toolbar-right
+			{
+				position: relative;
+				top: 158px;
+			}
+			.cms_structure-dimmer
+			{
+				top:-5000px !important;
+			}
+
+
+
+
+
+
+
+			th.confluenceTh.sortableHeader, th, thead, th p {
+				background: #ddd;
+				font-weight: bold;
+			}
+
+			table{
+				border: 1px solid #A2A2A2;
+			}
+			table tbody tr
+			{
+				background:#fff;
+			}
+
+			table tr
+			{
+				border-bottom: 1px solid #CCC6C6;
+			}
+
+			td,th{
+				border-left: 1px solid #A5A5A5;
+
+			}
+
+
+		</style>
+		<style>
+			.scrollToTop {
+				width: 40px;
+				height: 40px;
+				padding: 10px;
+				text-align: center;
+				font-weight: bold;
+				color: #444;
+				text-decoration: none;
+				position: fixed;
+				bottom: 30px;
+				right: 20px;
+				display: none;
+			}
+		</style>
+	</head>
+
+
+	<body>
+		{% load url from future %}
+		<!-- Navbar --> 
+
+		<div id="wrap">
+			<div class="navbar *navbar-fixed-top" id="kadoNavbar" style="display: none">
+				<div class="navbar-inner">
+					<div class="container">
+						<a class="brand" href="/"><img src="{{ STATIC_URL }}img/logo.png" style="height:21px;margin-left: 25px"> Can<strong>Kado</strong> - Wiki</a>
+						<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</a>
+
+						<div class="nav-collapse collapse">
+							<div id="WikiContron"></div>
+							<ul class="nav pull-right">
+								<li class="dropdown">
+									<a href="#" > <i class="fa fa-user"></i> {{ user.username }}</a>
+								</li>
+
+								<li><a href="{% url 'django.contrib.auth.views.logout_then_login' %}"><i class="fa fa-sign-out"></i>&nbsp;&nbsp;Logout</a></li>
+
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+			{% cms_toolbar %}
+			<!-- /Navbar -->
+			<!-- Main content -->
+			<div id="main-content">
+
+				<!-- Container -->
+				<div id="breadcrumbsWIKI" style="display: none">
+
+					{% getBreadCrumb request %}
+					<hr>
+				</div>
+				<div id="toc">
+					<strong>Inhaltsverzeichnis</strong>
+					<ul  data-toc="#main-content"></ul>
+					<hr>
+				</div>
+				{% placeholder base_content %}
+				{% block base_content %}{% endblock %}
+				{% render_block "js" %}
+
+
+			</div><!-- wrap end -->
+
+			<!-- Footer -->
+			<div id="footer" style="padding-top:6px; display: none">
+				<p class="pull-right"  style="margin-right:100px;">Cankado &copy; 2014</p>
+			</div>
+			<a href="#" class="scrollToTop"><i class="fa fa-chevron-circle-up fa-3x" ></i></a>
+			<!-- /Footer -->
+			<script src="{{ STATIC_URL }}js/jquery-ui.js"></script>
+			<script src="{{ STATIC_URL }}js/bootstrap.js"></script> 
+
+			<script src="{{ STATIC_URL }}js/bootbox.min.js"></script>
+			<script src="{{ STATIC_URL }}js/jquery.toc/jquery.toc.js"></script>
+			<script>
+function inIframe() {
+	try {
+		return window.self !== window.top;
+	} catch (e) {
+		return true;
+	}
+}
+if (!inIframe())
+{
+	$('#kadoNavbar,#breadcrumbsWIKI,#footer').show();
+}
+function tocShowHide()
+{
+	p = $('a[href="?build"]')[0]
+	if ($(p).hasClass('cms_btn-active'))
+	{
+		$("#toc").hide();
+	}
+	else
+	{
+		$("#toc").show();
+	}
+}
+tocShowHide();
+
+
+
+
+
+
+setInterval(
+	function()
+	{
+		tocShowHide();
+	}, 800);
+$(document).ready(function() {
+
+	//Check to see if the window is top if not then display button
+	$(window).scroll(function() {
+		if ($(this).scrollTop() > 100) {
+			$('.scrollToTop').fadeIn();
+		} else {
+			$('.scrollToTop').fadeOut();
+		}
+	});
+
+	//Click event to scroll to top
+	$('.scrollToTop').click(function() {
+		$('html, body').animate({scrollTop: 0}, 800);
+		return false;
+	});
+
+
+	setTimeout(function() {
+
+		$("#toc a").click(function() {
+//			alert('asdasd');
+			var onwardId = $(this).attr("href");
+			$("html, body").animate({
+				scrollTop: $(onwardId).offset().top
+			}, "slow");
+			return false;
+		});
+
+	}, 2000);
+
+});
+$('img').prop('src', function() {
+	return this.src.replace(/^.*\/\/[^\/]+/, '');
+})
+			</script>
+			{% block bottomScripts %}{% endblock %}
+
+	</body>
+</html>
+
+
+

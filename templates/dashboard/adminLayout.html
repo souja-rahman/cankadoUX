@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title> Cankado Admin Dashboard</title>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">    
+
+		<!-- CSS files -->
+		<link href="{{ STATIC_URL }}css/bootstrap.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/bootstrap-responsive.min.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/alveolae.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/fa/css/font-awesome.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/conkado/style.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/jquery-ui.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/footable.core.min.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/footable.standalone.min.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/jquery.mCustomScrollbar.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/main.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/adlayout.css" rel="stylesheet">
+		<!-- favicon -->
+		<link rel="apple-touch-icon-precomposed" sizes="144x144" href="{{ STATIC_URL }}img/apple-touch-icon-144-precomposed.png">
+		<link rel="shortcut icon" href="{{ STATIC_URL }}img/favicon.ico">   
+		<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.min.js"></script>
+		<link href="{{ STATIC_URL }}css/admin.css" rel="stylesheet" type="text/css"/>
+		<style>
+			
+			
+		</style>
+		<!-- Javascript files -->
+		<!--[if lt IE 9]>
+		 <script src="{{ STATIC_URL }}/js/html5.js"></script>
+		 <script src="{{ STATIC_URL }}/js/selectivizr.js"></script>
+		 <script src="{{ STATIC_URL }}/js/css3-mediaqueries.js"></script>          
+		 <![endif]-->
+
+	</head>
+
+	<body>
+		{% load url from future %}
+		<div id="wrap"> 	
+			<!-- Navbar -->
+			<div class="navbar navbar-fixed-top">
+				<div class="navbar-inner">
+					<div class="container">
+						<a class="brand" href="/admin/treatment/list/"><img src="{{ STATIC_URL }}img/logo.png" style="height:21px; margin-left: 25px">Can<strong>Kado</strong></a>
+						<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</a>
+
+						<div class="nav-collapse collapse">
+							<ul class="nav pull-right">
+								<li class="dropdown">
+									<a href="#" ><i class="fa fa-user"></i> {{ user.username }}</a>
+								</li>
+								<li class="divider-vertical"></li>
+								<li><a href="{% url 'django.contrib.auth.views.logout_then_login' %}"><i class="fa fa-sign-out"></i>&nbsp;&nbsp;Logout</a></li>
+								<li class="divider-vertical"></li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- /Navbar -->
+			<!-- Main content -->
+			<div id="main-content">
+				<!-- Container -->
+				<div class="container" >
+					<!-- Sidebar -->
+					<div class="row">
+						<div class="span3">
+							<ul id="sidebar" class="nav nav-tabs nav-stacked">
+
+
+
+								<li id="Tlist"><a href="{% url 'adminTreatList' %}"><i class="fa fa-list-ul"></i>&nbsp;&nbsp;<strong>Treatments</strong></a></li>
+								<li id="Tassign"><a href="{% url 'adminAddEditTreatment' %}" class="lchild"><i class="fa fa-level-up fa-rotate-90"></i> <i class="fa fa-plus-circle"></i>&nbsp;&nbsp;Add New Treatment</a></li>  
+								<li id="TArchive"><a href="{% url 'admintreatmentarchive' %}" class="lchild"><i class="fa fa-level-up fa-rotate-90"></i> <i class="fa fa-lock"></i>&nbsp;&nbsp;Archived Treatment Revisions</a></li>
+								<li id="drugList"><a href="{% url 'admindruglist' %}" class="lchild"><i class="fa fa-level-up fa-rotate-90"></i> <i class="icon-pill"></i>&nbsp;&nbsp;Drug List</a></li>      
+								<li id="drugUnit"><a href="{% url 'adminDrugUnits' %}" class="lchild"><i class="fa fa-level-up fa-rotate-90"></i> <i class="icon-pill"></i>&nbsp;&nbsp;Drug Unit</a></li> 
+
+								<li id="reminderGrade"><a href="{% url 'adminReminderGrade' %}"></i> <i class="icon-edit"></i>&nbsp;&nbsp;Reminder Messages</a></li> 
+								<!--<li><a href="/admin/sideeffects/sideeffect/"><i class="fa fa-stethoscope"></i>&nbsp;&nbsp;Sideeffect</a></li>-->
+								<!--<li ><a href="/admin/sideeffects/sideeffecttype/" class="lchild"><i class="fa fa-level-up fa-rotate-90"></i> <i class="fa fa-stethoscope"></i>&nbsp;&nbsp;Sideeffect Grades</a></li>-->
+								<!--<li id="Seffect"><a href="/admin/sideeffect/wiki/" class="lchild"><i class="fa fa-level-up fa-rotate-90"></i> <i class="fa fa-globe"></i>&nbsp;&nbsp;Sideeffect Wiki</a></li>-->
+								<li id="Seupload"><a href="{% url 'adminCTCAE' %}"></i> <i class="fa fa-stethoscope"></i>&nbsp;&nbsp;<strong>Side Effects (CTCAE)</strong></a></li>
+								<li id="userlist" ><a href="{% url 'adminuserlist' %}"><i class="fa fa-users"></i>&nbsp;&nbsp;<strong>Users</strong></a></li>                                
+								<li id="addusers"><a href="{% url 'adminadduser' %}" class="lchild"><i class="fa fa-level-up fa-rotate-90"></i> <i class="fa fa-plus-circle"></i>&nbsp;&nbsp;Add User</a></li>
+								<!--<li id='newuser'><a href="/adminuserlist/" class="lchild"><i class="fa fa-level-up fa-rotate-90"></i> <i class="fa fa-user"></i>&nbsp;&nbsp;Userlist</a></li>-->
+
+								<li><a href="/admin/quest/quest/"><i class="fa fa-bullseye"></i>&nbsp;&nbsp;<strong>Kado Management</strong></a></li>
+
+								<li><a href="/admin"><i class="fa fa-dashboard"></i>&nbsp;&nbsp;<strong>Django Admin</strong></a></li>
+
+								<li><a href="{% url 'django.contrib.auth.views.logout_then_login' %}"><i class="fa fa-sign-out"></i>&nbsp;&nbsp;Logout</a></li>
+							</ul>
+						</div>
+						<!-- /Sidebar -->
+
+
+						<!-- Content -->
+						{% block content %}{% endblock %}
+						<!-- /Content -->
+					</div>
+				</div>
+				<!-- /Container -->
+			</div>
+			<div style="display:none;">
+				<input type="hidden" value="{% block page_id %}{% endblock %}" id="hiddenPageId">
+			</div>
+			<!-- /Main content -->
+			<div id="push">
+			</div>
+		</div><!-- wrap end -->
+		<!-- Footer -->
+		<div id="footer" style="padding-top:6px;">
+			<p class="pull-right"  style="margin-right:100px;">Cankado &copy; 2014</p>
+		</div>
+		<!-- Javascript files -->
+		<script src="{{ STATIC_URL }}js/bootstrap.js"></script>
+		<script src="{{ STATIC_URL }}js/bootbox.min.js"></script>
+		<script src="{{ STATIC_URL }}js/jquery.mCustomScrollbar.concat.min.js"></script>
+		<script>
+(function($) {
+	$(document).ready(function() {
+		$(".vscroll,.v1scroll").mCustomScrollbar({
+			theme: "dark-thick",
+			advanced: {
+				updateOnContentResize: true
+			}
+		});
+	});
+})(jQuery);
+$(document).ready(function() {
+	var currentPage = $("#hiddenPageId").val();
+	$("#" + currentPage).addClass('active');
+});
+		</script>
+		<script>
+			$('.pagination li.disabled').each(function(index, val) {
+				$(this).find('a').removeAttr('href');
+				/* iterate through array or object */
+			});
+		</script>
+		<script>
+			function goToByScroll(location) {
+				$('html,body,div').animate({scrollTop: $(location).offset().top - 50}, 'slow');
+			}
+		</script>
+		{% block bottomScripts %}{% endblock %}
+	</body>
+</html>        

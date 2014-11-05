@@ -1,0 +1,150 @@
+{% extends "dashboard/patLayout.html" %} 
+{% block page_id %}statistics{% endblock %}
+{% load templateUtils %}
+{% load poll_extras %}
+{% load i18n %}
+{% block content %}
+<link href="{{ STATIC_URL }}js/jqplot/jquery.jqplot.min.css" rel="stylesheet" type="text/css" media="screen" />
+<link href="{{ STATIC_URL }}chart/css/daterangepicker.css" rel="stylesheet">
+<style>
+	.table-bordered th, .table-bordered td {
+		border-left: 1px solid #ddd !important;
+	}
+	td img{
+		height: 60px;
+		float: left;
+		clear: both;
+		margin-right: 3px;
+	}
+	.wiki img{
+		height:auto !important;
+	}
+	.barspan
+	{
+		background: #fff;
+		box-sizing: border-box;
+		padding: 10px;
+		padding-bottom: 12px;
+		padding-top: 12px;
+
+	}
+
+	.progress.progress-info .bar{
+		/*width: 55.71%;*/
+		background-color: #7CB4EB;
+		background-image: linear-gradient(to bottom, #7CB4EB, #7CB4EB);
+		box-shadow: 0 0 0 #fff;
+	}
+</style>
+
+<input type="hidden" id="patient" value="{{user.id}}">
+<input type="hidden" id="preloader" value="<img src='{{ STATIC_URL }}img/preloader.gif' style='height:32px;width:32px;'>">
+<!-- Content -->
+<div class="span9">
+	<h1 class="page-title"><i class="icon-syringe"></i>&nbsp;&nbsp; {%blocktrans%}Persönliche Statistik{%endblocktrans%}</h1>
+	{% if treatList %}
+	<!-- Table - 4 columns -->
+
+
+	<div class="widget ">
+		<div class="widget-header">
+			<h3>{%blocktrans%}Persönliche Statistik{%endblocktrans%}</h3>
+		</div>
+		<div class="widget-content">
+			<div class="row-fluid">
+				<div class="span12">
+					<div id="patDocGraph" class="gContainer" style="min-width: 310px; height: 400px; margin: 0 auto">
+						<img class="gLoading" src="{{ STATIC_URL }}img/bar.gif">
+					</div>
+				</div>	
+			</div>
+
+			<hr>
+			<div class="row-fluid">
+
+				<div class="span12 barspan">
+					<span class="graphTitle" style="text-align: left;">{%blocktrans%}Einnahmezeitpunkt (mittlerer Abstand zwischen vorgegebener und tatsächlicher Einnahme){%endblocktrans%}</span>
+					{% for data in data %}
+					<div class="row-fluid">
+						<div class="span5 inTGLbl">
+							{{data.1}}	
+						</div>
+						<div class="span5"> 
+							<div class="progress progress-info">
+								<div class="bar" style="width: {{data.0.0}}%"></div>
+							</div>
+						</div>
+						<div class="span2"> {{data.0.1}}</div>
+					</div>
+
+					{% endfor %}
+				</div>
+			</div>
+			<hr>
+			<div class="row-fluid">
+				<div class="span12">
+					<div id="patIntakeQtyMean" style="height:200px;"></div>
+				</div>	
+			</div>
+			<hr>
+			<div class="row-fluid">
+				<div class="span12">
+					<div id="patIntakeTimeDiff" style="height:200px;"></div>
+				</div>	
+			</div>
+		</div>
+	</div>
+	{% else %}
+	<div class="widget ">
+		<div class="widget-header">
+			<h3>{%blocktrans%}Persönliche Statistik{%endblocktrans%}</h3>
+		</div>
+		<div class="widget-content">
+			<div class="alert alert-info">
+				{%blocktrans%}Es wurde keine Behandlung gewählt.{%endblocktrans%}
+			</div>
+		</div>
+	</div>
+
+	{% endif %}
+
+</div>
+
+<!-- /Content -->
+{% endblock %}
+
+{% block bottomScripts %}
+<!-- Javascript files -->
+<script type="text/javascript" src="{{ STATIC_URL }}js/jqplot/jquery.jqplot.min.js" type="text/javascript"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jqplot/jqplot.barRenderer.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jqplot/jqplot.categoryAxisRenderer.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jqplot/jqplot.pointLabels.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jqplot/jqplot.highlighter.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jqplot/jqplot.cursor.min.js"></script>
+
+<script src="{{ STATIC_URL }}js/FooTable-2/js/footable.js"></script>
+<script src="{{ STATIC_URL }}js/FooTable-2/js/footable.sort.js" type="text/javascript"></script>
+<script src="{{ STATIC_URL }}js/FooTable-2/js/footable.paginate.js"></script>
+
+<script type="text/javascript">
+$(function() {
+	$('.footable').footable();
+	$('.footable').data('page-size', 12);
+	$('.footable').trigger('footable_initialized');
+})
+</script>
+
+<script src="{{ STATIC_URL }}highChart/js/highcharts.js" type="text/javascript"></script>
+<script src="{{ STATIC_URL }}highChart/js/modules/data.js"></script>
+<script src="{{ STATIC_URL }}highChart/js/modules/exporting.js" type="text/javascript"></script>
+
+<!-- The daterange picker bootstrap plugin -->
+<script src="{{ STATIC_URL }}chart/js/sugar.min.js"></script>
+<!--<script src="{{ STATIC_URL }}chart/js/daterangepicker.js"></script>-->
+
+<!-- Our main script file -->
+<!--<script src="{{ STATIC_URL }}chart/js/script.js"></script>-->
+
+<script src="{{ STATIC_URL }}js/custom_graph.js"></script>
+{% endblock %}
+

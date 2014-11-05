@@ -1,0 +1,64 @@
+{% extends "dashboard/patLayout.html" %}
+{% block page_id %}diary{% endblock %}
+{% load templateUtils %}
+{% load poll_extras %}
+{% load i18n %}
+{% block content %}
+<div class="span9"> <!-- The whole content comes here -->
+	<!-- ========================== Page Title ========================================== -->
+	<h1 class="page-title"><i class="fa fa-book"></i>&nbsp;&nbsp;{%blocktrans%}Tagebuch{%endblocktrans%}</h1>
+	<div class="widget ">
+		<!--		<div class="widget-header">
+					<h3>Meine Therapie</h3>
+				</div>-->
+		<div class="widget-content">
+			{% if diaries %}
+			<section id="cd-timeline" class="cd-container">
+				{% for diary in diaries %}
+				{% if diary.diary %}
+				<div class="cd-timeline-block">
+					<div class="cd-timeline-img {{ diary.drug|yesno:"cdIntak,cdSE" }}">
+						<i class="fa fa-stethoscope"></i>
+						<i class="icon-pill"></i>
+					</div> <!-- cd-timeline-img -->
+
+					<div class="cd-timeline-content">
+						<h2>{{ diary.drug|yesno:"Einnahme,Nebenwirkungen" }}</h2>
+						<div class="diaryEvent">
+							{% if diary.drug %}
+							<p class="diaryEventDetail"> {%blocktrans%}Medikament{%endblocktrans%} : <strong>{{user|getMedicineName:diary.drug.drugTaken.drugname}}</strong></p>
+							<p class="diaryEventDetail"> {%blocktrans%}Vorgeschriebenen Zeit{%endblocktrans%} : <strong>{% if diary.drug.drugTaken.drugTime != '0' %}{{diary.drug.drugTaken.drugTime|getDrugTimeStatus:user_language}}{% else %}{{diary.drug.prescribedTime|date:"H:i d.m.Y"}}{% endif %}</strong></p>
+							<p class="diaryEventDetail"> {%blocktrans%}Genommen Zeit{%endblocktrans%} : <strong>{{diary.drug.takenTime|date:"H:i d.m.Y"}}</strong></p>
+							<!--<p> genommen Zeit : <strong>{{diary.drug.takenTime|date:"H:i d.m.Y"}}</strong></p>-->
+
+							{% endif %}
+							{% if diary.sideeffect %}
+
+							{% for se in diary.sideeffect.all %}
+							{% if forloop.counter == 1 %}
+							<p> {%blocktrans%}Datum{%endblocktrans%} : <strong>{{se.sideeffectsDate|date:"d.m.Y"}}</strong></p>
+							{% endif %}
+							{% if se.sideeffecttype %}
+							<p class="diaryEventDetail">{{se.sideEffect.sideeffect.pat_term}} : <strong>{{se.sideeffecttype.sideeffecttype|default:"Keine"}}</strong></p>
+							{% endif %}
+							{% endfor %}
+
+							{% endif %}
+						</div>
+						<p class="diaryText"><i class="fa fa-quote-right"></i>{{diary.diary}}</p>
+						<span class="cd-date">{{diary.date|date:"H:i d.m.Y"}}</span>
+					</div> <!-- cd-timeline-content -->
+				</div> <!-- cd-timeline-block -->
+				{% endif %}
+				{% endfor %}
+			</section> 
+			{% else %}
+			<div class="alert alert-info">
+				{%blocktrans%}keine Tagebucheinträge{%endblocktrans%}
+			</div>
+			{% endif %}
+		</div>
+	</div>
+</div>
+
+{% endblock %}

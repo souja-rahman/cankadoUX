@@ -1,0 +1,141 @@
+{% extends "dashboard/patLayout.html" %} 
+
+{% block content %}
+
+
+<link href="{{ STATIC_URL }}css/patmytask.css" rel="stylesheet">
+
+
+<!-- Content -->
+<div class="span9">
+    <h1 class="page-title">My Treatments</h1>
+
+    <!-- Table - 4 columns -->
+    <div class="widget widget-table">
+
+        <div class="widget-content" style="padding:15px;background-color:#E5E5E5;">
+              <!-- ================================ medicine Quest Started================================ -->
+            <div class="box1 AEQ quest-row" time="" kados="" >  <!-- box 1 start-->                               
+                <div class="row-fluid">     <!-- row1  start : includes left,middle & right quest sections-->
+                    <!-- ================================ left quest section started================================ -->
+                    <div class="span3 leftbox" >
+                        <i class="icon-pill" style="font-size:50px; margin-left: -33px;"></i>
+                        <p style="text-transform:uppercase; "><br>
+                            <span style="color:#327DB7;text-transform:none;">Einnahme Erinnerung <br></span>
+                            <br>
+                         </p>
+                    </div>
+                    <!-- ================================ left quest section end================================ -->
+
+                    <!-- ================================ middle quest section started================================ -->
+                    <div class="span6" style="text-align:left; padding-top:17px; padding-left: 10px;padding-right: 10px;">
+                        <div class="qcontent vscroll">
+                            <div class="row-fluid ">
+                                <div class="span12">
+                                    <span style="font-weight: bold">&nbsp;<strong style="font-size:30px;"></strong><span style="margin-left: 20px">Menge : <span style="font-weight: bold"></span></span></span>
+                                </div>    
+                            </div>
+                            <input type="hidden"  class="pQty" value="">
+                            <input type="hidden"  class="TakenTime" value="{{times}}">
+                            <input type="hidden"  class="TakenQty" value="">
+                            <div class="row-fluid">
+                                <div class="span12">
+                                    <span class="span5">Datum :</span>
+                                    <div class="span7 datetimepicker2 input-prepend input-append" style="">
+
+                                        <input   class="keep_open date customTime span10" value="" data-format="dd.MM.yyyy" type="text">
+                                        <span class="add-on">
+                                            <i data-time-icon="fa fa-clock-o" data-date-icon="fa fa-calendar"></i>
+                                        </span>
+                                    </div>
+
+                                    <div class="time-range">
+                                        <span class="span5">Zeit : <span class="slider-time"></span></span><div class="span7 sliders_step1"><div style="" class="slider-Trange"></div></div>
+                                    </div>
+
+                                </div>    
+                            </div>
+                            <div class="row-fluid">
+                                <div class="span12 form-horizontal">
+                                    <div class="control-group">
+                                        <div class="time-range">
+                                            <span class="span5">Menge : <span class="slider-Qty"> </span> </span><div class="span7 sliders_step1"><div class="slider-Qrange"></div></div>
+                                        </div>
+                                    </div>
+                                </div>    
+                            </div>
+                        </div>
+                        <div class="span5">
+                            <button class="btn btn-block btn-info btn-small manualTime questOKbtn" ptime="" medicine="" alertId="">Ok</button>
+                        </div>
+                    </div>
+                    <!-- ================================ middle quest section end================================ -->
+
+                    <!-- ================================ right quest section start ================================ -->
+                    <div class="span3 rightbox">
+                        <input  value="" type="text" class="dial"  data-width="100" data-height="100" data-thickness=".2" data-fgColor="#389BE8" data-readOnly="true"  data-min="0" data-max="">
+                     <span class="crtbtn">
+                         <a>
+                                <i class="fa fa-angle-double-right aricon fa-rotate-90"></i>
+                            </a>
+                         <span class="crtbtn_inner">
+                            <a>
+                                <i class="fa fa-angle-double-right fa-2x "></i>
+                            </a>
+                         </span>
+                        </span> 
+                    </div>
+                    <!-- ================================ right quest section end================================ -->
+
+                    <!-- ================================ sliding  section start ================================ -->
+                   <div class="slider">
+                        <div class="tabbable tabs-left "> 
+                            <ul class="nav nav-tabs span3">
+                                <li class="active"><a href=".tab1" data-toggle="tab">Drug Info</a></li>
+                            </ul>
+                            <div class="tab-content">
+                                <div class="tab-pane active vscroll tab1" >
+                                    <img src="{{ STATIC_URL }}img/drug.png" alt="">
+                                    <p><strong></strong><br>
+                                        Date: <br>
+                                        Time:<br>
+                                        Quantity:
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- ================================ sliding  section end ================================ -->
+                </div> <!-- row1 end-->
+            </div><!-- box end-->
+            <!-- ================================ medicine Quest end================================ -->
+           
+          
+           
+        </div> 
+    </div>
+</div>
+    <!-- /Content -->
+    {% endblock %}
+
+
+{% block bottomScripts %}
+<!-- Javascript files -->
+<script src="{{ STATIC_URL }}js/footable.js"></script>
+<script type="text/javascript">
+$(function() {
+    $('table').footable();
+});
+
+</script>
+<script>
+    $("tr").click(function() {
+        if ($(this).hasClass("selected")) {
+            $(this).removeClass("selected");
+        } else {
+            $(this).addClass("selected");
+        }
+    });
+</script>    
+{% endblock %}
+

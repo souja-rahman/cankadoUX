@@ -1,0 +1,179 @@
+
+{% load i18n %}
+{% load templateUtils %}
+{% load poll_extras %}
+{% load url from future %}
+<style>
+	.terapyclone{
+		display: none;
+	}
+	.Tselected{
+		background-color: #6683AD;
+		color: #FFF;
+		font-weight: bold
+	}
+	.Tselected:hover,.Tselected td:hover
+	{
+		background-color: #426CA8;
+	}
+	.theader{
+		background: #F7F7F7;
+	}
+
+	.tcontain{
+		margin-bottom: 10px;
+		height: 170px;
+		overflow: hidden;
+
+	}
+	.tinner{
+		max-height: 160px;
+		overflow-y: auto;
+		display: block;
+		overflow-x: hidden;
+		-moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;
+	}
+	.tinner td, .tinner tr{
+		display: block;
+		width: 100%;
+	}
+	.tinner tr
+	{
+		cursor: pointer
+	}
+	.tinner td{
+		padding-left: 10px !important;
+	}
+
+
+	.Titem td{
+		padding: 4px !important;
+	}
+	.tips
+	{
+		margin-bottom:-2px; 
+	}
+
+
+</style>
+<div id="myModal" data-backdrop="static" data-keyboard="false" class="modal hide fade"  tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="width:800px;margin-left:-400px;margin-top: -280px; ">
+	<div class="modal-header">
+		<button type="button" class="close btn-asignTreament-close" data-dismiss="modal" aria-hidden="true">×</button>
+		<h3 id="myModalLabel">{%blocktrans%}Drug Unit{%endblocktrans%}</h3>
+	</div>
+	<div class="modal-body" style="max-height:433px;">
+
+
+		<div class="widget-content">
+			<div class="row-fluid">
+
+				<table class="footable">
+
+					<thead>
+						<tr>
+							<th data-sort-ignore="true">Singular</th>
+							<th data-sort-ignore="true">Plural</th>
+							<th data-sort-ignore="true">Action</th>
+						</tr>
+					</thead>
+
+					{% get_available_languages as LANGUAGES %}
+					{% for lang in LANGUAGES %}
+					<form  method="POST" class="drugUnits_en_Translation"> 
+						{% csrf_token %}
+						<tr>
+							<td colspan="3" >{{ lang.1 }}</td>
+						</tr>
+
+
+						<tr>
+
+
+							<td style="background:#FFF;"><input required="true" class="input-block-level input-data" id="en_singular{{ lang.0 }}" name="en_Singular"></td>
+							<td style="background:#FFF;"><input required="true" class="input-block-level input-data" id="en_plural{{ lang.0 }}" name="en_Plural"></td>
+
+							<td style="background:#FFF;"> 
+								<button class="btn btn-info btn-mini submitBtn" type="submit"  >Save</button>
+								<button class="btn btn-danger btn-mini unitReset" type="reset"  >Cancel</button>
+							</td>
+						<div hidden>
+							<input class="input-block-level drug_unit_id" name="drug_unit_id">
+							<input class="input-block-level " value="{{ lang.0 }}" name="language">
+							<input class="input-block-level " id="translationid{{ lang.0 }}" name="dtid">
+						</div>
+
+
+						</tr>
+					</form>
+					{% endfor %}
+
+				</table>
+
+
+
+			</div>
+		</div>
+
+	</div>
+	<div class="modal-footer">
+
+		<button class="btn  btn-small" data-dismiss="modal" id="drug_unit_model_close" >{%blocktrans%}Close{%endblocktrans%}</button>
+
+	</div>
+</div> 
+<!--===============================model ends=======================-->
+<script type="text/javascript">
+
+	$('.language').click(function() {
+		var thisBtn = $(this);
+		id = thisBtn.attr('unitId')
+		var Singular = thisBtn.parents('.UnitList').find('.tdSingle').text();
+		var Plural = thisBtn.parents('.UnitList').find('.tdPlural').text();
+		$.post('/admin/treatment/drugUnits/languages/', {id: id, csrfmiddlewaretoken: document.getElementsByName("csrfmiddlewaretoken")[0].value})
+			.done(function(data) {
+				if (data.message)
+				{
+					var jo = $.parseJSON(data.message);
+					for (var key in jo) {
+
+						$('#en_singular' + jo[key].fields.language).val(jo[key].fields.unit_single);
+						$('#en_plural' + jo[key].fields.language).val(jo[key].fields.unit_plural);
+						$('#translationid' + jo[key].fields.language).val(jo[key].pk);
+					}
+				}
+				else
+				{
+					$('#en_singularde').val(Singular);
+					$('#en_pluralde').val(Plural);
+				}
+
+			});
+
+		$('.drug_unit_id').val(id);
+	});
+
+	$('#drug_unit_model_close').click(function() {
+		$('.input-data').val("");
+	})
+
+	$('.drugUnits_en_Translation').submit(function(e) {
+		e.preventDefault();
+		$.post('/admin/treatment/drugUnits/translation/add/', $(this).serialize())
+			.done(function(data) {
+				if (data.status)
+				{
+					$('#translationid' + data.lang).val(data.id);
+					bootbox.alert('Saved')
+				}
+				else {
+					btn.removeAttr('disabled');
+					bootbox.alert('Failed to add new unit.')
+				}
+
+			});
+
+
+	});
+
+
+</script>

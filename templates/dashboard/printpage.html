@@ -1,0 +1,94 @@
+{% load i18n %}
+{% language user_language %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title> {%blocktrans%}Cankado Dashboard{%endblocktrans%}</title>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <meta name="apple-mobile-web-app-capable" content="yes">    
+
+        <!-- CSS files -->
+
+        <link href="{{ STATIC_URL }}css/bootstrap.min.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}css/bootstrap-responsive.min.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}css/alveolae.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}css/fa/css/font-awesome.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}css/conkado/style.css" rel="stylesheet">
+         <link href="{{ STATIC_URL }}css/main.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}css/printpage.css" rel="stylesheet">
+  		
+        <!-- Google font -->
+     
+
+        <!--[if lt IE 9]>
+      <script src="{{ STATIC_URL }}js/html5.js"></script>
+    <![endif]-->	
+      
+    </head>
+
+    <body style="background: #FFF">
+        <div id="wrap" style="padding: 10px"> 
+            <div class="row">
+		    <h4> <img height="48" style="max-height: 50px; margin-right: 10px;"  alt="logo" class="pull-left" src="{{ STATIC_URL }}img/logo.png"> {%blocktrans%}CANKADO eHealth-Support zur Steigerung der Therapieadhärenz in der Onkologie{%endblocktrans%}</h3>
+
+                <center>{%blocktrans%}Persönlicher Ausdruck für{%endblocktrans%} {{patient.userprofile.first_name}} {{patient.userprofile.last_name}} <br>{%blocktrans%}Druckdatum{%endblocktrans%}  {{date}}</center>
+            </div>
+            <div class="row">
+                <p>{%blocktrans%}Herzlich willkommen  bei CANKADO!{%endblocktrans%}</p>
+
+                <p align="justify">{%blocktrans%}Ihr behandelnder Arzt hat für Sie einen Zugang in CANKADO angelegt. CANKADO ist ein gemeinnütziger  Internetdienst zur Verbesserung der Patientenversorgung in der onkologischen Langzeittherapie und befindet sich derzeit noch im Forschungsstadium.{%endblocktrans%}</p> 
+
+                <p align="justify">{%blocktrans%}Aufbauend auf modernster Technologie und neusten wissenschaftlichen Erkenntnissen   stellt CANKADO einen innovativen Dienst da, der das normale Betreuungsangebot in der Interaktion     zwischen Ärzten, Patienten und Pflegepersonal erweitern soll.{%endblocktrans%}</p>
+
+                <strong><u>{%blocktrans%}Wie kann ich CANKADO nutzen?{%endblocktrans%}</u></strong>
+                <p align="justify">{%blocktrans%}Mit diesem Ausdruck erhalten Sie die Zugangsdaten zu Ihrem persönlichen Bereich in CANKADO. Hier werden Sie an die Therapieeinnahmen erinnert und können selber die Therapieeinnahme und auch mögliche auftretende Nebenwirkungen dokumentieren.{%endblocktrans%}</p>  
+
+                <p align="justify">{%blocktrans%}CANKADO ist ein Internetdienst. Sie benötigen daher einen internetfähigen Computer oder ein anderes internetfähiges Endgerät, wie z.B. ein Tablet oder ein Smartphone. Öffnen Sie an Ihrem Computer einen Internet-Browser und öffnen Sie folgende Internetseite{%endblocktrans%}</p> 
+
+        
+                <p>https://cankado.info</p>
+
+                <strong><u>{%blocktrans%}Wie lauten  meine Zugangsdaten?{%endblocktrans%}</u></strong> 
+                <p align="justify">{%blocktrans%}Sie werden direkt beim Start nach Benutzername und Passwort gefragt. Ihre persönlichen Zugangsdaten lauten{%endblocktrans%}</p> <br>
+
+                <strong>{%blocktrans%}Benutzername{%endblocktrans%}: {{patient.username}}</strong> <br>
+                <strong>{%blocktrans%}Passwort{%endblocktrans%}: {{patient.userprofile.plain_password}}</strong> <br><br>
+
+                <p align="justify">{%blocktrans%}Direkt nach dem ersten Aktivieren werden Sie aufgefordert Ihr Passwort zu ändern. Bitte notieren Sie sich dieses Passwort gut.{%endblocktrans%}</p>
+
+                <strong><u>{%blocktrans%}Erklärung zur Einwilligung{%endblocktrans%}:</u></strong> 
+                <p align="justify">{%blocktrans%}Es ist ihnen freigestellt, ob Sie CANKADO zur Unterstützung Ihrer persönlichen Betreuung verwenden wollen. CANKADO stellt ein zusätzliches und kostenfreies Angebot dar. Die normale Betreuung durch Ihren Arzt bleibt durch CANKADO vollkommen unberührt, auch wenn Sie sich nicht für die Nutzung von CANKADO entscheiden.{%endblocktrans%}</p>
+
+                <strong><u>{%blocktrans%}Datenschutz{%endblocktrans%}:</u></strong>
+                <p align="justify">{%blocktrans%}Bitte beachten Sie, dass alle von Ihnen eingetragenen Informationen auch von hrem behandelnden Arzt eingesehen werden können. Weitere Personen bekommen keinen Einblick in Ihre personenbezogenen Informationen.{%endblocktrans%}</p>
+
+                <strong><u>{%blocktrans%}WICHTIG{%endblocktrans%}:</u></strong>
+                <p align="justify"><strong>{%blocktrans%}CANKADO ersetzt nicht den direkten Kontakt zu Ihrem Arzt! Bitte wenden Sie sich bei Fragen oder Problemen stets an Ihren Arzt. Auftretende Nebenwirkungen sollten Sie stets mit Ihrem behandelnden Arzt abklären.{%endblocktrans%}</strong></p>
+                <hr>
+            </div>
+            <div class="row">
+                <em>{%blocktrans%}CANKADO ist ein gemeinnütziger  Dienst  von{%endblocktrans%}</em><br> <br>
+
+                <div class="pull-left">
+                    GEMKOM  e.V. <br>
+                    Caramanicostr.  9A <br>
+                    85551   Kirchheim   b.M. <br>
+                    www.gemkom.de
+                </div>
+                <div class="pull-right">
+                    Vorstand: <br> 
+                    Prof.   Dr. N.  Harbeck (Vorsitz) <br>
+                    Prof.   Dr. T.  Schinköthe
+                </div>
+
+            </div>
+            <p class="pull-right"  style="margin-right:100px;">Cankado &copy; 2014</p>
+        </div><!-- wrap end -->
+        <!-- Footer -->
+    </body>
+</html>
+{% endlanguage %}
+
+

@@ -1,0 +1,78 @@
+{% load i18n %}
+<div class="modal fade InterviewModal" id="timeInterviewModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title" id="myModalLabel">
+					{%blocktrans%}Interview{%endblocktrans%}
+
+				</h4>
+			</div>
+			<form class="" id="timeForm">
+				<div class="modal-body">
+
+
+
+
+
+
+					<div class="InterviewQuestion">
+						<p>
+							{%blocktrans%}Wann werden Sie in der Regel frühstücken?{%endblocktrans%}
+						</p>
+						<div class=" datetimepicker">
+							<input class="readonlyActive input-xlarge input add-on time" data-format="hh:mm"  id="breakfast" type="text" name="time" value="08:00" >
+
+						</div>
+					</div>
+
+					<div class="InterviewQuestion">
+						<p>
+							{%blocktrans%}Wann werden Sie in der Regel Ihre Mittags?{%endblocktrans%}
+						</p>
+						<div class=" datetimepicker">
+							<input data-format="hh:mm"  id="lunch" type="text" name="time" value="12:30" class="readonlyActive time input-xlarge input add-on">
+
+						</div>
+					</div>
+					<div class="InterviewQuestion">
+						<p>
+							{%blocktrans%}Wann werden Sie in der Regel Ihr Abendessen?{%endblocktrans%}
+						</p>
+						<div class=" datetimepicker">
+							<input data-format="hh:mm"  id="dinner" type="text" name="time" value="18:00" class="readonlyActive time input-xlarge input add-on">
+
+						</div>
+					</div>
+					<div class="InterviewQuestion">
+						<p>
+							{%blocktrans%}Wann werden Sie in der Regel schlafen gehen?{%endblocktrans%}
+						</p>
+						<div class=" datetimepicker">
+							<input data-format="hh:mm"  id="sleep" type="text" name="time" value="20:00" class="readonlyActive time input-xlarge input add-on">
+
+						</div>
+					</div>
+					<div class="control-group">
+						<div class="controls">
+
+						</div>
+					</div>
+
+
+				</div>
+				<div class="modal-footer">
+					<button class="btn btn-danger" type="button" class="close" data-dismiss="modal" aria-hidden="true">{%blocktrans%}Schließen{%endblocktrans%}</button>
+					<button type="submit" class="btn btn-info">{%blocktrans%}Sparen{%endblocktrans%}</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+{% for data in user.timeinterview_set.all %}
+<input type="hidden" id="breakfastTime" value="{{data.breakfast|time:'H:i'}}">
+<input type="hidden" id="lunchTime" value="{{data.lunch|time:'H:i'}}">
+<input type="hidden" id="dinnerTime" value="{{data.dinner|time:'H:i'}}">
+<input type="hidden" id="sleepTime" value="{{data.sleep|time:'H:i'}}">
+{% endfor %}

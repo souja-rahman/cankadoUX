@@ -1,0 +1,156 @@
+{% extends "dashboard/adminLayout.html" %}
+{% block page_id %}Tassign{% endblock %}
+{% load templateUtils %}
+{% block content %}
+<div class="span9">
+    <div class="row-fluid" style="padding-top:27px;">
+        <div class="span12" >
+            <div class="newbreadcrumb flat">
+                <a href="/admin/treatment/list/" >Admin</a>
+                <a href="/admin/treatment/list/" >Treatments</a>
+                <a href="/admin/view/treatment/{{treatment.id}}/" > {{treatment}}</a>
+                <a class="active">Assign SideEffect</a>
+            </div>
+        </div>
+    </div>
+    <div class="row-fluid ">
+        <div class="widget" >
+
+            <form action="/admin/assign/sideeffect/{{treatment.id}}/" method="POST">{% csrf_token %}
+                <div class="widget-header">
+                    <h3>Select Side Effects</h3>
+                    <a href="/admin/view/treatment/{{treatment.id}}/"  style="margin-top: 5px; margin-right: 5px;" class="btn pull-right"><i class="fa fa-plus"></i> cancel</a>
+                    {% if ses %}
+                    <button type="submit" style="margin-top: 5px; margin-right: 5px;" class="btn btn-info pull-right"><i class="fa fa-plus"></i> save</button>
+                    {% endif %}
+                    <div class="input-append pull-right" style="margin-top: 5px; margin-right: 5px;">
+                        <input id="csrf_token" type="hidden" value="{{csrf_token}}">
+                        <input type="text" id="seSearch" class="form-control" placeholder="Sideeffect">
+                        <a class="add-on searchPatient"><i class="fa fa-search"></i></a>
+                    </div>
+
+                </div>
+                <div class="widget-content">
+                    <table class="footable table-bordered">
+                        <thead>
+                            <tr>
+                                <th>MedDRA v12.0 Code</th>
+                                <th>CTCAE v4.0 SOC</th>
+                                <th>CTCAE v4.0 Term</th>
+                                <th>pt_CTCAE v4.0 Term</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for se in ses %}
+                            <tr class="seList" sideeffect="{{se.sideeffect}}" seId="{{se.MedDRA_Code}}" soc="{{se.SOC}}" patTerm="{{se.pat_term}}">
+                                <td class="seId">{{se.MedDRA_Code}}</td>
+                                <td class="soc">{{se.SOC|default:'--'}}</td>
+                                <td class="sideeffect">{{se.sideeffect|default:'--'}}</td>
+                                <td class="patTerm">{{se.pat_term|default:'--'}}</td>
+                                <td><input type="checkbox" name="sideeffect" id="sideeffect{{se.MedDRA_Code}}" value="{{se.MedDRA_Code}}"></td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6">
+                                    <div class="alert alert-info" style="margin-bottom:0px;">No side effects to assign.</div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                        <!--
+                        {% if paginator.num_pages > 1 %}
+                        <tfoot id="tfoot">
+                            <tr>
+                                <td colspan="5">
+                                </td>
+                            </tr>
+                        </tfoot>
+                        {% endif %}
+                        -->
+                    </table>
+                    <div id="emptyMsg" class="alert alert-info" style="display:none;">
+                        No match found!!
+                    </div>
+                    <a href="/admin/view/treatment/{{treatment.id}}/"  style="margin-top: 5px; margin-right: 5px;" class="btn pull-right"><i class="fa fa-plus"></i> cancel</a>
+                    {% if ses %}
+                    <button type="submit" class="btn btn-info pull-right" style="margin-top:5px; margin-right: 5px;"><i class="fa fa-plus"></i> save</button> {% endif %}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block bottomScripts %}
+<script>
+    {% for se in treatment.sideeffect_set.all %}
+    {% if not se.is_unexpected %}
+    $('#sideeffect{{se.sideeffect.MedDRA_Code}}').prop('checked', true);
+    {% endif %}
+    {% endfor %}
+    $('.seList').each(function(index, val) {
+    var se = $(this).attr('sideeffect').toUpperCase()
+            $(this).attr('sideeffect', se);
+            var soc = $(this).attr('soc').toUpperCase()
+            $(this).attr('soc', soc);
+            var patTerm = $(this).attr('patTerm').toUpperCase()
+            $(this).attr('patTerm', patTerm);
+            });
+            $('#seSearch').on('change keyup', function() {
+    $('.seList').find('strong').each(function(index, val) {
+    $(this).replaceWith($(this).html());
+            });
+            $('.seList').hide();
+            $('#emptyMsg').hide();
+            $('#tfoot').show();
+            var se = $('#seSearch').val();
+            se = se.toUpperCase();
+            if (se === ''){
+    $('.seList').show();
+            }
+    else{
+    if (! $(".seList[seId*='" + se + "']").length && ! $(".seList[sideeffect*='" + se + "']").length && ! $(".seList[soc*='" + se + "']").length && ! $(".seList[patTerm*='" + se + "']").length)
+            {
+            $('#emptyMsg').show();
+            $('#tfoot').hide();
+                    }
+    $(".seList[seId*='" + se + "']").fadeIn().find('.seId').wrapInTag({
+    tag: 'strong',
+            words: [se]
+            });
+            $(".seList[soc*='" + se + "']").fadeIn().find('.soc').wrapInTag({
+    tag: 'strong',
+            words: [se]
+            });
+            $(".seList[sideeffect*='" + se + "']").fadeIn().find('.sideeffect').wrapInTag({
+    tag: 'strong',
+            words: [se]
+            });
+            $(".seList[patTerm*='" + se + "']").fadeIn().find('.patTerm').wrapInTag({
+    tag: 'strong',
+            words: [se]
+            });
+            }
+    });
+            $.fn.wrapInTag = function(opts) {
+
+            var tag = opts.tag || 'strong',
+                    words = opts.words || [],
+                    regex = RegExp(words.join('|'), 'gi'),
+                    replacement = '<' + tag + '>$&</' + tag + '>';
+                    return this.html(function() {
+                    return $(this).text().replace(regex, replacement);
+                            });
+                    };</script>
+
+<script src="{{ STATIC_URL }}js/FooTable-2/js/footable.js"></script>
+<!--<script src="{{ STATIC_URL }}js/FooTable-2/js/footable.paginate.js"></script>-->
+<script type="text/javascript">
+            $(function() {
+            $('table').footable();
+                   // $('table').data('page-size', 12);
+                    $('table').trigger('footable_initialized');
+            });
+</script>
+
+{% endblock %}

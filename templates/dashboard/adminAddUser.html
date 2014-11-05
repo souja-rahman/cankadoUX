@@ -1,0 +1,300 @@
+{% extends "dashboard/adminLayout.html" %}  
+{% block page_id %}addusers{% endblock %}
+{% load templateUtils %} 
+{% block content %}
+<div class="span9">
+	<div class="row-fluid ">
+		<div class=" span12" style="padding-top:27px;border-radius:5px;">
+			<div class="row-fluid">
+				<div class="newbreadcrumb flat">
+					<a href="/admin/treatment/list/" >Admin</a>
+					<a href="#" class="active">AddUser</a>
+				</div>
+				{% if created_user %}
+				<a class="btn btn-danger btn-small pull-right deleteUser" ><i class="fa fa-trash-o"></i> Delete</a>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+	<div class="widget" style="padding-bottom:0px;">	
+		<div class="widget-header">			
+		<h4 style="margin-left: 10px;margin-bottom:3px;"> {% if created_user %}Edit User{% else %}Add User{% endif %}</h4>
+		</div>		
+		<div class="widget-content">
+		<form class="form-horizontal" action="{% if created_user %}/adminedituser/{{created_user.id}}/{% else %}/adminadduser/{% endif %}" method="POST" enctype="multipart/form-data" onSubmit="return fileValidation();">{% csrf_token %}
+			
+			{% if form_error %}
+			<div class="alert alert-danger ">
+				<button class="close" data-dismiss="alert">&times;</button>
+				Please fill in all fields with *.
+			</div>
+			{% endif %}
+			
+			{% if user_error %}
+			<div class="alert alert-danger ">
+				<button class="close" data-dismiss="alert">&times;</button>
+				Username already exists.
+			</div>
+			{% endif %}
+
+			{% if password_error %}
+			<div class="alert alert-danger ">
+				<button class="close" data-dismiss="alert">&times;</button>
+				The passwords didn't match.
+			</div>
+			{% endif %}
+
+			{% if email_error %}
+			<div class="alert alert-danger">
+				<button class="close" data-dismiss="alert">&times;</button>
+				This email is already registered, please give another email.
+			</div>
+			{% endif %}
+
+			{% if success %}
+			<div class="alert alert-success">
+				<button class="close" data-dismiss="alert">&times;</button>
+				User created successfully <img src="{{STATIC_URL}}img/accept.png">
+			</div>
+			{% endif %}
+
+			{% if updateSuccess %}
+			<div class="alert alert-success ">
+				<button class="close" data-dismiss="alert">&times;</button>
+				User updated successfully <img src="{{STATIC_URL}}img/accept.png">
+			</div>
+			{% endif %}
+
+			{% if not_image %}
+	    <div class="alert alert-danger ">The file you selected is not an image, please check.</div>
+	    {% endif %}
+
+	    {% if image_type_error %}
+	    <div class="alert alert-danger ">Only jpg/png images allowed.</div>                  
+	    {% endif %}
+
+	    {% if image_size_error %}
+	    <div class="alert alert-danger ">Image size should be less than 2 mb.</div>                  
+	    {% endif %}
+
+			{% if error %}
+			<div class="alert alert-danger ">
+				<button class="close" data-dismiss="alert">&times;</button>
+				An error occured while creating user, please try again.
+			</div>
+			{% endif %}
+
+			{% if not created_user %}
+
+			<div class="control-group">
+				<label class="control-label" for="username">Username *</label>
+				<div class="controls">
+					<input type="text" id="username" name="username" placeholder="username" value="{{form.username.value}}" required>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="inputPassword">Password *</label>
+				<div class="controls">
+					<input type="password" id="inputPassword" name="password" placeholder="Password" required>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="confirmPassword">Confirm Password *</label>
+				<div class="controls">
+					<input type="password" id="confirmPassword" name="confirm_password" placeholder="Confirm Password" required>
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="firstname">First Name</label>
+				<div class="controls">
+					<input type="text" id="firstname" name="firstname" placeholder="First Name" value="{{form.firstname.value}}">
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="lastname">Last Name</label>
+				<div class="controls">
+					<input type="text" id="lastname" name="lastname" placeholder="Last Name" value="{{form.lastname.value}}">
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="email">E-mail *</label>
+				<div class="controls">
+					<input type="email" id="email" name="email" placeholder="E-mail" value="{{form.email.value}}" required>
+				</div>
+			</div>
+
+			<div class="control-group">
+				<label class="control-label" for="group">Role *</label>
+				<div class="controls">
+					<select name="group" id="group" required>
+                                            <option value="">Select Role</option>
+						{% for name, group in groups.items %}
+						{% if not name == 'patient' %}
+						<option value="{{name}}">{{group}}</option>
+						{% endif %}
+						{% endfor %}
+					</select>
+				</div>
+			</div>
+
+			<div id="pharma" style="display:none;">
+				<div class="control-group">
+					<label class="control-label" for="company">Company</label>
+					<div class="controls">
+						<input type="text" name="company" id="company" value="{{form.company.value|default:''}}">
+					</div>
+				</div>
+				<div class="control-group">
+					<label class="control-label" for="logo">Logo</label>
+					<div class="controls">
+						<img class="previewImage" src="" alt="" height="100" width="100">
+						<input type="file" name="image" id="flUpload" class="hidden" onchange="readURL(this);"><br>
+						<a class="btn btn-mini" id="image_alt">{% if created_user.pharma.logo %}Change{% else %}Upload{% endif %} image</a> 
+					</div>
+				</div>
+			</div>
+			{% else %}
+
+			<div class="control-group">
+				<label class="control-label" for="username">Username</label>
+				<div class="controls">
+					<input type="text" id="username" name="username" placeholder="username" value="{{form.username.value|default:created_user.username}}" required>
+				</div>
+			</div>
+			
+			<div class="control-group">
+				<label class="control-label" for="password">New Password</label>
+				<div class="controls">
+					<input type="password" id="password" name="password" placeholder="password">
+				</div>
+			</div>
+
+			<div class="control-group">
+				<label class="control-label" for="firstname">First Name</label>
+				<div class="controls">
+					<input type="text" id="firstname" name="firstname" placeholder="First Name" value="{{form.firstname.value|default:created_user.userprofile.first_name}}">
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="lastname">Last Name</label>
+				<div class="controls">
+					<input type="text" id="lastname" name="lastname" placeholder="Last Name" value="{{form.lastname.value|default:created_user.userprofile.last_name}}">
+				</div>
+			</div>
+			<div class="control-group">
+				<label class="control-label" for="email">E-mail *</label>
+				<div class="controls">
+					<input type="email" id="email" name="email" placeholder="E-mail" value="{% if form.email.value %}{{form.email.value}}{% else %}{{created_user.userprofile.email|default:''}}{% endif %}" required>
+				</div>
+			</div>
+
+			<div class="control-group">
+				<label class="control-label" for="email">Role</label>
+				<div class="controls">
+					<input type="text" disabled value="{{ created_user.groups.all.0.name|getGroupName }}">
+				</div>
+			</div>
+			
+
+			<div id="pharma" style="display:none;">
+				<div class="control-group">
+					<label class="control-label" for="company">Company</label>
+					<div class="controls">
+						<input type="text" id="company" name="company" placeholder="Company Name" value="{{created_user.pharma.company}}" {% if created_user.pharma.company %}readonly{% endif %}>
+					</div>
+				</div>
+
+				<div class="control-group">
+					<label class="control-label" for="logo">Logo</label>
+					<div class="controls">
+						<img class="previewImage" src="{{created_user.pharma.logo}}" alt="" height="100" width="100">
+						<input type="file" name="image" id="flUpload" class="hidden" onchange="readURL(this);"><br>
+						<a class="btn btn-mini" id="image_alt">{% if created_user.pharma.logo %}Change{% else %}Upload{% endif %} image</a> 
+					</div>
+				</div>
+			</div>
+
+
+			{% endif %}
+			<div class="control-group">
+				<div class="controls">
+					<button type="submit" class="btn btn-info"><i class="fa fa-plus"></i> {% if created_user %}Edit{% else %}Save{% endif %}</button>
+          <button type="reset" class="btn "><i class="fa fa-plus"></i> cancel</button>
+				</div>
+			</div>
+		</form>
+		</div>
+	</div>
+
+
+	
+</div>		
+{% endblock %}      
+
+{% block bottomScripts %}
+<script>
+	jQuery(document).ready(function($) {
+		{% if form %}
+			$('#group').attr('value', '{{form.group.value}}');
+			// Have to change group name to auditor
+			if('{{form.group.value}}' == 'auditor'){
+				$('#pharma').show();
+			}
+		{% elif created_user %}
+			$('#group').attr('value', '{{ created_user.groups.all.0.id }}');
+		{% endif %}
+		{% if form.staff.value %}
+			$('#staff').attr('checked','checked');
+		{% elif created_user.is_staff %}
+			$('#staff').attr('checked','checked');
+		{% endif %}
+		{% if form.superuser.value %}		
+			$('#superuser').attr('checked','checked');
+		{% elif created_user.is_superuser %}		
+			$('#superuser').attr('checked','checked');
+		{% endif %}
+	});
+	$('.deleteUser').click(function(e) {
+		e.preventDefault();
+		bootbox.confirm("Are you sure to delete this user?", function(result) {
+      if (result) {
+      	window.location = '/admindeleteuser/' + {{created_user.id}} + '/';
+      }
+    });
+	});
+	$('#group').change(function(e) {
+		e.preventDefault();
+		var group = $(this).val()
+		if (group === 'auditor'){
+			$('#pharma').show();
+		}
+		else{
+			$('#pharma').hide();
+			$('#flUpload').val('');
+		}
+	});
+	$('#image_alt').click(function(e) {
+      e.preventDefault();
+      $('#flUpload').click();
+  });
+  function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                $('.previewImage')
+                    .attr('src', e.target.result)
+            };
+
+            reader.readAsDataURL(input.files[0]);
+            $('#preview').show();
+        }
+    }
+</script>
+{% if created_user.groups.all.0.name == 'auditor' %}
+<script>
+		$('#pharma').show();
+</script>
+{% endif %}
+<script type="text/javascript" src="{{STATIC_URL}}js/imageValidation.js"></script>
+{% endblock %} 

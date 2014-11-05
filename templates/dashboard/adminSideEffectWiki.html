@@ -1,0 +1,135 @@
+{% extends "dashboard/adminLayout.html" %}  
+{% block page_id %}userlist{% endblock %}
+{% load templateUtils %} 
+{% block content %}
+<div class="span9">
+    <div class="row-fluid tlist" style="padding:10px;">
+        <h4>{{se}}</h4>
+        <hr>
+        <form class="form-horizontal" action="/admin/sideeffect/wiki/{{se.id}}/" method="POST">{% csrf_token %}
+
+            <div class="control-group">
+                <label class="control-label" >MedDRA v12.0 Code</label>
+                <div class="controls">
+                    <input type="text" value="{{se.sideeffect.MedDRA_Code}}" placeholder="" disabled class="disback span10">
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">CTCAE v4.0 SOC</label>
+                <div class="controls">
+                    <textarea rows="4"  placeholder="" class="span10" disabled>{{se.sideeffect.SOC|default:'--'}}</textarea>
+                </div>
+            </div>
+             <div class="control-group">
+                <label class="control-label" >CTCAE v4.0 Term</label>
+                <div class="controls">
+                    <textarea rows="4"  placeholder="" class="span10" disabled>{{se.sideeffect.sideeffect|default:'--'}}</textarea>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">Grade 1 </label> 
+                <div class="controls">
+                    <textarea rows="4"  placeholder="" class="span10" disabled>{{se.sideeffect.doc_grade1|default:'--'}}</textarea>
+                </div>
+            </div>
+             <div class="control-group">
+                <label class="control-label" >Grade 2 </label>
+                <div class="controls">
+                    <textarea rows="4"  placeholder="" class="span10" disabled>{{se.sideeffect.doc_grade2|default:'--'}}</textarea>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">Grade 3 </label>
+                <div class="controls">
+                    <textarea rows="4"  placeholder="" class="span10" disabled>{{se.sideeffect.doc_grade3|default:'--'}}</textarea>
+                </div>
+            </div>
+             <div class="control-group">
+                <label class="control-label" >Grade 4 </label>
+                <div class="controls">
+                    <textarea rows="4"  placeholder="" class="span10" disabled>{{se.sideeffect.doc_grade4|default:'--'}}</textarea>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" >CTCAE v4.0 AE Term Definition</label>
+                <div class="controls">
+                    <textarea rows="4"  placeholder="" class="span10" disabled>{{se.sideeffect.doc_termdefinition|default:'--'}}</textarea>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">pt_CTCAE v4.0 Term</label>
+                <div class="controls">
+                    <textarea rows="4"  name="pat_term" class="span10" placeholder="" disabled>{{se.sideeffect.pat_term|default:''}}</textarea>
+                </div>
+            </div>
+             <div class="control-group">
+                <label class="control-label" >pt_Grade 1</label>
+                <div class="controls">
+                    <textarea rows="4" name="grade1" placeholder="" class="span10" disabled>{{se.sideeffect.grade1|default:''}}</textarea>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">pt_Grade 2</label>
+                <div class="controls">
+                    <textarea rows="4" name="grade2" placeholder="" class="span10" disabled>{{se.sideeffect.grade2|default:''}}</textarea>
+                </div>
+            </div>
+             <div class="control-group">
+                <label class="control-label" >pt_Grade 3</label>
+                <div class="controls">
+                    <textarea rows="4" name="grade3" placeholder="" class="span10" disabled>{{se.sideeffect.grade3|default:''}}</textarea>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">pt_Grade 4</label>
+                <div class="controls">
+                    <textarea rows="4" name="grade4" placeholder="" class="span10" disabled>{{se.sideeffect.grade4|default:''}}</textarea>
+                </div>
+            </div> 
+            <div class="control-group">
+                <label class="control-label" > pt_CTCAE v4.0 AE Term Definition</label>
+                <div class="controls">
+                    <textarea rows="4" name="pat_termdefinition" placeholder="" class="span10" disabled>{{se.sideeffect.pat_termdefinition|default:''}}</textarea>
+                </div>
+            </div>     
+
+            <div class="control-group">
+                <label class="control-label" > Physician Wiki</label>
+                <div class="controls span8">
+                    <textarea rows="3" class="wiki" name="physician_wiki" placeholder="">{{se.getPhysicianWiki}}</textarea>
+                </div>
+            </div>  
+
+             <div class="control-group">
+                <label class="control-label" > Patient Wiki</label>
+                <div class="controls span8">
+                    <textarea rows="3" class="wiki" name="patient_wiki" placeholder="">{{se.getPatientWiki}}</textarea>
+                </div>
+            </div>  
+
+            <div class="control-group">
+                <div class="controls">                    
+                    <button type="submit" class="btn">Update</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}      
+
+{% block bottomScripts %}
+
+<script src="{{ STATIC_URL }}js/tinymce/tinymce.min.js"></script>
+<script>
+ tinymce.init({
+     selector: '.wiki',
+     plugins: [
+         "advlist autolink lists link image charmap print preview anchor",
+         "searchreplace visualblocks fullscreen",
+     ],
+     toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image",
+     statusbar: false
+ });
+ </script>
+{% endblock %}      
+

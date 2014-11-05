@@ -1,0 +1,286 @@
+{% extends "dashboard/adminLayout.html" %}  
+{% block page_id %}drugList{% endblock %}
+{% load url from future %}
+{% block content %}
+
+
+
+<div class="span9">
+	<div class="row-fluid ">
+		<div class=" span12" style="padding-top:27px;border-radius:5px;">
+			<div class="row-fluid">
+				<div class="newbreadcrumb flat">
+					<a href="/admin/treatment/list/" >Admin</a>
+					<a href="#" class="active">{% if drug %}Edit Drug{% else %}Add Drug{% endif %}</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="widget" style="padding-bottom:0px;">   
+		<div class="widget-header">         
+			<h3>{% if drug %}Edit {% else %}Add{% endif %} Drug</h3>
+		</div>      
+		<div class="widget-content">
+
+			<div class="row-fluid">           
+				<div class="span8">
+					{% if success %}
+					<div class="alert alert-success">Drug added successfully <img src="{{ STATIC_URL }}img/accept.png"></div>
+					{% endif %}
+
+					{% if update %}
+					<div class="alert alert-success">Updated successfully <img src="{{ STATIC_URL }}img/accept.png"></div>
+					{% endif %}
+
+					{% if form_error %}
+					<div class="alert alert-danger">Drug name is required!</div>
+					{% endif %}  
+
+					{% if not_image %}
+					<div class="alert alert-danger">Please select a valid Image!!</div>
+					{% endif %}    
+
+					{% if image_type_error %}
+					<div class="alert alert-danger">Only jpg/png files allowed!!</div>
+					{% endif %}  
+
+					{% if image_size_error %}
+					<div class="alert alert-danger">Image size should be upto 2Mb!!</div>
+					{% endif %} 
+
+					{% if upload_error %}
+					<div class="alert alert-danger">An error occured while image uploading, please try again!!</div>
+					{% endif %} 
+
+					{% if already_exist %}
+					<div class="alert alert-danger">Drug with same name already exist.</div>
+					{% endif %}
+
+					<form class="form-horizontal" action="{% if drug %}{% url 'editDrug' id=drug.id %}{% else %}{% url 'addDrug' %}{% endif %}" method="POST" enctype="multipart/form-data" onSubmit="return fileValidation(this);">{% csrf_token %}
+						<div class="control-group">
+							<label class="control-label" for="username">Drug Name *</label>
+							<div class="controls">
+								<input type="text" id="drug" name="drug" placeholder="Drug" value="{{drug.name|default:''}}" required data-provide="typeahead" data-items="10" data-source='[{% for drug in druglist %}{% if forloop.last %}"{{drug}}"{% else %}"{{drug}}",{% endif %}{% endfor %}]'>
+							</div>
+						</div>
+						<div class="control-group">
+							<label class="control-label" for="username">Image *</label>
+							<div class="controls">
+								<img class="drugImage"  src="{% if drug.image %}{{drug.image}}{% else %}{{ STATIC_URL }}img/drug.png{% endif %}" alt="Drug" height="128" width="128">
+								<input type="file" name="image" class="flUpload hidden" onchange="readURL(this);">
+								<a class="btn btn-mini pull-left image_alt">{% if drug.image %}Change{% else %}Select{% endif %} image</a> 
+							</div>
+						</div>
+						<!--						<div class="control-group">
+													<label class="control-label">Other Names</label>
+													<div class="controls span4">
+														<input type="text" name="other_names" data-role="tagsinput" placeholder="Add names and click enter" value="{% for name in drug.drugname_set.all %}{{name.name}}, {% endfor %}" class="tag">
+														{% if drug %}
+						
+														{% else %}
+														Please save Drug to add other names.
+														{% endif %}
+						
+													</div>
+												</div>-->
+						<div class="control-group">
+							<label class="control-label" for="username">Unit *</label>
+							<div class="controls">
+								<select name="unit" id="unit" required>
+									{% for unit in units %}
+									<option value="{{unit.id}}">{{unit.unit_single}} {% if unit.unit_plural %} / {{unit.unit_plural}}{% endif %}</option>
+									<!--                                {% if unit.unit_plural %}
+													    <option value="{{unit.unit_plural}}">{{unit.unit_plural}}</option>
+													{% endif %}-->
+									{% endfor %}
+								</select>
+								{% if not units %}
+								<a href="/admin/treatment/drugUnits/" class="btn btn-info btn-mini">Add Unit</a>
+								{% endif %}
+							</div>
+						</div>
+						<input type="hidden" name="drug_id" value="{{drug.id}}">
+						<div class="control-group">
+							<div class="controls">
+								<button type="submit" class="btn btn-info submitBtn"><i class="fa fa-plus"></i> Save Drug</button>
+							</div>
+						</div>
+					</form>
+				</div>
+				<div class="row-fluid">           
+					<div class="span8 otherNames"> 
+						<h4>Other Names</h4>
+						{% if drug %}
+						<div class="row_fluid">
+							<div class="span10 offset1">
+								<table class="otherNamesTable table table-hover"> 
+									{% for name in drug.drugname_set.all %}
+									<tr class="drugnamelist">
+										<td class="oNtdF controls">
+											<img class="otherNameImg drugImage" src="{{name.image|default:'/static/img/drug.png'}}" alt="" height="60" width="60">
+											<form method="POST" action="/admin/edit/drug/othername/{{name.id}}/" class="nameEditFrm" enctype="multipart/form-data" style="display:none;" onSubmit="return fileValidation(this);">{% csrf_token %}
+												<input type="hidden" name="name" class="frmName">
+												<input type="file" name="image" class="flUpload hidden" onchange="readURL(this);">
+												<a class="btn btn-mini pull-left image_alt">Change image</a>
+											</form>
+										</td>
+										<td class="name">{{name.name}}</td>
+										<td class="oNtdL">
+											<button class="btn btn-mini btn-info drugnameEdit" drug="{{name.id}}">Edit</button>
+										</td>
+										<td class="oNtdL">
+											<button class="btn btn-mini btn-danger drugnameDel" drug="{{name.id}}">Delete</button>
+										</td>
+									</tr>
+									{% endfor %}
+								</table>
+							</div>
+						</div>
+						<div class="row-fluid">
+							<div class="span11">
+								<h5>Add Other Names</h5>
+								<form class="form-horizontal" action="/admin/save/drug/othername/{{drug.id}}/" method="POST" enctype="multipart/form-data" onSubmit="return fileValidation(this);">{% csrf_token %}
+									<div class="control-group">
+										<label class="control-label" >Other Name</label>
+										<div class="controls">
+											<input type="text" name="name" required id="drugothername">
+										</div>
+									</div>
+
+									<div class="control-group">
+										<label class="control-label" >Image</label>
+										<div class="controls">
+											<img class="drugImage"  src="{{ STATIC_URL }}img/drug.png" alt="Drug" height="60" width="60">
+											<input type="file" name="image" class="flUpload hidden" onchange="readURL(this);">
+											<a class="btn btn-mini image_alt">Select Image</a>
+										</div>
+									</div>
+
+									<div class="control-group">
+										<div class="controls">
+											<button type="submit" class="btn btn-info submitBtn"><i class="fa fa-plus"></i> Add Name</button>
+										</div>
+									</div>
+								</form>
+							</div>
+						</div>
+
+						{% else %}
+
+						<div class="row-fluid">
+							Please save Drug to Other Names!
+						</div>
+
+						{% endif %}
+					</div>
+
+				</div>
+			</div>
+
+		</div>
+	</div>
+</div>
+
+{% endblock %}      
+
+{% block bottomScripts %}
+<script>
+	$('.image_alt').click(function(e) {
+		e.preventDefault();
+		$(this).prev('.flUpload').click();
+	});
+	function readURL(input) {
+		if (input.files && input.files[0]) {
+			var reader = new FileReader();
+
+			reader.onload = function(e) {
+				$(input).parents('.controls').find('.drugImage')
+					.attr('src', e.target.result)
+			};
+
+			reader.readAsDataURL(input.files[0]);
+			$('#preview').show();
+		}
+	}
+	$('.drugnameDel').click(function(e) {
+		e.preventDefault();
+		var btn = $(this)
+		var id = btn.attr('drug');
+		bootbox.confirm('Are you sure to delete this drugname?', function(result) {
+			if (result) {
+				$.ajax({
+					url: '/admin/delete/drug/othername/' + id + '/',
+					type: 'GET'
+				})
+					.done(function(data) {
+						if (!data.status) {
+							bootbox.alert('This drugname is assigned to treatment, it cannot be deleted!!')
+						}
+						else {
+							btn.parents('.drugnamelist').fadeOut('slow');
+						}
+					})
+					.fail(function() {
+						console.log("error");
+					})
+			}
+		});
+
+	});
+
+	$('.drugnameEdit').click(function(e) {
+		e.preventDefault();
+		var btn = $(this);
+		var id = btn.attr('drug');
+		if (btn.html() === 'Save') {
+			var name = btn.parents('.drugnamelist').find('.name').text();
+			if (name === ''){
+				bootbox.alert('Name can\'t be empty!!', function(){
+					btn.parents('.drugnamelist').find('.name').focus();
+				});
+				return
+			}
+			if (name.match(/\s/g) != null){
+				bootbox.alert('Space not allowed in Name!!', function(){
+					btn.parents('.drugnamelist').find('.name').focus();
+				});
+				return
+			}
+			btn.parents('.drugnamelist').find('.frmName').val(name);
+			if (fileValidation(btn.parents('.drugnamelist').find('.nameEditFrm'))){
+				btn.attr('disabled', 'disabled');
+				btn.html('Updating');
+				btn.parents('.drugnamelist').find('.nameEditFrm').submit();
+			}
+		}
+		else{
+			btn.html('Save');
+			btn.parents('.drugnamelist').find('.nameEditFrm').show();
+			btn.parents('.drugnamelist').find('.name').attr('contenteditable', true);
+			btn.parents('.drugnamelist').find('.name').focus();
+		}
+	});
+</script>
+{% if drug %}
+<script>
+	$('#unit').attr('value', '{{drug.unit.id}}')
+</script>
+{% endif %}
+<script type="text/javascript" src="{{STATIC_URL}}js/imageValidation.js"></script>
+<script src="/static/js/tags/bower_components/angular/angular.min.js"></script>
+<script src="/static/js/tags/bower_components/google-code-prettify-lite/prettify.js"></script>
+<script src="/static/js/tags/bootstrap-tagsinput.js"></script>
+<script src="/static/js/tags/bootstrap-tagsinput-angular.js"></script>
+<script src="/static/js/tags/app_bs2.js"></script>
+<script src="/static/js/tags/app.js"></script>
+<script>
+	$('.tag').tagsinput({
+		typeahead: {
+			source: function(query) {
+				return $.getJSON('/adminGetDrugNames/');
+			}
+		}
+	});
+</script>
+{% endblock %}

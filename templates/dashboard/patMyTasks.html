@@ -1,0 +1,144 @@
+{% extends "dashboard/patLayout.html" %}
+{% block page_id %}dash{% endblock %}
+{% block custom_css %}
+<link href="{{ STATIC_URL }}css/patmytask.css" rel="stylesheet">
+
+{% endblock %}
+
+{% load i18n %}
+{% block content %}
+<style>
+	#loading
+	{
+		background-color: grey;
+		filter:alpha(opacity=50); /* IE */
+		opacity: 0.7; /* Safari, Opera */
+		-moz-opacity:0.70; /* FireFox */
+		z-index: 500;
+		min-height: 700px;
+		width: 100%;
+		background-repeat:no-repeat;
+		background-position:center;
+		position:relative;
+		top: 0px;
+		left: 0px;
+		text-align: center;
+		padding-top: 25%;
+		/*border-radius: 5px;*/
+	}
+</style>
+<!-- Content -->
+<div class="span9"> <!-- The whole content comes here -->
+	<!-- ========================== Page Title ========================================== -->
+	<h1 class="page-title"><i class="icon-check-clipboard-1"></i>&nbsp;&nbsp;{%blocktrans%}Meine Aufgaben{%endblocktrans%}</h1>
+
+	<!-- ================================ Page Title End ================================ -->
+
+	<!-- ================================ Filter Bar Start ================================ -->
+	<div class="page-title filterbar">
+		<div class="row-fluid">
+			<form id="qOptions">
+			<div class="span9">
+				<label style="font-weight: bold;">
+					{%blocktrans%}Sortieren nach{%endblocktrans%}
+					
+					<select name="sortby" id="QUESTFilterBY" style="margin-top: 8px;margin-left: 15px">
+						<option value="DASC" {% if request.GET.sortby == "DASC" %}selected=""{% endif %}>{%blocktrans%}Datum Aufsteigend{%endblocktrans%}</option>
+						<option value="DDSC" {% if request.GET.sortby == "DDSC" or not request.GET.sortby %}selected=""{% endif %}>{%blocktrans%}Datum Absteigend{%endblocktrans%}</option>
+						<!--<option value="KASC" {% if request.GET.sortby == "KASC" %}selected=""{% endif %}>{%blocktrans%}Kados Aufsteigend{%endblocktrans%}</option>-->
+						<!--<option value="KDSC" {% if request.GET.sortby == "KDSC" %}selected=""{% endif %}>{%blocktrans%}Kados Absteigend{%endblocktrans%}</option>-->
+					</select>
+				</label>
+			</div>
+			<div class="span3">
+				<button type="button" class="btn btn-small btn-info  fbutton" style="margin-top: 10px" data-toggle="button">{%blocktrans%}Filteroptionen{%endblocktrans%}</button>
+			</div>
+
+			<div class="row-fluid filtercontent" style="display:none;">
+				<div class="span11 offset1">
+				</div>
+				<div class="span11 offset1">
+					<ul class="nav">
+						<li>
+							<label class="checkbox">
+								<input type="checkbox" id="filter_TM" {% if not request.GET.sortby or request.GET.fAEQ == "on" %}checked=""{% endif %} name="fAEQ" quests="AEQ" class="disabled filterITEM"> {%blocktrans%}Therapie{%endblocktrans%}
+							</label>
+						</li>
+						<li>
+							<label class="checkbox">
+								<input type="checkbox" id="filter_SE" {% if not request.GET.sortby or request.GET.fSEQ == "on" %}checked=""{% endif %} name="fSEQ" quests="SEQ" class="disabled filterITEM"> {%blocktrans%}Nebenwirkungen{%endblocktrans%}
+							</label>
+						</li>
+						<li>
+							<label class="checkbox">
+								<input type="checkbox" id="filter_OTHER" {% if not request.GET.sortby or request.GET.fALQ == "on" %}checked=""{% endif %} name="fALQ" quests="ALQ" class="disabled filterITEM"> {%blocktrans%}Weitere Aufgaben{%endblocktrans%}
+							</label>
+						</li>
+						
+					</ul>
+				</div>
+			</div>
+			</form>
+		</div>
+	</div>
+	<!-- ================================ Filter Bar End ================================ -->
+
+	<!-- ================================ Quest Section Started ================================ -->
+	<!--<div id='loading'> <span style='color:white;font-size:20px;'> {%blocktrans%}Lade Meine Aufgaben{%endblocktrans%} <br><img src='{{ STATIC_URL }}img/bar.gif' ></span></div>-->
+	{% for t in treatment|slice:"0:1" %}
+	<input type="hidden" id="recommendation" {% if t.treatment.recommendation %}value="{{t.treatment.id}}"{% endif %}>
+	       {% endfor %}
+	       <div class="widget" style="margin-top: 10px;">
+		<div class="widget-content" id="questList" style="padding:15px;background-color:#E5E5E5;">
+
+			<div id="patientQuests">
+				<a class="nextQset" href="/patient/getQuest/?latestQTime=0&sortby={{request.GET.sortby}}">next</a>
+			</div>
+		</div>
+	</div>
+	<form id="questFrm" method="POST">{% csrf_token %}
+		<input type="hidden" name="medicine" id="drug" value="">
+		<input type="hidden" name="qty" id="qty" value="">
+		<input type="hidden" name="ptime" id="ptime" value="">
+		<input type="hidden" name="ttime" id="ttime" value="">
+		<input type="hidden" name="questtime" id="questtime" value="">
+		<input type="hidden" name="reminder1" id="reminder1" value="">
+		<input type="hidden" name="reminder2" id="reminder2" value="">
+		<input type="hidden" name="reminder4" id="reminder4" value="">
+		<input type="hidden" name="reminder5" id="reminder5" value="">
+		<input type="hidden" name="reminder6" id="reminder6" value="">
+		<input type="hidden" name="personal_diary" id="personalDiary" value="">
+		<input type="hidden" name="no_kado" id="no_kado" value="">
+	</form>
+
+</div>
+
+<div class="successpop">
+
+</div>
+<!-- /Content -->
+{% endblock %}
+{% block bottomScripts %}
+<!-- Javascript files -->
+<script src="{{ STATIC_URL }}js/moment-with-langs.min.js"></script>
+<script src="{{ STATIC_URL }}js/bootbox.min.js"></script>
+
+<script src="{{ STATIC_URL }}js/jquery.cookie.js"></script>
+<script src="{{ STATIC_URL }}js/jquery.cookie.js"></script>
+<script src="{{ STATIC_URL }}js/jscroll/jquery.jscroll.min.js"></script>
+
+<script type="text/javascript">
+
+$(".TakenQtySelectBox").change(function() {
+	var value = $(this).val();
+	$(this).parents('.time-range').find('.slider-Qrange').slider({
+		value: value
+	});
+	$(this).parents('.box1').find('.slider-Qty').html(value);
+	$(this).parents('.box1').find('.TakenQty').val(value);
+});</script>
+<script src="{{ STATIC_URL }}js/quest.js"></script>
+
+{% endblock %}
+
+

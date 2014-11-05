@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title> Cankado Auditor-Dashboard</title>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <meta name="apple-mobile-web-app-capable" content="yes">    
+
+        <!-- CSS files -->
+        <link href="{{ STATIC_URL }}css/bootstrap.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}css/bootstrap-responsive.min.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}css/alveolae.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}css/fa/css/font-awesome.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}css/conkado/style.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}css/jquery-ui.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}css/footable.core.min.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}css/footable.standalone.min.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}css/jquery.mCustomScrollbar.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}css/main.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}css/adlayout.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}css/Pharlayout.css" rel="stylesheet">
+        <!-- favicon -->
+        <link rel="apple-touch-icon-precomposed" sizes="144x144" href="{{ STATIC_URL }}img/apple-touch-icon-144-precomposed.png">
+        <link rel="shortcut icon" href="{{ STATIC_URL }}img/favicon.ico">   
+        <script type="text/javascript" src="{{ STATIC_URL }}js/jquery.min.js"></script>
+        <!-- Javascript files -->
+        <!--[if lt IE 9]>
+         <script src="{{ STATIC_URL }}/js/html5.js"></script>
+         <script src="{{ STATIC_URL }}/js/selectivizr.js"></script>
+         <script src="{{ STATIC_URL }}/js/css3-mediaqueries.js"></script>          
+         <![endif]-->
+
+        {% block custom_css %}{% endblock %}
+        <style>
+            .badge-inverse {
+                background-color: #747474;
+            }
+            .badge-success{
+                background-color: #468847;
+            }
+        </style>
+    </head>
+
+
+    <body>
+        {% load url from future %}
+        <!-- Navbar --> 
+
+        <div id="wrap">
+            <div class="navbar navbar-fixed-top">
+                <div class="navbar-inner">
+                    <div class="container">
+                        <a class="brand" href="{% url 'auditor:dashboard' %}"><img src="{{ STATIC_URL }}img/logo.png" style="height:21px;margin-left: 25px"> Can<strong>Kado</strong> - Auditor Dashboard</a>
+                        <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </a>
+
+                        <div class="nav-collapse collapse">
+                            <ul class="nav pull-right">
+                                <li class="dropdown">
+                                    <a href="#" > <i class="fa fa-user"></i> {{ user.username }}</a>
+                                </li>
+
+                                <li><a href="{% url 'django.contrib.auth.views.logout_then_login' %}"><i class="fa fa-sign-out"></i>&nbsp;&nbsp;Logout</a></li>
+
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /Navbar -->
+            <!-- Main content -->
+            <div id="main-content">
+                <!-- Container -->
+                <div class="container" >
+                    <div class="row">
+                        <!-- Sidebar -->
+                        <div class="span3">
+                            <ul id="sidebar" class="nav nav-tabs nav-stacked">
+                                <li id="pending"><a href="{% url 'auditor:dashboard' %}"><i class="fa fa-home"></i>&nbsp;&nbsp;Home</a></li>
+                                <li id="approved"><a href="{% url 'auditor:approvedtreatments' %}"><i class="fa fa-check"></i>&nbsp;&nbsp;Approved Treatments</a></li>
+                                <li id="declined"><a href="{% url 'auditor:declinedtreatments' %}"><i class="fa fa-times"></i>&nbsp;&nbsp;Declined Treatments</a></li>
+                                <li id="archived"><a href="{% url 'auditor:archivedtreatments' %}"><i class="fa fa-lock"></i>&nbsp;&nbsp;Archived Treatment Revisions</a></li>
+                                <li><a href="{% url 'django.contrib.auth.views.logout_then_login' %}"><i class="fa fa-sign-out"></i>&nbsp;&nbsp;Logout</a></li>                               
+                            </ul>
+                        </div>
+                        <!-- /Sidebar -->
+
+                        {% block content %}{% endblock %}
+                    </div>
+                </div>
+                <!-- /Container -->
+                <!-- ================== SIDEBAR SET ACTIVE ===============-->
+                <div style="display:none;">
+                    <input type="hidden" value="{% block page_id %}{% endblock %}" id="hiddenPageId">
+                </div>
+                <!-- ================== SIDEBAR SET ACTIVE ===============-->
+
+            </div>
+            <!-- /Main content -->
+            <div id="push"></div>
+        </div><!-- wrap end -->
+
+        <!-- Footer -->
+        <div id="footer" style="padding-top:6px;">
+            <p class="pull-right"  style="margin-right:100px;">Cankado &copy; 2014</p>
+        </div>
+        <!-- /Footer -->
+        <script src="{{ STATIC_URL }}js/jquery-ui.js"></script>
+        <script src="{{ STATIC_URL }}js/bootstrap.js"></script> 
+        <script src="{{ STATIC_URL }}js/jquery.mCustomScrollbar.concat.min.js"></script>
+        <script src="{{ STATIC_URL }}js/bootbox.min.js"></script>
+        <script>
+$(function() {
+    $(".dial").knob();
+});
+        </script>
+        <script src="{{ STATIC_URL }}js/jquery.knob.js"></script>
+        <script>
+$(function() {
+    $('.datepicker').datetimepicker({
+        pickTime: false
+    });
+    $('.timepicker').datetimepicker({
+        pickDate: false
+    });
+});
+
+        </script>
+        <script>
+            $(document).ready(function() {
+                var currentPage = $("#hiddenPageId").val();
+                $("#" + currentPage).addClass('active');
+            });
+
+            (function($) {
+                $(document).ready(function() {
+                    $(".vscroll,.v1scroll").mCustomScrollbar({
+                        theme: "dark-thick",
+                        advanced: {
+                            updateOnContentResize: true
+                        }
+                    });
+                });
+            })(jQuery);
+
+        </script>
+        <script src="{{ STATIC_URL }}js/bootstrap-datetimepicker.min.js"></script>
+        {% block bottomScripts %}{% endblock %}
+
+    </body>
+</html>
+
+
+

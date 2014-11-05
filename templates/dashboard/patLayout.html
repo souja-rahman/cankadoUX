@@ -1,0 +1,332 @@
+{% load i18n %}
+{% language user_language %}
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Cankado-Dashboard-Patienten</title>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">    
+		<meta http-equiv="cache-control" content="max-age=0" />
+		<meta http-equiv="cache-control" content="no-cache" />
+		<meta http-equiv="expires" content="0" />
+		<meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
+		<meta http-equiv="pragma" content="no-cache" />
+		<!-- CSS files -->
+		<link href="{{ STATIC_URL }}css/bootstrap.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/bootstrap-responsive.min.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/alveolae.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/fa/css/font-awesome.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/conkado/style.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/jquery.mCustomScrollbar.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/footable.core.min.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/footable.standalone.min.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/jquery-ui.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/main.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/patlayout.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}chart/css/daterangepicker.css" rel="stylesheet">
+		<link rel="stylesheet" href="{{ STATIC_URL }}css/iThing.css" type="text/css" />
+		<link href="{{ STATIC_URL }}foundation/css/foundation.css" rel="stylesheet" type="text/css"/>
+
+		<link href="{{ STATIC_URL }}foundation/css/normalize.css" rel="stylesheet" type="text/css"/>
+
+		<link href='//fonts.googleapis.com/css?family=Droid+Serif|Open+Sans:400,700' rel='stylesheet' type='text/css'>
+		<link href="{{ STATIC_URL }}vertical-timeline/css/style.css" rel="stylesheet" type="text/css"/>
+
+
+		{% include 'translation.html' %}
+
+		<!-- favicon -->
+		<link rel="apple-touch-icon-precomposed" sizes="144x144" href="{{ STATIC_URL }}img/apple-touch-icon-144-precomposed.png">
+		<link rel="shortcut icon" href="{{ STATIC_URL }}img/favicon.ico">   
+		<script src="{{ STATIC_URL }}vertical-timeline/js/modernizr.js" type="text/javascript"></script>
+		<!--[if lt IE 9]>
+		 <script src="{{ STATIC_URL }}/js/html5.js"></script>
+		 <script src="{{ STATIC_URL }}/js/selectivizr.js"></script>
+		 <script src="{{ STATIC_URL }}/js/css3-mediaqueries.js"></script> 
+		 <script type="text/javascript" src="{{ STATIC_URL }}/js/PIE.js"></script>             
+	       <![endif]-->
+
+		{% block custom_css %}{% endblock %}
+
+	</head>
+
+
+	<body>
+		{% load url from future %}
+		{% load templateUtils %}
+		<input type="hidden" id="csrf" value="{{csrf_token}}">
+		<div id="wrap">        
+			<!-- Navbar -->
+			<div class="navbar navbar-fixed-top">
+				<div class="navbar-inner">
+					<div class="container">
+						<a class="brand" href="/"><img src="{{ STATIC_URL }}img/logo.png" style="height:21px;margin-left: 25px"alt="conkado">Can<strong>Kado</strong></a>
+						<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</a>
+
+						<div class="nav-collapse collapse">
+							<ul class="nav pull-right">
+								<li class="divider-vertical"></li>
+								<li class="dropdown">
+									<a href="#" data-toggle="dropdown" class="dropdown-toggle">{%blocktrans%}Language{%endblocktrans%}<b class="caret"></b></a>
+									<ul class="dropdown-menu">
+										{% get_available_languages as LANGUAGES %}
+										{% for lang in LANGUAGES %}
+										<li class="tran-Lang {% if lang.0 == user_language %}selected{% endif %}" lngvalue="{{ lang.0 }}"><a>{{ lang.1 }}</a></li>
+										{% endfor %}
+									</ul>
+								</li>
+								<li class="divider-vertical"></li>
+								<li class="dropdown">
+									<a href="#" data-toggle="dropdown" class="dropdown-toggle"><i class="fa fa-user"></i>&nbsp;&nbsp;{% if user.userprofile.last_name %}{{ user.userprofile.last_name }}{% else %}Leer{% endif %}, {% if user.userprofile.first_name %}{{ user.userprofile.first_name }}{% else %}Leer{% endif %}{% if not user.userprofile.first_name and not user.userprofile.last_name %}{{user}}{% endif %}<b class="caret"></b></a>
+									<ul class="dropdown-menu">
+										<li><a href="{% url 'patient:profile' %}"><i class="fa fa-file"></i>&nbsp;&nbsp;{%blocktrans%}Profil{%endblocktrans%}</a></li>
+										<li><a href="{% url 'patient:passwordChange' %}"><i class="fa fa-file"></i>&nbsp;&nbsp;{%blocktrans%}Passwort ändern{%endblocktrans%}</a></li>
+										<!--  <li><a id="box7" href="password.html" onmouseover="$('#box7').addClass('discolor');" onmouseout="$('#box7').removeClass('discolor');" onclick="return false;"><i class="fa fa-key"></i>&nbsp;&nbsp;Change Password</a></li> -->
+									</ul>
+								</li>
+								<li class="divider-vertical"></li>
+								<li><a href="{% url 'django.contrib.auth.views.logout_then_login' %}"><i class="fa fa-sign-out"></i>&nbsp;&nbsp;{%blocktrans%}Abmelden{%endblocktrans%}</a></li>
+								<li class="divider-vertical"></li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- /Navbar -->
+
+			<!-- Main content -->
+			<div id="main-content">
+				<!-- Container -->
+				<div class="container" >
+					<!-- Header boxes -->
+					<div class="row-fluid">
+						<div class="span3 cube">
+							<a href="/" ><div class="span12"><span><i class="fa fa-home fa-3x"> </i><br></span>{%blocktrans%}Home{%endblocktrans%}</div></a>
+						</div>
+						<div class="span3 cube" >						
+							<a href="" onmouseover="$('#box1').addClass('discolor');" onmouseout="$('#box1').removeClass('discolor');" onclick="return false;"><div class="span12" id="box1"><span><i class="fa fa-comments fa-3x"></i><br></span>{%blocktrans%}Nachrichten{%endblocktrans%}</div></a>
+						</div>
+						<div class="span3 cube">						
+							<a href=""  onmouseover="$('#box2').addClass('discolor');" onmouseout="$('#box2').removeClass('discolor');" onclick="return false;"><div class="span12" id="box2"><span><i class="fa fa-cutlery fa-3x" ></i><br></span>{%blocktrans%}Lifestyle{%endblocktrans%}</div></a>
+						</div>
+						<div class="span3 cube totKado">                       
+							<div class="kadolevelBOX">
+								<img class="levelImg" src="{{ STATIC_URL }}kadoLogos/KADO_Level_{{user|getKadoLevel}}.png" title="Ihre Kado-Ebene : {{user|getKadoLevel}}" alt="Ihre Kado-Ebene : {{user|getKadoLevel}}">
+								<div class="kadoLbox">
+									<span class="kadoTxt">{%blocktrans%}Ihr KADO-Punktestand{%endblocktrans%}</span>
+									<span id="kado" title="Ihr KADO-Punktestand : {{user.getKadoCount}}">{{user.getKadoCount}}</span>
+								</div>
+							</div>
+						</div> 
+					</div>
+					<!-- /Header boxes -->
+
+					<div class="row">
+						<!-- Sidebar -->
+						<div class="span3" >
+							<ul id="sidebar" class="nav nav-tabs nav-stacked " >
+								<li id="dash"><a  href="{% url 'patient:dashboard' %}"><i class="icon-check-clipboard-1"></i>&nbsp;&nbsp;{%blocktrans%}Meine Aufgaben{%endblocktrans%}</a></li>
+								<li id="therapy"><a href="{% url 'patient:therapies' %}"><i class="icon-pill"></i>&nbsp;&nbsp;{%blocktrans%}Meine Therapie{%endblocktrans%}</a></li>
+								<li id="statistics"><a href="{% url 'patient:statistics' %}"><i class="icon-tasks"></i>&nbsp;&nbsp;{%blocktrans%}Persönliche Statistik{%endblocktrans%}</a></li>
+								<li id="sideeffect" ><a id="box6" href="{% url 'patient:patSideEffect' %}" ><i class="fa fa-stethoscope "></i>&nbsp;&nbsp;{%blocktrans%}Nebenwirkungen{%endblocktrans%}</a></li>
+								<li id="mydocs"><a id="box8" href="{% url 'patient:MyDocs' %}"><i class="fa fa-user-md"></i>&nbsp;&nbsp; {%blocktrans%}Meine Ärzte{%endblocktrans%}</a></li>
+								<!-- <li ><a id="box4" href="#" class="disabled"  onmouseover="$('#box4').addClass('discolor');" onmouseout="$('#box4').removeClass('discolor');" onclick="return false;"><i class="fa fa-user"></i>&nbsp;&nbsp; My Helper</a></li>
+								 <li ><a id="box5" href="#" class="disabled"  onmouseover="$('#box5').addClass('discolor');" onmouseout="$('#box5').removeClass('discolor');" onclick="return false;"><i class="fa fa-meh-o"></i>&nbsp;&nbsp; My Mood</a></li> -->
+								<li id="calender"><a href="{% url 'patient:calendar' %}"><i class="fa fa-calendar"></i>&nbsp;&nbsp; {%blocktrans%}Kalender{%endblocktrans%}</a></li>
+								<li id="diary"><a href="{% url 'patient:diary' %}"><i class="fa fa-book "></i>&nbsp;&nbsp; {%blocktrans%}Tagebuch{%endblocktrans%}</a></li>
+								<li id="settings"><a href="{% url 'patient:settings' %}"><i class="fa fa-cog"></i>&nbsp;&nbsp;{%blocktrans%}Einstellungen{%endblocktrans%}</a></li>
+								<li><a href="{% url 'django.contrib.auth.views.logout_then_login' %}"><i class="fa fa-sign-out"></i>&nbsp;&nbsp;{%blocktrans%}Abmelden{%endblocktrans%}</a></li>
+							</ul>
+						</div>
+						<!-- Content -->
+						{% block content %}{% endblock %}
+						<!-- /Content -->
+
+						<!-- /Sidebar -->
+
+					</div>
+
+				</div>
+				<!-- /Container -->
+			</div>
+			<!-- /Main content -->
+			<div style="display:none;">
+				<input type="hidden" value="{% block page_id %}{% endblock %}" id="hiddenPageId">
+			</div>
+			<div id="push"></div>
+		</div><!-- wrap end -->
+		<a href="#" class="scrollToTop"><i class="fa fa-chevron-circle-up fa-3x" ></i></a>
+		<!-- Footer -->
+
+		<div id="footer" style="padding-top:6px;">
+			<span class="pull-left" style="color: #F5F5F5;font-weight: bold;margin-left:50px;">{%blocktrans%}Zeit{%endblocktrans%} : {% now "jS F Y H:i" %}</span>
+			<p class="pull-right"  style="margin-right:50px;"> Cankado &copy; 2014</p>
+		</div>
+
+		<!-- /Footer -->
+		<!-- Javascript files -->
+
+
+		<script src = "{{ STATIC_URL }}js/jquery.min.js" ></script>
+		<script src="{{ STATIC_URL }}js/jquery-ui.js"></script>
+		<script src="{{ STATIC_URL }}js/bootstrap.js"></script>
+		<script src="{{ STATIC_URL }}js/jquery.knob.js"></script>
+		<script src="{{ STATIC_URL }}js/jquery.mCustomScrollbar.concat.min.js"></script>       
+		<script src="{{ STATIC_URL }}js/bootstrapx-clickover.js"></script>
+		<script src="{{ STATIC_URL }}js/bootbox.min.js"></script>
+		<!-- The daterange picker bootstrap plugin -->
+		<script src="{{ STATIC_URL }}chart/js/sugar.min.js"></script>
+		<script src="{{ STATIC_URL }}chart/js/daterangepicker.js"></script>
+
+		<!-- Our main script file -->
+		<script src="{{ STATIC_URL }}chart/js/script.js"></script>
+		<script src="{{ STATIC_URL }}js/jQDateRangeSlider-min.js"></script>
+		<script src="{{ STATIC_URL}}js/timeInterview.js"></script>
+		<script>
+								$(document).ready(function() {
+
+									$('.time').inputmask('h:s');
+
+
+									$('.date').inputmask("dd.mm.yyyy");
+									$('.mobile').inputmask("004\\99{5,16}");
+
+								});
+								$(function() {
+									if (window.PIE) {
+										$('.dial').each(function() {
+											PIE.attach(this);
+										});
+									}
+								});
+								$(function() {
+									if (window.PIE) {
+										$('input').each(function() {
+											PIE.attach(this);
+										});
+									}
+								});
+								$(function() {
+									if (window.PIE) {
+										$('.cube').each(function() {
+											PIE.attach(this);
+										});
+									}
+								});
+
+								//								$(document).ready(function() {
+								//									var knobWidth;
+								//									var knobHeight;
+								//									// store reference to div obj
+								//									var windowObj = $('.rightbox');
+								//									var newwidth = $(".box1").width() * (Math.round(windowObj.width()) / 100);
+								//									var newwidth = Math.round(newwidth);
+								//
+								//									if (newwidth > 100 && newwidth < 520) {
+								//										newwidth = 100;
+								//									} else if ($(".box1").width() >= 520 && $(".box1").width() < 648) {
+								//										newwidth = 60;
+								//									}
+								//
+								//									knobWidth = newwidth;
+								//									knobHeight = newwidth;
+								//									//    knobHeight = Math.round(windowObj.height());                
+								//									// change the data-width and data-height attributes of the input to either 75%
+								//									// of the width or 75% of the height
+								//									$('.dial').attr('data-width', knobWidth).attr('data-height', knobHeight);
+								//
+								//									// draw the nob NOTE: must be called after the attributes are set.
+								//									$(function() {
+								//										$(".dial").knob({
+								//											draw: function() {
+								//											}
+								//										});
+								//									});
+								//								});
+
+		</script>
+		<script>
+			$(function() {
+				$('.datepicker').datetimepicker({
+					pickTime: false
+				});
+			});
+			$(function() {
+				$('.timepicker').datetimepicker({
+					pickDate: false
+				});
+			});
+			$(document).ready(function() {
+
+				//Check to see if the window is top if not then display button
+				$(window).scroll(function() {
+					if ($(this).scrollTop() > 100) {
+						$('.scrollToTop').fadeIn();
+					} else {
+						$('.scrollToTop').fadeOut();
+					}
+				});
+
+
+				//Click event to scroll to top
+				$('.scrollToTop').click(function() {
+					$('html, body').animate({scrollTop: 0}, 800);
+					return false;
+				});
+
+
+			});
+		</script>
+
+		<script>
+			/* $(document).ready(function(){
+			 var Llink = $(location).attr('pathname');
+			 if(Llink == "{% url 'patient:dashboard' %}"){
+			 $('#sidebar li:first-child').addClass("active");
+			 }else if(Llink == "{% url 'patient:therapies' %}"){
+			 $('#sidebar li:nth-child(2)').addClass("active");              
+			 }else if(Llink == "{% url 'patient:patSideEffect' %}"){
+			 $('#sidebar li:nth-child(3)').addClass("active");
+			 }else if(Llink == "{% url 'patient:MyDocs' %}"){
+			 $('#sidebar li:nth-child(4)').addClass("active");
+			 }else if(Llink == "{% url 'patient:calendar' %}"){
+			 $('#sidebar li:nth-child(5)').addClass("active");
+			 }
+			 
+			 }); */
+			$(document).ready(function() {
+				var currentPage = $("#hiddenPageId").val();
+				$("#" + currentPage).addClass('active');
+
+			});
+		</script>
+
+		<script src="{{ STATIC_URL }}js/bootstrap-datetimepicker.min.js"></script>
+		<script src="{{ STATIC_URL }}js/jquery.inputmask.js"></script>
+		<script src="{{ STATIC_URL }}js/jquery.inputmask.date.extensions.js"></script>
+		<script src="{{ STATIC_URL}}js/drugInterview.js"></script>
+		<script src="{{ STATIC_URL }}foundation/js/foundation.min.js" type="text/javascript"></script>
+		<script src="{{ STATIC_URL }}vertical-timeline/js/main.js" type="text/javascript"></script>
+		<script>
+			$('.tran-Lang').click(function(e) {
+				e.preventDefault();
+				var lng = $(this).attr('lngvalue')
+//				alert(lng)
+				$.get("/translator/set_language/", {language: lng})
+					.done(function() {
+						window.location = window.location.pathname;
+					});
+
+			})
+		</script>
+		{% block bottomScripts %}{% endblock %}
+	</body>
+</html>
+{% endlanguage %}

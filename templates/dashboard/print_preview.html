@@ -1,0 +1,19 @@
+{% load i18n %}
+<div class="modal fade" id="previewModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="myModalLabel">
+            {%blocktrans%}Vorschau{%endblocktrans%}
+            <span class="pull-right">
+                <button class="btn btn-info print">{%blocktrans%}Druck{%endblocktrans%}</button>
+                <button class="btn btn-danger" type="button" class="close" data-dismiss="modal" aria-hidden="true">{%blocktrans%}Schließen{%endblocktrans%}</button>
+            </span>
+        </h4>
+      </div>
+      <div class="modal-body">
+        <iframe id="contentstoprint" style="height: 395px;width: 100%;border: 0px;"></iframe>
+      </div>
+    </div>
+  </div>
+</div>

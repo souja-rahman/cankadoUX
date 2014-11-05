@@ -1,0 +1,73 @@
+{% extends "dashboard/docLayout.html" %} 
+{% load i18n %}
+{% load url from future %}
+{% block content %}
+
+<input id="csrf_token" type="hidden" value="{{csrf_token}}">
+
+<div class="span9">
+    <h1 class="page-title">{%blocktrans%}Unregistered Patients{%endblocktrans%}</h1>
+
+    <!-- Table - 4 columns -->
+    {% if patients %}
+    <div class="widget">
+        <div class="widget-content">
+        	<table class="footable table table-bordered table-striped table-hover ">
+        		<tr>
+        			<th>{%blocktrans%}No{%endblocktrans%}</td>
+        			<th>{%blocktrans%}Username{%endblocktrans%}</th>
+        			<th>{%blocktrans%}Password{%endblocktrans%}</th>
+        			<th>{%blocktrans%}Action{%endblocktrans%}</th>
+        		</tr>
+        		{% for patient in patients %}
+        		<tr class="printData">
+        			<td>{{forloop.counter}}</td>
+        			<td>{{patient.user.username}}</td>
+        			<td>{{patient.plain_password}}</td>
+        			<td><button class="btn btn-primary print" id="{{patient.user.id}}">{%blocktrans%}Print{%endblocktrans%}</button></td>
+        		</tr>
+        		{% endfor %}
+        	</table>
+        	<iframe id="contentstoprint" style="height: 0px; width: 0px; position: absolute;display:none;"></iframe>
+        </div>
+    </duv>
+    {% else %}
+    <div class="alert alert-info">
+    	{%blocktrans%}No patients there.{%endblocktrans%}
+    </div>
+    {% endif 	%}
+
+</div>
+
+{% endblock %}
+
+{% block bottomScripts %}
+
+<script>
+	$(function(){
+
+		$('.print').bind('click', function(e) {
+			e.preventDefault();
+			var id = $(this).attr('id');
+
+			$.get("/doctor/print/receipt/", {      
+          id: id
+      })
+      .done(function(data) {
+          var content = data;
+          var pri = document.getElementById("contentstoprint").contentWindow;
+      		pri.document.open();
+      		pri.document.write(content);
+      		pri.document.close();
+      		pri.focus();
+      		pri.print();
+      })
+      .fail(function() {
+          bootbox.alert( JS_LOCALE.getTrans("Ein Fehler ist aufgetreten beim Abrufen von Patientendaten, versuchen Sie es!" ));
+      });
+		});
+
+	});	
+</script>
+
+{% endblock %}

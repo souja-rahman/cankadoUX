@@ -1,0 +1,65 @@
+.cube{
+    background-color:whitesmoke;
+    border-radius:0px;
+    text-align:center;
+    min-height:80px !important;
+    margin-bottom:5px;
+    text-decoration: none;
+}
+.cube  a:hover {
+    text-decoration:none; 
+}     
+.cube .span12{
+    padding-top:5px;            
+}
+.cube a div{
+    min-height:85px !important;
+    padding-top:15px;
+    color:#4A515B;
+}
+input.dial{
+    box-shadow:none;
+    text-shadow: 0px 0px 5px rgba(0,0,0,0.2);
+
+}	
+input.dial:focus{
+    box-shadow:none;    
+}
+.discolor{
+    background-color:#DDDDDD !important;
+    color:#BDBDBD !important;
+}
+.discolor i{
+    color:#BDBDBD !important;
+}  
+.scrollToTop{
+	width:40px; 
+	height:40px;
+	padding:10px;
+       
+	text-align:center; 
+	
+	font-weight: bold;
+	color: #444;
+	text-decoration: none;
+	position:fixed;
+	bottom:30px;
+	right:20px;
+	display:none;
+	
+}
+.scrollToTop:hover{
+	text-decoration:none;
+}
+input[readonly]{
+                cursor: default;
+            }
+            
+.activeb{
+        background: #ABD2EF !important;
+        color: white;
+    }
+.activea{
+        background: #79A0BB !important;
+        color: white;
+    }

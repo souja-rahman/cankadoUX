@@ -1,0 +1,228 @@
+@charset "UTF-8";
+
+@font-face {
+	font-family: "conkado";
+	src:url("fonts/conkado.eot");
+	src:url("fonts/conkado.eot?#iefix") format("embedded-opentype"),
+		url("fonts/conkado.woff") format("woff"),
+		url("fonts/conkado.ttf") format("truetype"),
+		url("fonts/conkado.svg#conkado") format("svg");
+	font-weight: normal;
+	font-style: normal;
+
+}
+
+[data-icon]:before {
+	font-family: "conkado" !important;
+	content: attr(data-icon);
+	font-style: normal !important;
+	font-weight: normal !important;
+	font-variant: normal !important;
+	text-transform: none !important;
+	speak: none;
+
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+[class^="icon-"]:before,
+[class*=" icon-"]:before {
+	font-family: "conkado" !important;
+	font-style: normal !important;
+	font-weight: normal !important;
+	font-variant: normal !important;
+	text-transform: none !important;
+	speak: none;
+
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+.icon-coins:before {
+	content: "a";
+}
+.icon-pill:before {
+	content: "b";
+}
+.icon-syringe:before {
+	content: "c";
+}
+.icon-hospital-24:before {
+	content: "d";
+}
+.icon-art-gallery-24:before {
+	content: "e";
+}
+.icon-check-clipboard-1:before {
+	content: "f";
+}
+.icon-skull:before {
+	content: "g";
+}
+.icon-picture:before {
+	content: "h";
+}
+
+img.kr{
+	width:24px;
+	height:40px;
+	background:url('../../img/kados2.png') 0 0;
+	background-size:cover;
+}
+img.ky{
+	width:24px;
+	height:40px;
+	background:url('../../img/kados2.png') 97px 0;
+	background-size:cover;
+}
+img.kbl{
+	width:24px;
+	height:40px;
+	background:url('../../img/kados2.png') 73px 0;
+	background-size:cover;
+}
+img.kg{
+	width:24px;
+	height:40px;
+	background:url('../../img/kados2.png') 48px 0;
+	background-size:cover;
+}
+img.kbk{
+	width:24px;
+	height:40px;
+	background:url('../../img/kados2.png') 24px 0;
+	background-size:cover;
+}
+html,
+body {
+	height: 100%;
+	margin:0 !important;
+	padding: 0 !important;
+	min-width: 670px;
+	/* The html and body elements cannot have any padding or margin. */
+}
+
+/* Wrapper for page content to push down footer */
+#wrap {
+	min-height: 100%;
+	height: auto !important;
+	height: 100%;
+	/* Negative indent footer by it's height */
+	margin: 0 auto -30px;
+}
+
+/* Set the fixed height of the footer here */
+#push,
+#footer {
+	height: 30px;
+}
+#footer {
+	background-color: #f5f5f5;
+	position: fixed;
+	bottom: 0px;
+	width: 100%;
+	z-index: 1000000000;
+}
+
+/* Lastly, apply responsive CSS fixes as necessary */
+@media (max-width: 767px) {
+	#footer {
+		margin-left: -20px;
+		margin-right: -20px;
+		padding-left: 20px;
+		padding-right: 20px;
+	}
+}
+
+.alert{
+	-webkit-border-radius: 0px; 
+	-moz-border-radius: 0px;
+	border-radius: 0px; 
+	box-shadow: 1px 2px 2px #A5A5A5;	
+}
+
+@media (max-width: 767px)
+{
+	.modal.fade {
+		display: none;
+		/*		top: -1640px !important;*/
+	}
+}
+
+.conswitch
+{
+	width: 2em;
+	display: inline-block;
+	float: left;
+}
+
+.conswitch input[type="radio"]
+{
+	left: -100000px;
+	position: absolute;
+}
+
+.conswitch input[type="radio"] + label
+{
+	margin: 0;
+}
+
+.conswitch input[type="radio"] + label .fa
+{
+	color: #F9D119;
+	cursor: pointer;
+}
+.conswitch input[type="radio"] + label .fa-check
+{
+	color: #41AD48;
+}
+.conswitch input[type="radio"] + label .fa-check
+{
+	display: none;
+}
+
+.conswitch input[type="radio"]:checked + label .fa-check
+{
+	display: inline-block;
+}
+.conswitch input[type="radio"] + label .fa-times
+{
+	display: none;
+}
+
+.mCSB_container {
+	padding-bottom: 10px;
+}
+
+th, .footable {
+	border-radius: 0px !important;
+}
+
+.activeTreatment{
+	display: block;
+	text-align: center;
+	font-size: 18px;
+	margin-bottom: 13px;
+}
+.activeTreatment strong
+{
+	font-size: 19px
+}
+
+.graphTitle {
+	display: block;
+	text-align: center;
+	font-size: 18px;
+	color: #3D3D3D;
+	margin-bottom: 22px;
+}
+
+.inTGLbl {
+	text-align: right;
+	font-weight: bold;
+}
+.progress
+{
+	margin-bottom: 0px;
+	border-radius: 0px
+}

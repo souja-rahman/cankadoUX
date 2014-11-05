@@ -1,0 +1,292 @@
+{% load i18n %}
+{% load templateUtils %}
+{% load poll_extras %}
+<style>
+	.table_wrapper{
+		max-height: 200px;
+		overflow-y: scroll;
+	}
+	.sewiki{
+		border: 1px solid #49708A;
+		padding: 5px;
+		border-radius: 5px;
+		margin-bottom: 5px;
+		margin-left: -5px;
+	}
+	.sewiki_head{
+		background: #49708A;
+		height: 24px;
+		margin-top: -5px;
+		margin-right: -6px;
+		margin-left: -6px;
+		padding: 5px;
+		margin-bottom: 5px;
+		border-top-left-radius: 5px;
+		border-top-right-radius: 5px;
+		padding-top: 12px;
+		color:#fff;
+	}
+	.selected{
+		background: #6683AD;
+		color:white;
+	}
+</style>
+<div class="row-fluid ">
+	<!-- ==========================================================drug widget==================================== -->
+	<div class="widget">
+		<div class="widget-header">
+			<h3>{%blocktrans%}Medikamente{%endblocktrans%}</h3>
+		</div>
+		<div class="widget-content">
+			{% if treatment|getDrugs %}
+			<table class="footable unitblock">
+				<thead>
+					<tr>
+						<th>{%blocktrans%}Medikamente{%endblocktrans%}</th>
+						<th>{%blocktrans%}Menge{%endblocktrans%}</th>
+						<th>{%blocktrans%}Zeit{%endblocktrans%}</th>
+						<th data-hide='all'>{%blocktrans%}Tage{%endblocktrans%}</th>
+						<th>{%blocktrans%}Anmerkung{%endblocktrans%}</th>
+					</tr>
+				</thead>
+				<tbody>
+
+					{% for drug in treatment|getDrugs %}  
+					{% with value=drug.0|drugValue %}       
+					<tr>
+						<td>
+							{{drug.0.drugname}}
+						</td>
+						<!--                        <td>{{value}} {{value|getUnit:drug.0.drugname.unit}}</td>-->
+						<td>{{value}} {{value|getUnitLanguage:drug.0.drugname.unit|language:user_language}}</td>
+						<td>
+							{% if drug.0.timeNotRequired %}
+							{%blocktrans%}Ganzer Tag{%endblocktrans%}
+							{% elif drug.0.drugTime != '0' %}
+							{{drug.0.drugTime|getDrugTimeStatus:user_language}}
+							{% else %}
+							{{drug.0.time|time:'H:i'}}
+							{% endif %}
+						</td>
+						<td>{{drug.1|join:', '}}</td>
+						<td>{{drug.0.annotation}}</td>
+					</tr>
+					{% endwith %}
+					{% endfor %}
+				</tbody>
+			</table>
+			{% else %}
+			<p style="color:#0088cc;">* {%blocktrans%} Keine Medikamente hinzugefügt.{%endblocktrans%}</p>
+			{% endif %}
+		</div>
+	</div>
+	<!-- ==========================================================drug widget end==================================== -->
+	<!-- ==========================================================sideeffect widget==================================== -->
+	<div class="widget">
+		<div class="widget-header">
+			<h3>{%blocktrans%}Nebenwirkungen{%endblocktrans%}</h3>
+		</div>
+		<div class="widget-content">
+			{% if treatment.sideeffect_set.all %}
+			<div class="table_wrapper">
+				<table  class="footable" id="setable" >
+					<tbody >
+						{% for seData in treatment.sideeffect_set.all %}
+						{% if not seData.is_unexpected %}
+						<tr class="unitblock">
+							<td se="{{seData.id}}" class="se">
+								{{seData.sideeffect}}
+							</td>
+						</tr>
+						{% endif %}
+						{% endfor %}
+					</tbody>
+				</table>
+			</div>
+			{% for seData in treatment.sideeffect_set.all %}
+			{% if not seData.is_unexpected %}
+			<div class="row-fluid seDetails" style="display:none;" id="seDetails_{{seData.id}}">
+				<h4> {%blocktrans%}Nebenwirkungen Informationen{%endblocktrans%}</h4>
+
+				<div class="row-fluid">
+					<div class="span3">
+						<p class="pull-right" style="font-weight:900;">                                
+							{%blocktrans%}MedDRA v12.0 Code{%endblocktrans%}
+						</p>
+					</div> 
+					<div class="span9">
+						<p>{{seData.sideeffect.MedDRA_Code|default:'---'}}</p>
+					</div>
+				</div>
+				<div class="row-fluid">
+					<div class="span3">
+						<p class="pull-right" style="font-weight:900;">                                
+							{%blocktrans%}CTCAE v4.0 SOC{%endblocktrans%}
+						</p>
+					</div> 
+					<div class="span9">
+						<p>{{seData.sideeffect.SOC|default:'---'}}</p>
+					</div>
+				</div>
+				<div class="row-fluid">
+					<div class="span3">
+						<p class="pull-right" style="font-weight:900;">                                
+							{%blocktrans%}CTCAE v4.0 Term{%endblocktrans%}
+						</p>
+					</div> 
+					<div class="span9">
+						<p>{{seData.sideeffect.sideeffect|default:'---'}}</p>
+					</div>
+				</div>
+				<div class="row-fluid">
+					<div class="span3">
+						<p class="pull-right" style="font-weight:900;">                                
+							{%blocktrans%}pt_CTCAE v4.0 Term{%endblocktrans%}
+						</p>
+					</div> 
+					<div class="span9">
+						<p>{{seData.sideeffect.pat_term|default:'---'}}</p>
+					</div>
+				</div>
+				<div class="row-fluid">
+					<table class="footable table-condensed" style="margin-bottom: 5px;" >
+						<thead>
+							<tr>
+								<th>
+									{%blocktrans%}Grad{%endblocktrans%}
+								</th>
+								<th>
+									{%blocktrans%}Patient{%endblocktrans%}
+								</th>
+								<th>
+									{%blocktrans%}Arzt{%endblocktrans%}
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							{% if seData.sideeffect.grade1.sideeffecttype %}
+							<tr>
+								<td>1</td>
+								<td>{{seData.sideeffect.grade1|default:'---'}}</td>
+								<td>{{seData.sideeffect.doc_grade1|default:'---'}}</td>
+							</tr>
+							{% endif %}
+
+							{% if seData.sideeffect.grade2.sideeffecttype %}
+							<tr>
+								<td>2</td>
+								<td>{{seData.sideeffect.grade2|default:'---'}}</td>
+								<td>{{seData.sideeffect.doc_grade2|default:'---'}}</td>
+							</tr>
+							{% endif %}
+
+							{% if seData.sideeffect.grade3.sideeffecttype %}
+							<tr>
+								<td>3</td>
+								<td>{{seData.sideeffect.grade3|default:'---'}}</td>
+								<td>{{seData.sideeffect.doc_grade3|default:'---'}}</td>
+							</tr>
+							{% endif %}
+
+							{% if seData.sideeffect.grade4.sideeffecttype %}
+							<tr>
+								<td>4</td>
+								<td>{{seData.sideeffect.grade4|default:'---'}}</td>
+								<td>{{seData.sideeffect.doc_grade4|default:'---'}}</td>
+							</tr>
+							{% endif %}
+
+						</tbody>
+					</table>
+				</div>
+				{% autoescape off %}
+				<div class="row-fluid sewiki">
+					<h4 class="sewiki_head">{%blocktrans%}Nebenwirkungen - Physician Beschreibung{%endblocktrans%}
+					</h4>
+					{% if seData.getPhysicianWiki %}
+					<center><a ttarget="wiki" href="{{seData.getPhysicianWikiUrl}}" class='btn btn-large btn-inverse'>{%blocktrans%}Vorschau{%endblocktrans%}</a></center>
+					{% else %}
+					<p style="color:#0088cc;"> * {%blocktrans%}Keine Beschreibung.{%endblocktrans%}</p>
+					{% endif %}
+				</div>
+				<div class="row-fluid sewiki">
+					<h4 class="sewiki_head">{%blocktrans%}Nebenwirkung - Patient Beschreibung{%endblocktrans%}
+					</h4>
+
+					{% if seData.getPatientWiki %}
+					<center><a ttarget="wiki" href="{{seData.getPatientWikiUrl}}" class='btn btn-large btn-inverse'>{%blocktrans%}Vorschau{%endblocktrans%}</a></center>
+					{% else %}
+					<p style="color:#0088cc;"> * {%blocktrans%}Keine Beschreibung.{%endblocktrans%}</p>
+					{% endif %}
+				</div>
+				{% endautoescape %}
+			</div>
+			{% endif %}
+			{% endfor %}
+			{% else %}
+			<p style="color:#0088cc;">* {%blocktrans%}Keine nebenwirkungen.{%endblocktrans%}</p>
+			{% endif %}
+		</div>
+	</div>
+	<!-- ==========================================================sideeffect widget end==================================== -->
+	{% autoescape off %}
+	<div class="widget">
+		<div class="widget-header">
+
+			<h3>{%blocktrans%}Therapie - Physician Beschreibung{%endblocktrans%}</h3>
+		</div>
+		<div class="widget-content"> 
+
+			{% if treatment.getPhysicianWiki %}
+			<center><a ttarget="wiki" href="{{treatment.getPhysicianWikiUrl}}" class='btn btn-large btn-inverse'>{%blocktrans%}Vorschau{%endblocktrans%}</a></center>
+			{% else %}
+			<p style="color:#0088cc;"> * {%blocktrans%}Keine Beschreibung.{%endblocktrans%}</p>
+			{% endif %}
+
+		</div>
+
+	</div>
+
+	<div class="widget ">
+		<div class="widget-header"> 
+			<h3>{%blocktrans%}Therapie - Patient Beschreibung{%endblocktrans%}</h3>
+		</div>
+		<div class="widget-content">
+			{% if treatment.getPatientWiki %}
+			<center><a ttarget="wiki" href="{{treatment.getPatientWikiUrl}}" class='btn btn-large btn-inverse'>{%blocktrans%}Vorschau{%endblocktrans%}</a></center>
+			{% else %}
+			<p style="color:#0088cc;"> * {%blocktrans%}Keine Beschreibung.{%endblocktrans%}</p>
+			{% endif %}
+		</div>
+	</div>
+	{% endautoescape %}
+</div>
+
+<script>
+	$('.se').click(function(e) {
+		e.preventDefault();
+		$('.seDetails').css("display", "none");
+		var se = $(this).attr('se');
+		$('#seDetails_' + se).show();
+		$('.se').each(function(index, val) {
+			if ($(this).attr('se') == se) {
+				$(this).addClass('selected');
+			}
+			else {
+				$(this).removeClass('selected');
+			}
+		});
+	});
+</script>
+<script src="{{ STATIC_URL }}js/footable.js"></script>
+<script src="{{ STATIC_URL }}js/footable.sort.js" type="text/javascript"></script>
+<script type="text/javascript">
+	$(function() {
+		$('.footable').footable();
+	});
+</script>
+<script type="text/javascript">
+	$(document).ready(function() {
+		$("#setable tr:first td").trigger("click");
+	});
+</script>

@@ -1,0 +1,108 @@
+{% extends "dashboard/adminLayout.html" %}  
+{% block page_id %}TArchive{% endblock %}
+{% load templateUtils %} 
+{% block content %}
+<div class="span9">
+    <div class="row-fluid ">
+        <div class=" span12" style="padding:27px;border-radius:5px;">
+            <div class="row-fluid">
+                <div class="newbreadcrumb flat">
+                    <a href="/admin/treatment/list/">Admin</a>
+                    <a href="/admin/treatment/list/">Treatments</a>
+                    <a href="/admin/treatment/archive/">Archive</a>
+                    <a href="#" class="active">{{treatment.name}}</a>
+                </div>
+            </div>
+            <h1 class="page-title">{{archiveTreatment|default:treatment.name}}</h1>
+            {% include 'dashboard/treatmentDetails.html' %}
+            <div class="widget" style="padding-bottom:0px;">    
+                <div class="widget-header">         
+                    <h3>Comment From Auditor</h3>
+                </div>      
+                <div class="widget-content">
+                    <div class="row-fluid">
+
+
+                        <form class="form-horizontal span12 " method="POST" id="treatmentApproveForm">
+                            {% csrf_token %}
+                            <div class="control-group">
+                                <label class="control-label"><strong>Comment from Auditor</strong></label>
+                                <div class="controls">
+                                    <textarea name="comment"  readonly="true"  rows="8" style="width:97%;resize:none;border: 1px solid #ddd;">{{treatment.getPharmacistTreatmentAprvDecComment|default:' '}}</textarea>
+                                </div>
+                            </div>
+                           
+
+
+
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+            <!--
+            <div class="row-fluid">
+
+                <h4>Physician Wiki</h4>
+                {% autoescape off %}
+                <div> 
+                    {% if treatment.getPhysicianWiki %}
+                        {{treatment.getPhysicianWiki}}      
+                    {% else %}
+                        <p>* No wiki added.</p>    
+                    {% endif %}  
+                </div>
+                {% endautoescape %} 
+
+            </div> 
+
+            <div class="row-fluid">
+                <h4>Patient Wiki</h4>
+                {% autoescape off %}
+                <div> 
+                    {% if treatment.getPatientWiki %}
+                        {{treatment.getPatientWiki}} 
+                    {% else %}
+                        <p>* No wiki added.</p>    
+                    {% endif %}            
+                </div>
+                {% endautoescape %}
+
+            </div>
+            <hr>
+
+            <h4>Drugs</h4>
+            {% if not drugs %}
+            <p>* No drugs related to this treatment.</p>
+            {% endif %}
+            <div class="container-fluid drugsList vscroll" style="">
+                {% for drug in drugs %}
+                <div class="row-fluid" id="drug{{drug.1}}">
+                    <div class="span10">
+                        {{drug.0}} 
+                    </div>
+                </div>
+                <hr>
+                {% endfor %}
+
+            </div>
+
+            <h4>Side Effects</h4>
+            {% if not treatment.sideeffect_set.all %}
+            <p>* No sideeffects added in this treatment.</p>
+            {% endif %}
+            <div class="container-fluid drugsList vscroll" style="">
+                {% for se in treatment.sideeffect_set.all %}
+                <div class="row-fluid" id="drug{{drug.1}}">
+                    <div class="span10">
+                        {{se.sideeffect}} 
+                    </div>
+                </div>
+                <hr>
+                {% endfor %}
+            </div>-->
+        </div>       
+    </div>
+</div>
+{% endblock %}      
+

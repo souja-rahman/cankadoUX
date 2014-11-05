@@ -1,0 +1,195 @@
+{% extends "dashboard/patLayout.html" %}
+{% block page_id %}settings{% endblock %}
+{% load templateUtils %}
+
+{% load i18n %}
+{% block content %}
+
+<style>
+	.input-append .add-on, .input-prepend .add-on
+	{
+		height: 30px;
+		margin-left: -1px !important;
+	}
+	.datetimepicker .icon-time
+	{}
+</style>
+
+
+<div class="span9">
+	<h1 class="page-title"><i class="fa fa-cog"></i>&nbsp;&nbsp; {%blocktrans%}Einstellungen{%endblocktrans%}</h1>
+
+	<div class="widget">
+		<div class="widget-header">
+			<h3>{%blocktrans%}Bitte tragen Sie Ihre Essensgewohnheiten ein{%endblocktrans%} </h3>
+		</div>
+		<div class="widget-content">
+			<form class="" id="timeForm">
+				<div>
+
+					<div class="InterviewQuestion">
+						<p>
+							{%blocktrans%}Wann werden Sie in der Regel frühstücken?{%endblocktrans%}
+						</p>
+						<div class=" datetimepicker">
+							<div class="input-append">
+								<input class="readonlyActive input-xlarge input time" data-format="hh:mm"  id="breakfast" type="text" name="time" value="08:00" >
+								<span class="add-on" style="">
+									<i class=""></i>
+								</span>
+							</div>
+						</div>
+
+						<p>
+							{%blocktrans%}Wann werden Sie in der Regel Ihre Mittags?{%endblocktrans%}
+						</p>
+						<div class=" datetimepicker">
+							<div class="input-append">
+								<input data-format="hh:mm"  id="lunch" type="text" name="time" value="12:30" class="readonlyActive time input-xlarge input">
+								<span class="add-on" style="">
+									<i class=""></i>
+								</span>
+							</div>
+						</div>
+
+						<p>
+							{%blocktrans%}Wann werden Sie in der Regel Ihr Abendessen?{%endblocktrans%}
+						</p>
+						<div class=" datetimepicker">
+							<div class="input-append">
+								<input data-format="hh:mm"  id="dinner" type="text" name="time" value="18:00" class="readonlyActive time input-xlarge input">
+								<span class="add-on" style="">
+									<i class=""></i>
+								</span>
+							</div>
+						</div>
+
+						<p>
+							{%blocktrans%}Wann werden Sie in der Regel schlafen gehen?{%endblocktrans%}
+						</p>
+						<div class=" datetimepicker">
+							<div class="input-append">
+								<input data-format="hh:mm"  id="sleep" type="text" name="time" value="20:00" class="readonlyActive time input-xlarge input">
+								<span class="add-on" style="">
+									<i class=""></i>
+								</span>
+							</div>
+						</div>
+
+						<p>
+							{%blocktrans%}Frei wählbar{%endblocktrans%}
+						</p>
+						<div class=" datetimepicker">
+							<div class="input-append">
+								<input data-format="hh:mm"  id="free_selectable" type="text" name="time" value="08:00" class="readonlyActive time input-xlarge input">
+								<span class="add-on" style="">
+									<i class=""></i>
+								</span>
+							</div>
+						</div>
+					</div>
+
+
+
+				</div>
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-info submitBtn">{%blocktrans%}Speichern{%endblocktrans%}</button>
+				</div>
+			</form>
+		</div>
+	</div>
+	
+	{% with drugs=user|getInterviewDrugs %}
+	{% if drugs.status %}
+	<div class="widget">
+		<div class="widget-header">
+			<h3>{%blocktrans%}Medizin Benennungsoptionen{%endblocktrans%} </h3>
+		</div>
+		<div class="widget-content">
+			<div class="InterviewModal" id="drugInterviewModal">
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div>
+							<h4>
+								{%blocktrans%}Medizin mit demselben Wirkstoff in verschiedenen Namen bekannt, können Sie einen Namen für jedes Medikament unten wählen.{%endblocktrans%}
+							</h4>
+
+							
+							{% if drugs.status %}
+							{% for drug in drugs.druglist %}
+							{% if drug.drugname_set.all %}
+							<div class="InterviewQuestion">
+								<p>
+									{%blocktrans%}Medikamente mit Wirkstoff{%endblocktrans%} {{drug}}
+								</p>
+								<ul>
+									{% for name in drug.drugname_set.all %}
+
+									<li class="DIdrugOptions">
+
+										<div class="kadoswitch switch tiny span6">
+											<input type="radio" class="drugInterviewBtn" drug="{{name.id}}" {% if user|drugNameSaved:name %}checked{% endif %} name="{{name.drug.id}}"  >
+											       <span class="fa-stack">
+												<!--<i class="fa fa-circle-o fa-stack-2x"></i>-->
+												<i class="fa fa-times fa-stack-1x"></i>
+												<i class="fa fa-check fa-stack-1x"></i>
+											</span>  
+											<span class="drugoption">{{name.name}}</span>
+										</div> 
+
+									</li>
+
+
+									{% endfor %}
+								</ul>
+								<p></p>
+							</div>
+
+							{% endif %}
+							{% endfor %}
+							{% endif %}
+
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	{% endif %}
+	{% endwith %}
+</div>
+
+{% for data in user.timeinterview_set.all %}
+<input type="hidden" id="breakfastTime" value="{{data.breakfast|time:'H:i'}}">
+<input type="hidden" id="lunchTime" value="{{data.lunch|time:'H:i'}}">
+<input type="hidden" id="dinnerTime" value="{{data.dinner|time:'H:i'}}">
+<input type="hidden" id="sleepTime" value="{{data.sleep|time:'H:i'}}">
+<input type="hidden" id="freeselectable" value="{{data.free_selectable|time:'H:i'}}">
+{% endfor %}
+
+
+{% endblock %}
+
+{% block bottomScripts %}
+<script>
+	$('.switch').click(function() {
+		$(this).find('input[type="radio"]').prop('checked', true).trigger('change');
+	});
+	if ($("#breakfastTime").length !== 0) {
+		$('#breakfast').val($('#breakfastTime').val());
+	}
+	if ($("#lunchTime").length !== 0) {
+		$('#lunch').val($('#lunchTime').val());
+	}
+	if ($("#dinnerTime").length !== 0) {
+		$('#dinner').val($('#dinnerTime').val());
+	}
+	if ($("#sleepTime").length !== 0) {
+		$('#sleep').val($('#sleepTime').val());
+	}
+	if ($("#freeselectable").length !== 0) {
+		$('#free_selectable').val($('#freeselectable').val());
+	}
+</script>
+{% endblock %}

@@ -1,0 +1,481 @@
+{% extends "dashboard/docLayout.html" %} 
+{% load i18n %}
+{% block page_id %}mypatients{% endblock %}
+
+{% load templateUtils %}
+{% load poll_extras %}
+{% load url from future %}
+{% block content %}
+<link href="{{ STATIC_URL }}js/jqplot/jquery.jqplot.min.css" rel="stylesheet" type="text/css" media="screen" />
+<style>
+	.activeTreatment
+	{
+		background: #4A515B;;
+	}
+	.activeTreatment h4
+	{
+		color: #F8F8F8;
+	}
+	.treatmentRadio
+	{
+		display: none;
+	}
+	.editbut{
+		*position: absolute;
+		right: 6%;
+		margin-top:2px;
+		display: none;
+	}
+	hr{
+		margin: 10px;
+	}
+	.treatmentItem{
+		border-radius:5px;
+	}
+	.input.span8.add-on{
+		border-radius:5px;
+
+	}
+	/* Large desktop */
+	@media (min-width: 1200px) {
+
+	}
+
+	/* Portrait tablet to landscape and desktop */
+	@media (min-width: 768px) and (max-width: 979px) { 
+
+	}
+
+	/* Landscape phone to portrait tablet */
+	@media (max-width: 767px) { 
+		.input.span8.add-on{
+			width: 100%;
+
+		}
+	}
+
+	/* Landscape phones and down */
+	@media (max-width: 480px) {
+		.input.span8.add-on{
+			width: 100%;
+
+		}
+	}
+	.editableDrugs{
+		display: none;
+	}
+	.time-range
+	{
+		border-top: 1px solid #ACA5A5;
+		padding-top: 10px;
+
+	}
+	#chart2 .jqplot-point-label {
+		border: 1.5px solid #aaaaaa;
+		padding: 1px 3px;
+		background-color: #eeccdd;
+	}
+	.searchBtn{
+		width: 10%;
+	}
+	.searchGrade{
+		width:80%;
+		float:right;
+	}
+
+	#seSearchResult .footable-row-detail-inner
+	{
+		width: 100%
+	}
+	
+</style>
+<link href="{{ STATIC_URL }}chart/css/daterangepicker.css" rel="stylesheet">
+<link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap-switch.min.css" />
+<input id="csrf_token" type="hidden" value="{{csrf_token}}">
+<input type="hidden" id="patient" value="{{patient.id}}">
+<input type="hidden" id="preloader" value="<img src='{{ STATIC_URL }}img/preloader.gif' height='32' width='32'>">
+<!-- Content -->
+<div class="span9">
+	<h1 class="page-title">{%blocktrans%}Verwalten{%endblocktrans%} : {{patient.userprofile.first_name|default:'Leer'}} {{patient.userprofile.last_name|default:'Leer'}}</h1>
+	{% if patient.userprofile.plain_password %}
+	<div class="row-fluid">
+		<div class="span12">
+			<div class="alert alert-error alert-block">
+				{%blocktrans%}Dieser Zugang wurde vom Patienten noch nicht bestätigt.{%endblocktrans%}
+				{% if patient.userprofile.plain_password %} <button class="btn btn-danger pull-right previewBtn" style="text-transform:uppercase;margin-top: -5px;" id="{{patient.id}}">{%blocktrans%}Druck-Karte{%endblocktrans%}</button>{% endif %}
+			</div>
+		</div>
+	</div>
+	{% endif %}
+	{% if messages %}
+	<div class="row-fluid">
+		<div class="span12">
+			<div class="alert alert-warning alert-block">
+				{% autoescape off %}
+				{{messages}}
+				{% endautoescape %}
+
+			</div>
+		</div>
+	</div>
+	{% endif %}
+
+	<div class="widget">
+		<form action="/doctor/patient/{{patient.id}}/" method="POST">{% csrf_token %}
+			<div class="widget-header">
+				<h3>{%blocktrans%}Benutzerinformationen{%endblocktrans%} 
+				</h3>
+				<button class="btn btn-info btn-mini pull-right span1 formUpdate" type="submit" style="margin:5px;">{%blocktrans%}Save{%endblocktrans%}
+				</button>
+			</div>    
+
+
+			<div class="widget-content">
+
+				<div class="row-fluid">
+					<div class="span6">
+						<div class="row-fluid formData">
+							<label class="span4" >{%blocktrans%}Patienten Id{%endblocktrans%}</label>
+							<input type="text" style="background: #6683AD; color: #F8F8F8; font-weight: bold;" readonly value="{{patient.username}}" class="span8 input">
+
+							<hr>
+						</div>
+
+						<div class="row-fluid formData">
+							<label class="span4"  >{%blocktrans%}Vorname{%endblocktrans%}</label>
+							<input name="fName" type="text" readonly="" value="{% if patient.userprofile.first_name %}{{patient.userprofile.first_name|default:''}}{% endif %}" class="span8 input formEdit" required>
+
+						</div>
+
+						<div class="row-fluid formData">
+							<label class="span4"  >{%blocktrans%}Nachname{%endblocktrans%}</label>
+							<input type="text" name="lName" readonly="" value="{% if patient.userprofile.last_name %}{{patient.userprofile.last_name|default:''}}{% endif %}" class="span8 input formEdit" required>
+
+							<hr>
+						</div>
+
+						<div class="row-fluid formData">
+							<label class="span4"  >{%blocktrans%}Telefon{%endblocktrans%}</label>
+							<input type="text" readonly="" name="phone" value="{{patient.userprofile.mobile}}" class="span8 input formEdit mobile">
+
+						</div>
+
+						<div class="row-fluid formData">
+							<label class="span4"  >{%blocktrans%}E-Mail Adresse *{%endblocktrans%}</label>
+							<input type="email" name="email" value="{% if patient.userprofile.email %}{{patient.userprofile.email|default:''}}{% endif %}" readonly="" class="span8 input formEdit">
+						</div>
+
+					</div>
+					<div class="span6" style="min-height:216px;">
+
+						<div class="row-fluid formData">
+							<label class="span4"  >{%blocktrans%}Geschlecht{%endblocktrans%} </label>
+							<div class="span8">
+								<label for="Male" class="radio ">
+									<input type="radio" name="gender" id="Male" value="Male" class="input offset1">{%blocktrans%}männlich {%endblocktrans%}
+								</label>
+								<label  for="Female" class="radio ">
+									<input type="radio" name="gender" id="Female" value="Female" class="input offset1">{%blocktrans%}weiblich{%endblocktrans%}
+								</label>
+							</div>
+
+							<hr> 
+						</div>
+
+						<div class="row-fluid formData datepicker">
+							<label class="span4"  >{%blocktrans%}Geburtsdatum{%endblocktrans%}</label>
+							<div class="input-append ">
+								<input type="text"  name="dob" data-format="dd.MM.yyyy" readonly="" value="{{patient.userprofile.dob|date:'d.m.Y'}}" class="input span8 date formEdit" id="dateOfBirth">
+								<span class="add-on" style="position: relative;z-index:4;margin-left: -28px;">
+									<i class="fa fa-calendar"></i>
+								</span>
+							</div>
+
+							<hr>
+						</div>
+
+
+						<div class="row-fluid formData">
+							<label class="span4"  >{%blocktrans%}Therapie{%endblocktrans%}</label>
+							<input type="text" readonly value="{{currentTreatment.0.name|default:'No Therapie'}}" class="span8 input">
+						</div>
+
+						<div class="row-fluid formData">
+							<label class="span4"  >{%blocktrans%}Diagnose{%endblocktrans%}</label>
+							<textarea  readonly name="diagnose"  class="span8 input formEdit" rows="4">{% for patient in patient.patient_properties.all %}{{patient.diagnose}}{% endfor %}</textarea>
+						</div>
+
+					</div>
+
+				</div>
+			</div>
+		</form>
+	</div>
+
+	<div class="widget" id="treatwidget">
+		<div class="widget-header">
+			<h3> {%blocktrans%}Therapie{%endblocktrans%} </h3>
+			<button class="btn btn-info btn-mini pull-right treatEditBtn" style="margin:9px 10px 0px 0px;" href="#myModal" role="button" data-toggle="modal" treatment="{% if currentTreatment %}{{currentTreatment.0.id}}{% endif %}" data-backdrop="static" data-keyboard="false">{%blocktrans%}bearbeiten{%endblocktrans%}</button>
+		</div>   
+
+		<div class="widget-content">
+
+			<div class="row-fluid">
+
+				{% if currentTreatment %}
+
+
+				<form class="form-horizontal">
+					<div class="control-group">
+						<label class="control-label span4">{%blocktrans%}Therapie{%endblocktrans%}</label>
+						<div class="controls span8" style="" >
+							<input style="min-width:50%" type="text" readonly="" value="{{currentTreatment.0.name}}">
+							{% if currentTreatment.1 %}
+							<br>
+
+							<span class="badge badge-info" style="margin-top: 10px;">
+								{%blocktrans%}Beginnt am{%endblocktrans%} {{currentTreatment.1 }}
+							</span>
+
+							{% endif %}
+						</div>
+					</div>
+					<table class="footable table-bordered"> 
+						<thead>
+							<tr>
+								<th>{%blocktrans%}Medikamente{%endblocktrans%}</th>
+								<th>{%blocktrans%}Menge{%endblocktrans%}</th>
+								<th>{%blocktrans%}Einnahmezeit{%endblocktrans%}</th>
+								<th data-hide="all">{%blocktrans%}Tage{%endblocktrans%}</th>
+								<th data-hide="all">{%blocktrans%}Annotations{%endblocktrans%}</th>
+							</tr>
+						</thead>
+
+						{% for drug in currentTreatment.0|getDrugs %}
+						{% with value=drug.0|drugValueEditable:patient %}
+						<!--<tr>
+						    <td>{{drug.0.drugname}}</td>
+						    <td>
+							{% if drug.0.editableByDoc %}
+							{% for myedd in myEditedDrugs %}
+							{% if drug.0.drugname == myedd.drug %}
+							{{myedd.qty|numberFormat}} {{drug.0.get_unit_display}} {{drug.0|drugValue}}
+							{% endif %}
+							{% endfor %}
+							{% else %}
+							{{drug.0|drugValue}} {{drug.0.get_unit_display}}
+							{% endif %}
+						    </td>
+						    <td>{% if drug.0.timeNotRequired %}Ganzer Tag{% else %}{{drug.0.time|time:'H:i'}}{% endif %}</td>
+						    <td>{{drug.1|join:', '}}</td>
+						    <td>{{drug.0.annotation}}</td>
+						</tr>-->
+						<tr>
+							<td>{{drug.0.drugname}}</td>
+							<td>{{drug.0|drugValueEditable:patient}} {{value|getUnitLanguage:drug.0.drugname.unit|language:user_language}} </td>
+							<td>
+								{% if drug.0.timeNotRequired %}
+								{%blocktrans%}Ganzer Tag{%endblocktrans%}
+								{% elif drug.0.drugTime != '0' %}
+								{{drug.0.drugTime|getDrugTimeStatus:user_language}}
+								{% else %}
+								{{drug.0.time|time:'H:i'}}
+								{% endif %}
+							</td>
+							<td>{{drug.1|join:', '}}</td>
+							<td>{{drug.0.annotation}}</td>
+						</tr>
+
+						{% if drug.0.editableByDoc %}
+						<div class="editableDrugs control-group" tid="{{t.id}}">
+							<label class="control-label" style="font-weight: bold">{{drug.0.drugname}}</label>
+							<div class="controls ">
+								<label><input class="input " type="text" name="ED{{drug.0.drugname.id}}" value="{{drug.0.value|floatformat:"-3"}}"> {{value|getUnitLanguage:drug.0.drugname.unit|language:user_language}} </label>
+							</div>
+						</div>
+						<input type="hidden" class="editableDrugInputDoc" drug="{{drug.0.drugname.id}}" value="{% if currentTreatment %}{{drug.0|drugValueEditableQty:patient}}{% endif %}">
+						{% endif %}
+						</tr>
+						{% endwith %}
+						{% endfor %}
+					</table>  
+
+				</form>
+				<div class="pull-right"> 
+					<div class="btn-group">                       
+						<a class="btn btn-inverse tPauseBtn {% if patientStatus.getTreatmentStatus == 1 %}disabled{% endif %}" treatment="{{currentTreatment.0.id}}">{%blocktrans%}Pause{%endblocktrans%}</a>
+						<a class="btn btn-inverse tResumeBtn {% if patientStatus.getTreatmentStatus != 1 %}disabled{% endif %}" treatment="{{currentTreatment.0.id}}">{%blocktrans%}Resume{%endblocktrans%}</a>
+						<a class="btn btn-inverse tStopBtn {% if patientStatus.getTreatmentStatus == '1' %}disabled{% endif %}" treatment="{{currentTreatment.0.id}}">{%blocktrans%}Stop{%endblocktrans%}</a>
+					</div>
+				</div>
+				{% else %}
+				{%blocktrans%}Keine Behandlung zugewiesen{%endblocktrans%}
+				{% endif %}
+			</div>
+		</div>
+	</div>
+
+	<div class="widget">
+		<div class="widget-header">
+			<h3>{%blocktrans%}Unerwartet Nebenwirkungen{%endblocktrans%}</h3>
+
+		</div>
+		<div class="widget-content">
+			<div class="row-fluid">
+				<div id="uxGraph" class="gContainer" style="min-width: 310px; height: 400px; margin: 0 auto">
+					<img class="gLoading" src="{{ STATIC_URL }}img/bar.gif">
+				</div>
+			</div>
+			<div class="row-fluid">
+				<div class="span12">
+					<hr>
+					<form class="form-inline" id="ctcaefrm">
+
+						<label style="font-weight:bold" class="control-label">{%blocktrans%}Wählen Sie unerwartete Nebenwirkung{%endblocktrans%} </label>
+
+						<input type="text" id="se" class="form-control" placeholder="ID, Bedingungen...">   
+
+						<button type="submit" class="btn btn-small btn-info ctcae">{%blocktrans%}Suche{%endblocktrans%}</button>
+					</form>
+					<hr>
+					<button class="btn btn-mini btn-danger pull-right hideBtn" style="display:none;">{%blocktrans%}Verbergen{%endblocktrans%}</button>
+					<table id="seSearchResultTable" class="footable table-bordered" style="display:none;">
+						<thead>
+							<tr>
+								<th>{%blocktrans%}MedDRA Code{%endblocktrans%}</th>
+								<th>{%blocktrans%}Nebenwirkung{%endblocktrans%}</th>
+								<th data-hide="all"></th>
+								<th data-hide="all"></th>
+								<th data-hide="all"></th>
+								<th data-hide="all"></th>
+							</tr>
+						</thead>
+						<tbody id="seSearchResult">
+							<tr style="display:none;">
+								<td class="code"></td>
+								<td class="se"></td>
+								<td class="grade1"></td>
+								<td class="grade2"></td>
+								<td class="grade3"></td>
+								<td class="grade4"></td>
+							</tr>
+						</tbody>
+					</table>
+					<div id="seLoading" style="text-align: center; display:none "> <span style="/* color:white; */font-size:20px;"><img src="{{ STATIC_URL }}img/bar.gif"></span></div>
+				</div>
+
+			</div>
+		</div>
+	</div>
+	
+	<div class="widget">
+		<div class="widget-header">
+			<h3 class="row-fluid">
+				{%blocktrans%}Nebenwirkungen{%endblocktrans%}
+			</h3>
+		</div>
+		<div class="widget-content">
+			<div id="nWgraph" class="gContainer" style="min-width: 310px; height: 400px; margin: 0 auto">
+				<img class="gLoading" src="{{ STATIC_URL }}img/bar.gif">
+			</div>
+		</div>
+	</div>
+	<div class="widget">
+		<div class="widget-header">
+			<h3 class="row-fluid">
+				{%blocktrans%}Benutzerdokumentation{%endblocktrans%}
+			</h3>
+		</div>
+		<div class="widget-content">
+			<div id="combGraph" class="gContainer" style="min-width: 310px; height: 400px; margin: 0 auto">
+				<img class="gLoading" src="{{ STATIC_URL }}img/bar.gif">
+			</div>
+		</div>
+	</div>
+
+
+	{% include 'dashboard/print_preview.html' %}<!-- Print priview -->
+	{% include 'dashboard/treatment_modal.html' %}<!-- Treatment List modal -->
+</div>
+
+{% endblock %}
+{% block bottomScripts %}
+
+<script type="text/javascript">
+	var patient_pk = parseInt("{{patient.pk}}");
+	var STATIC_URL = '{{STATIC_URL}}';
+	var csrf_token = '{{csrf_token}}';
+	var patient_userprofile_gender = '{{patient.userprofile.gender}}';
+	var patient_id = parseInt("{{patient.id}}");
+	var url_doctor_stopTreatment = "{% url 'doctor:stopTreatment' %}";
+	var url_doctor_pauseTreatment = "{% url 'doctor:pauseTreatment' %}";
+	var url_doctor_continueTreatment = "{% url 'doctor:continueTreatment' %}"
+	var CURRENT_TREATMENT = '{{currentTreatment.0.id}}'
+	$('.editableDrugsModel').append('<input type="hidden" name="pid" value="' + patient_pk + '">')
+
+</script>
+
+
+<script src="{{ STATIC_URL }}js/footable.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jqplot/jquery.jqplot.min.js" type="text/javascript"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jqplot/jqplot.barRenderer.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jqplot/jqplot.categoryAxisRenderer.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jqplot/jqplot.pointLabels.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jqplot/jqplot.highlighter.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/jqplot/jqplot.cursor.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/docPopup.js"></script>
+
+<script src="{{ STATIC_URL }}highChart/js/highcharts.js" type="text/javascript"></script>
+<script src="{{ STATIC_URL }}highChart/js/modules/data.js"></script>
+<script src="{{ STATIC_URL }}highChart/js/modules/exporting.js" type="text/javascript"></script>
+
+<script src="{{ STATIC_URL }}js/graphs.js" type="text/javascript"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/bootstrap-switch.min.js"></script>
+
+<!-- The daterange picker bootstrap plugin -->
+<script src="{{ STATIC_URL }}chart/js/sugar.min.js"></script>
+
+<script src="{{ STATIC_URL }}chart/js/daterangepicker.js"></script>
+
+<!-- Our main script file -->
+<!--<script src="{{ STATIC_URL }}chart/js/script.js"></script>-->
+
+
+
+
+
+<script src="{{ STATIC_URL }}js/doc.js"></script>
+
+
+<script src="{{ STATIC_URL }}js/custom_graph.js"></script>
+
+
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$(".footable").css("opacity", "1");
+		$('.footable').footable();
+		$('table').trigger('footable_initialized');
+	});
+</script>
+
+{% if emailExists %}
+<script type="text/javascript">
+	bootbox.alert('Diese E-Mail ist bereits registriert <img src="{{STATIC_URL}}/img/delete.png">')
+</script>
+{% endif %}
+{% if psuccess %}
+<script type="text/javascript">
+	//bootbox.alert('Profil erfolgreich aktualisiert <img src="{{STATIC_URL}}/img/accept.png">')
+</script>
+{% endif %}
+<script>
+//	$('#graph').show();
+	$('#pat').show();
+	$('#patientGraph').attr('href', '/doctor/patient/graphs/{{patient.id}}/');
+	$('#patId').html('<i style="margin-left:20px;" class="fa fa-level-up fa-rotate-90"></i> <i class="fa fa-user"  ></i> {{patient.username}}');
+	$('#pat a').addClass("activea");
+	$('.date').inputmask("dd.mm.yyyy");
+</script>
+
+{% endblock %}

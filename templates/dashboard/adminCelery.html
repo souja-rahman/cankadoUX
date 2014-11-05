@@ -1,0 +1,49 @@
+{% extends "dashboard/adminLayout.html" %}  
+{% load url from future %}
+{% block content %}
+
+<div class="span9">
+	<div class="row-fluid ">
+		<div class=" span12" style="padding-top:27px;border-radius:5px;">
+			<div class="row-fluid">
+				<div class="newbreadcrumb flat">
+					<a href="/admin/treatment/list/" >Admin</a>
+					<a href="#" class="active">Celery</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="widget" style="padding-bottom:0px;">   
+		<div class="widget-header">         
+			<h3>Celery Works</h3>
+		</div>      
+		<div class="widget-content">
+			<a class="btn btn-info btn-large" href="{% url 'adminCelery' celery='email' %}">Send Email</a>
+			<a class="btn btn-info btn-large" href="{% url 'adminCelery' celery='quest' %}">Quest Calculation</a>
+			<a class="btn btn-info btn-large" href="{% url 'adminCelery' celery='graph' %}">Graph Calculation</a>
+			
+			<br><br>
+			{% if graph %}
+			<div class="alert alert-success">
+				Graph Celery Started.
+			</div>
+			{% endif %}
+
+			{% if quest %}
+			<div class="alert alert-success">
+				Quest Celery Started.
+			</div>
+			{% endif %}
+
+			{% if email %}
+			<div class="alert alert-success">
+				Email Celery Started.
+			</div>
+			{% endif %}
+
+		</div>
+	</div>
+
+</div>
+{% endblock %}

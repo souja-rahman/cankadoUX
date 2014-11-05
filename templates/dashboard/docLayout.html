@@ -1,0 +1,302 @@
+{% load i18n %}
+{% language user_language %}
+{% load templateUtils %}
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title> {%blocktrans%}Cankado Arzt-Dashboard{%endblocktrans%}</title>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">    
+
+		<!-- CSS files -->
+		<link href="{{ STATIC_URL }}css/bootstrap.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/bootstrap-responsive.min.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/alveolae.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/fa/css/font-awesome.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/conkado/style.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/jquery-ui.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/footable.core.min.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/footable.standalone.min.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/bootstrap-datetimepicker.min.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/jquery.mCustomScrollbar.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/main.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/doclayout.css" rel="stylesheet">
+		<link rel="stylesheet" href="{{ STATIC_URL }}css/iThing.css" type="text/css" />
+		<link href='//fonts.googleapis.com/css?family=Seymour+One' rel='stylesheet' type='text/css'>
+		<!-- favicon -->
+		<link rel="apple-touch-icon-precomposed" sizes="144x144" href="{{ STATIC_URL }}img/apple-touch-icon-144-precomposed.png">
+		<link rel="shortcut icon" href="{{ STATIC_URL }}img/favicon.ico">   
+		<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.min.js"></script>
+		 {% include 'translation.html' %}
+		<!-- Javascript files -->
+		<!--[if lt IE 9]>
+		 <script src="{{ STATIC_URL }}/js/html5.js"></script>
+		 <script src="{{ STATIC_URL }}/js/selectivizr.js"></script>
+		 <script src="{{ STATIC_URL }}/js/css3-mediaqueries.js"></script>          
+	       <![endif]-->
+
+		{% block custom_css %}{% endblock %}
+		<script type="text/javascript" src="{{ STATIC_URL }}js/jquery.min.js"></script>
+		<script src="{{ STATIC_URL }}js/jquery-ui.js"></script>
+		<script src="{{ STATIC_URL }}js/bootstrap.js"></script> 
+		<script src="{{ STATIC_URL }}js/jquery.mCustomScrollbar.concat.min.js"></script>
+		<script src="{{ STATIC_URL }}js/bootbox.min.js"></script>
+		<script src="{{ STATIC_URL }}js/jQDateRangeSlider-min.js"></script>
+		<style>
+			.modal {
+
+				/*margin: -342px 0 0 -280px;*/
+			}
+			.modal.fade{
+				top:-400%
+			}
+		</style>
+	</head>
+
+
+	<body>
+		{% load url from future %}
+		<!-- Navbar --> 
+		<div id="wrap">
+			<div class="navbar navbar-fixed-top">
+				<div class="navbar-inner">
+					<div class="container">
+						<a class="brand" href="/"><img src="{{ STATIC_URL }}img/logo.png" style="height:21px;margin-left: 25px"> Can<strong>{%blocktrans%}Kado{%endblocktrans%}</strong></a>
+						<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</a>
+
+						<div class="nav-collapse collapse">
+							<ul class="nav pull-right">
+								<li class="divider-vertical"></li>
+								<li class="dropdown">
+									<a href="#" data-toggle="dropdown" class="dropdown-toggle">{%blocktrans%}Language{%endblocktrans%}<b class="caret"></b></a>
+									<ul class="dropdown-menu">
+										{% get_available_languages as LANGUAGES %}
+										{% for lang in LANGUAGES %}
+										<li class="tran-Lang {% if lang.0 == user_language %}selected{% endif %}" lngvalue="{{ lang.0 }}"><a>{{ lang.1 }}</a></li>
+										{% endfor %}
+									</ul>
+								</li>
+
+
+								<li class="divider-vertical"></li>
+<!--								<li class="dropdown">
+									                                 <a href="#" data-toggle="dropdown" class="dropdown-toggle"><i class="icon-comments-alt"></i>&nbsp;&nbsp;Messages&nbsp;&nbsp;<span class="label label-important">6</span></a> 
+																 <a href="#" data-toggle="dropdown" class="dropdown-toggle"><i class="fa fa-comments-alt"></i>&nbsp;&nbsp;Messages&nbsp;&nbsp;</a>
+									<ul class="dropdown-menu" style="max-height: 300px;overflow-y: scroll;">
+
+										 <li><a href="#"><i class="icon-comment"></i>New comment<span class="time">24 mins ago</span></a></li>
+										 <li><hr><a class="dropdown-menu-footer">
+											 <span class="footer"><i class="icon-eye-open"></i>&nbsp;&nbsp;View all Messages</span></a>
+										 </li>
+										{% load DocExtras %}
+										{% for m in user|getMessages %}
+										<li>
+											<a><i  class="fa fa-comment"></i>{{m.message|truncatechars:15}}<span class="time">{{m.sender.email}}</span></a>
+										</li>
+										{% empty %}
+										<li>Keine Nachrichten.</li>
+										{% endfor %}
+									</ul>
+								</li>
+
+								<li class="divider-vertical"></li>-->
+
+								<li class="dropdown">
+									<a href="#" data-toggle="dropdown" class="dropdown-toggle"><i class="fa fa-user"></i>&nbsp;&nbsp;{% if user.userprofile.last_name %}{{ user.userprofile.last_name }}{% endif %}, {% if user.userprofile.first_name %}{{ user.userprofile.first_name }}{% endif %} {% if not user.userprofile.first_name and not user.userprofile.last_name %}{{user}}{% endif %}<b class="caret"></b></a>
+									<ul class="dropdown-menu">
+										<li><a href="{% url 'doctor:profile' %}"><i class="fa fa-male"></i>&nbsp;&nbsp;{%blocktrans%}Profil{%endblocktrans%}</a></li>
+										<!--  <li><a id="box7" href="password.html" onmouseover="$('#box7').addClass('discolor');" onmouseout="$('#box7').removeClass('discolor');" onclick="return false;"><i class="fa fa-key"></i>&nbsp;&nbsp;Change Password</a></li> -->
+									</ul>
+								</li>
+								<li class="divider-vertical"></li>
+								<li><a href="{% url 'django.contrib.auth.views.logout_then_login' %}"><i class="fa fa-sign-out"></i>&nbsp;&nbsp;{%blocktrans%}Abmelden{%endblocktrans%}</a></li>
+								<li class="divider-vertical"></li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- /Navbar -->
+
+			<!-- Main content -->
+			<div id="main-content">
+				<!-- Container -->
+				<div class="container" >
+					<!-- Header boxes -->
+					<div class="row-fluid">
+						<div class="span3 cube">
+							<a href="/" ><div class="span12"><span><i class="fa fa-home fa-3x"> </i><br></span>{%blocktrans%}Home{%endblocktrans%}</div></a>
+						</div>
+						<div class="span3 cube" >                       
+							<a href="" onmouseover="$('#box1').addClass('discolor');" onmouseout="$('#box1').removeClass('discolor');" onclick="return false;"><div class="span12" id="box1"><span><i class="fa fa-comments fa-3x"></i><br></span>{%blocktrans%}Nachrichten{%endblocktrans%}</div></a>
+						</div>
+						<div class="span3 cube">                        
+							<a href="{% url 'doctor:docnews' %}"  ><div class="span12" ><span><i class="fa fa-file-text fa-3x" ></i><br></span>{%blocktrans%}News{%endblocktrans%} {% if user|getNewsCount > 0 %}<span class="badge badge-important" id="newsNotification">{{user|getNewsCount}}</span>{% endif %}</div></a>
+						</div>
+						<div class="span3 cube ">                       
+							<a href=""  onmouseover="$('#box3').addClass('discolor');" onmouseout="$('#box3').removeClass('discolor');" onclick="return false;"><div class="span12" id="box3"><span><i class="fa fa-certificate fa-3x" ></i><br></span>{%blocktrans%}Kados{%endblocktrans%}</div></a>
+						</div>
+					</div>
+					<!-- /Header boxes -->
+
+					<div class="row">
+						<!-- Sidebar -->
+						<div class="span3">
+							<ul id="sidebar" class="nav nav-tabs nav-stacked">
+								<li id="dash"><a href="{% url 'doctor:dashboard' %}"><i class="fa fa-dashboard"></i>&nbsp;&nbsp;{%blocktrans%}Übersicht{%endblocktrans%}</a></li>
+								<li id="addpatient"><a href="{% url 'doctor:addPatientForm' %}"><i class="fa fa-plus-circle"></i>&nbsp;&nbsp;{%blocktrans%}Patient Hinzufügen{%endblocktrans%}</a></li>
+								<li id="mypatients"><a href="{% url 'doctor:mypatients' %}"><i class="fa fa-users"></i>&nbsp;&nbsp;{%blocktrans%}Meine Patienten{%endblocktrans%}</a></li>
+								<li id="pat" style="display:none;"><a id="patId" href="">&nbsp;&nbsp;</a></li>
+								<li id="graph" style="display:none;"><a id="patientGraph" href=""><i style="margin-left:40px;" class="fa fa-level-up fa-rotate-90"></i> <i class="fa fa-bar-chart-o"></i>&nbsp;&nbsp;{%blocktrans%}Nebenwirkungen{%endblocktrans%}</a></li>
+
+								<li id="therapies"><a href="{% url 'doctor:therapies' %}"><i class="icon-syringe"></i>&nbsp;&nbsp;{%blocktrans%}Therapien{%endblocktrans%}</a></li>
+								<li id="therapie" style="display:none;"><a id="therapiename"  href=""><i style="margin-left:20px;" class="fa fa-level-up fa-rotate-90"></i> <i class="icon-syringe"></i>&nbsp;</a></li>
+								<li><a href="{% url 'django.contrib.auth.views.logout_then_login' %}"><i class="fa fa-sign-out"></i>&nbsp;&nbsp;{%blocktrans%}Abmelden{%endblocktrans%}</a></li>
+								<!--                            <li><a href="messages.html"><i class="icon-comments-alt"></i>&nbsp;&nbsp;Feature 1<span class="label label-success pull-right">New!</span></a></li>
+											    <li><a href="news.html"><i class="icon-globe"></i>&nbsp;&nbsp;Feature 2<span class="label label-success pull-right">6</span></a></li>
+											    <li><a href="products.html"><i class="icon-truck"></i>&nbsp;&nbsp;Feature 3<span class="label label-success pull-right">3</span></a></li>
+											    <li><a href="alerts.html"><i class="icon-bolt"></i>&nbsp;&nbsp;Feature 4</a></li>
+											    <li><a href="gallery.html"><i class="icon-camera-retro"></i>&nbsp;&nbsp;Feature 5</a></li>
+											    <li><a href="faqs.html"><i class="icon-legal"></i>&nbsp;&nbsp;Feature 6</a></li>
+											    <li><a href="user-account.html"><i class="icon-user"></i>&nbsp;&nbsp;Feature 7</a></li>
+											    <li class="accordion" id="navigation-components">
+												<a href="#collapse-additional-info" class="accordion-toggle" data-toggle="collapse" data-parent="navigation-components">
+												    <i class="icon-list-ul"></i>&nbsp;&nbsp;feature 8
+												    <span class="label label-success pull-right">Click me!</span>
+												</a>
+												<div id="collapse-additional-info" class="accordion-body collapse">
+												    <div class="sidebar-extra well">
+													more features here
+												    </div>
+												</div>
+											    </li>-->
+							</ul>
+						</div>
+						<!-- /Sidebar -->
+
+						<!-- Content -->
+						{% block content %}{% endblock %}
+						<!-- /Content -->
+					</div>
+				</div>
+				<!-- /Container -->
+			</div>
+			<!-- /Main content -->
+			<div style="display:none;">
+				<input type="hidden" value="{% block page_id %}{% endblock %}" id="hiddenPageId">
+			</div>
+			<div id="push"></div>
+		</div><!-- wrap end -->
+		<a href="#" class="scrollToTop"><i class="fa fa-chevron-circle-up fa-3x" ></i></a>
+		<!-- Footer -->
+		<div id="footer" style="padding-top:6px;">
+			<p class="pull-right"  style="margin-right:100px;">Cankado &copy; 2014</p>
+		</div>
+		<!-- /Footer -->
+
+		<script>
+			$(function() {
+				$(".dial").knob();
+			});
+		</script>
+		<script src="{{ STATIC_URL }}js/jquery.knob.js"></script>
+		<script>
+			$(function() {
+				$('.datepicker').datetimepicker({
+					pickTime: false
+				});
+				$('.timepicker').datetimepicker({
+					pickDate: false
+				});
+			});
+			$(document).ready(function() {
+
+				//Check to see if the window is top if not then display button
+				$(window).scroll(function() {
+					if ($(this).scrollTop() > 100) {
+						$('.scrollToTop').fadeIn();
+					} else {
+						$('.scrollToTop').fadeOut();
+					}
+				});
+
+				//Click event to scroll to top
+				$('.scrollToTop').click(function() {
+					$('html, body').animate({scrollTop: 0}, 800);
+					return false;
+				});
+
+			});
+		</script>
+		<script>
+
+			(function($) {
+				$(document).ready(function() {
+
+					$('.time').inputmask('h:s');
+
+
+					$('.date').inputmask("dd.mm.yyyy");
+					$('.mobile').inputmask("004\\99{5,16}");
+					$('.pcode').inputmask('99999');
+
+					$(".vscroll,.v1scroll").mCustomScrollbar({
+						theme: "dark-thick",
+						advanced: {
+							updateOnContentResize: true
+						}
+					});
+				});
+			})(jQuery);
+
+		</script>
+		<script>
+			/*   $(document).ready(function(){
+			 var Llink = $(location).attr('pathname');
+			 if(Llink === "{% url 'doctor:dashboard' %}"){
+			 $('#sidebar li:first-child').addClass("active");
+			 }else if(Llink === "{% url 'doctor:addPatientForm' %}"){
+			 $('#sidebar li:nth-child(2)').addClass("active");              
+			 }else if(Llink === "{% url 'doctor:mypatients' %}"){
+			 $('#sidebar li:nth-child(3)').addClass("active");
+			 }else if(Llink === "{% url 'doctor:therapies' %}"){
+			 $('#sidebar li:nth-child(4)').addClass("active");
+			 }
+			 
+			 }); */
+			$(document).ready(function() {
+				var currentPage = $("#hiddenPageId").val();
+				$("#" + currentPage).addClass('active');
+			});
+		</script>
+		<script src="{{ STATIC_URL }}js/bootstrap-datetimepicker.min.js"></script>
+		<script src="{{ STATIC_URL }}js/jquery.inputmask.js"></script>
+		<script src="{{ STATIC_URL }}js/jquery.inputmask.date.extensions.js"></script>
+		<script>
+			function goToByScroll(id) {
+				$('html,body,div').animate({scrollTop: $("#" + id).offset().top - 50}, 'slow');
+			}
+		</script>
+		<script>
+			$('.tran-Lang').click(function(e) {
+				e.preventDefault();
+				var lng = $(this).attr('lngvalue')
+//				alert(lng)
+				$.get("/translator/set_language/", {language: lng})
+					.done(function() {
+						window.location = window.location.pathname;
+					});
+
+			})
+		</script>
+		{% block bottomScripts %}{% endblock %}
+
+	</body>
+</html>
+{% endlanguage %}

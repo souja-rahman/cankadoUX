@@ -1,0 +1,59 @@
+{% extends "dashboard/adminLayout.html" %}  
+{% block page_id %}TArchive{% endblock %}
+{% load templateUtils %} 
+{% block content %}
+<div class="span9">
+    <div class="row-fluid ">
+        <div class=" span12" style="padding:27px;border-radius:5px;">
+            <div class="row-fluid">
+                <div class="newbreadcrumb flat">
+                    <a href="/admin/treatment/list/">Admin</a>
+                    <a href="/admin/treatment/list/">Treatments</a>
+                    <a href="#" class="active">Archive</a>
+                </div>
+            </div>
+
+            <div class="widget" style="padding-bottom:0px;">	
+                <div class="widget-header">			
+                    <h4 style="margin-left: 10px;margin-bottom:3px;"> Archived Treatments</h4>
+                </div>		
+                <div class="widget-content">
+                    <table class="footable table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="span7">Treatments</th>
+                                 <th class="span3" style="text-align: center;">Status</th>
+                                <th class="span2" style="text-align: center;">Show Details</th>
+                               
+                            </tr>
+                        </thead>
+                        {% for t in treatList %}
+                        {% if t.approved or t.is_deleted %}
+                        <tr>
+
+                            <td><a href="/admin/archive/treatment/details/{{t.treatment.id}}/{% if t.approved %}{{t.old_treatment}}{% else %}{{t.new_treatment}}{% endif %}/">{% if t.approved %}{{t.old_treatment}}{% else %}{{t.new_treatment}}{% endif %}</a></td>
+                             <td><span class="badge minbad badge-success ">Archived</span> </td>
+                            <td><a class="btn btn-info btn-small btn-block" href="/admin/archive/treatment/details/{{t.treatment.id}}/{% if t.approved %}{{t.old_treatment}}{% else %}{{t.new_treatment}}{% endif %}/">View</a></td>
+                        </tr>
+                        {% endif %}
+                        {% empty %}
+                        <tr>
+                            <td>* No Treatments available</td>
+                        </tr>
+                        {% endfor%}
+                    </table>
+                </div>
+            </div>
+        </div>       
+    </div>
+</div>
+{% endblock %}   
+
+{% block bottomScripts %}
+<script src="{{ STATIC_URL }}js/footable.js"></script>
+<script type="text/javascript">
+$(function() {
+    $('table').footable();
+});
+</script>
+{% endblock %}   

@@ -1,0 +1,24 @@
+{% extends "dashboard/docLayout.html" %} 
+{% block page_id %}therapies{% endblock %}
+{% load templateUtils %}
+{% load poll_extras %}
+{% block content %}
+<input id="csrf_token" type="hidden" value="{{csrf_token}}">
+<!-- Content -->
+<div class="span9">
+    <h1 class="page-title">{{treatment.name}}</h1>
+
+    <!-- ==========================================================Treatment Details==================================== -->
+    {% include 'dashboard/treatmentDetails.html' %}
+    <!-- ==========================================================Treatment Details==================================== -->
+
+</div>
+<!-- /Content -->
+{% endblock %}
+{% block bottomScripts %}
+<script>
+    $('#therapie').show();
+    $('#therapiename').append('{{treatment.name|truncatechars:22}}');
+    $('#therapie a').addClass("activea");
+</script>
+{% endblock %}

@@ -1,0 +1,25 @@
+  h3{   background:#F7F7F7;
+        height:50px; 
+        width:auto;  
+        line-height: 54px;
+        vertical-align:middle; 
+        padding: 5px 0px 5px 18px;
+        font-family: 'Asap', sans-serif;
+         color: #49708A;
+          font-weight: bold;
+                margin-top: 0px;
+            }
+            h3 > img{
+                height:48px;
+            }
+            .contentdiv{
+                width:80%;
+                padding-top:30px;
+                padding-left:50px;
+                font-size:20px;
+                line-height: 25px;
+            }
+            #wrap{
+                background: white;
+                
+            }

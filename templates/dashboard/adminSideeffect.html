@@ -1,0 +1,151 @@
+{% extends "dashboard/adminLayout.html" %}  
+{% block page_id %}Tassign{% endblock %}
+{% block content %}
+
+<div class="span9">
+    <div class="row-fluid" style="padding-top:27px;">
+        <div class="span12" >
+            <div class="newbreadcrumb flat">
+                <a href="#" >Admin</a>
+                <a href="#" >SideEffect</a>
+                <a href="/admin/edit/sideeffect/{{se.id}}/" class="active"> {{se.sideeffect}}</a>
+            </div>
+        </div>
+    </div>            
+    <div class="row-fluid tlist">
+        <div class="span12" style="padding:20px;margin-left:0px;">
+            {% if name_error %}
+                <div class="alert alert-danger">
+                    Side Effect name can't be empty.
+                </div>
+            {% endif %}
+            <form class="form-horizontal" action="/admin/edit/sideeffect/{{se.id}}/" method="POST">{% csrf_token %}
+                <div class="control-group">
+                    <label class="control-label"> Name</label>
+                    <div class="controls">
+                        <input class="input span5" name="name" type="text" value="{{se.sideeffect}}" required>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label"> Grade1</label>
+                    <div class="controls">
+                        <textarea class="span5" name="grade1" readonly rows="3">{{se.grade1}}</textarea>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <label class="control-label"> Grade2</label>
+                    <div class="controls">
+                        <textarea class="span5" name="grade2" readonly rows="3">{{se.grade2}}</textarea>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label"> Grade3</label>
+                    <div class="controls">
+                        <textarea class="span5" name="grade3" readonly rows="3">{{se.grade3}}</textarea>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label"> Grade4</label>
+                    <div class="controls">
+                        <textarea class="span5" name="grade4" readonly rows="3">{{se.grade4}}</textarea>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <div class="controls">
+                        <button type="submit" class="btn btn-info  btn-small"><i class="fa fa-plus"></i> Update Sideeffect</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        {% autoescape off %}
+        <div  class="span10 drugsListItem" id="physicianwiki{{se.pk}}"> 
+            <strong>Physician Wiki</strong><hr>
+            {% if se.getPhysicianWiki %}
+            {{se.getPhysicianWiki}}
+            {% else %}
+            <div class="alert alert-info">No Wiki added.</div>
+            {% endif %}
+            <button class="btn btn-primary btn-small pull-right addPhysicianWiki" data-toggle="modal" data-target="#myModal" content='{{ se.getPhysicianWiki }}'>{% if se.getPhysicianWiki %}Edit{% else %}Add {% endif %} Wiki</button>
+        </div>
+
+        <div  class="span10 drugsListItem" id="patientwiki{{se.pk}}"> 
+            <strong>Patient Wiki</strong><hr>
+            {% if se.getPatientWiki %}
+            {{se.getPatientWiki}}
+            {% else %}
+            <div class="alert alert-info">No Wiki added.</div>
+            {% endif %}
+            <button class="btn btn-primary btn-small pull-right addPatientWiki" data-toggle="modal" data-target="#myModal" content='{{ se.getPatientWiki }}'>{% if se.getPatientWiki %}Edit{% else %}Add {% endif %} Wiki</button>
+        </div>
+        {% endautoescape %}
+
+
+    </div>
+</div>
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">{% csrf_token %}
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form action="/admin/sideeffect/wiki/" method="POST">{% csrf_token %}
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title" id="myModalLabel">Add Wiki</h4>
+                    </div>
+                    <div class="modal-body">
+                        {% if wiki_error %}
+                        <div class="alert alert-info">
+                            Wiki can't be empty.
+                        </div>
+                        {% endif %}
+                        <textarea id="wiki" rows="10" name="wiki">{% if wiki_error %}{% if patient %}{{se.getPatientWiki}}{% else %}{{se.getPhysicianWiki}}{% endif %}{% endif %}</textarea><br>
+                    </div>
+                    <div class="modal-footer">
+                        <input type="hidden" name="se" value="{{se.id}}">
+                        <input type="hidden" name="setype" id="setype" value="{{setype}}">
+                        <input type="hidden" name="treatmentse" value="1">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary" id="submit">Submit</button>
+                    </div>
+                </form>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+{% endblock %}
+{% block bottomScripts %}
+<script src="{{ STATIC_URL }}js/tinymce/tinymce.min.js"></script>
+<script>
+    tinymce.init({
+        selector: '#wiki',
+        plugins: [
+                "advlist autolink lists link image charmap print preview anchor",
+                "searchreplace visualblocks fullscreen",
+        ],
+        toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image",
+        statusbar: false
+    });
+    $(document).on('focusin', function(e) {
+        if ($(e.target).closest(".mce-window").length) {
+            e.stopImmediatePropagation();
+        }
+    });
+
+    {% if wiki_error %}
+        $('#myModal').modal('show');
+    {% endif %}
+    $('.addPhysicianWiki').click(function(event) {
+        $('#setype').val('physician');
+        var content = $(this).attr('content');
+        tinyMCE.get('wiki').setContent(content);
+    });
+
+    $('.addPatientWiki').click(function(event) {
+        $('#setype').val('patient');
+        var content = $(this).attr('content');
+        tinyMCE.get('wiki').setContent(content);
+    });
+</script>
+{% endblock %}

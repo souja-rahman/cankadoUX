@@ -1,0 +1,252 @@
+{% extends "dashboard/adminLayout.html" %}  
+{% block page_id %}Seupload{% endblock %}
+{% load templateUtils %} 
+{% block content %}
+<input id="csrf_token" type="hidden" value="{{csrf_token}}">
+<div class="span9">
+    <div class="row-fluid ">
+        <div class=" span12" style="padding-top:27px;border-radius:5px;">
+            <div class="row-fluid">
+                <div class="newbreadcrumb flat">
+                    <a href="/admin/treatment/list/">Admin</a>
+                    <a href="#" class="active">Side Effect CTCAE</a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="row-fluid">
+        <div class="widget" style="display:none;">
+            <div class="widget-header">
+                <h3> CTCAE xlx Upload</h3>
+            </div>
+            <div class="widget-content" style="padding:10px;overflow: hidden;display:none;">
+                <h5>Import Side-effects</h5>
+                <form enctype="multipart/form-data" name="uploadForm" action="/admin/add/CTCAE/" method="POST">{% csrf_token %}
+                    <div id="upBtn" class="btn btn-warning" onclick="getFile()">Upload CTCAE XLX file.</div>
+
+                    <div style='height: 0px;width: 0px; overflow:hidden;'>
+                        <input id="upfile" type="file" name="excel" value="upload" onchange="sub(this)"/></div>
+                    <p>* Only <strong>XLX</strong> files are supported.</p>
+                    {% if success %}
+                    <div class="alert alert-success"><p> File uploaded successfully.</p> </div>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+        <div class="widget">
+            <div class="widget-header">
+                <h3>Side Effect List</h3>
+                <form action="/admin/search/ctcae/" method="GET" class="input-append pull-right" style="margin-top: 5px; margin-right: 5px;" id="ctcaeform">
+                  <input id="csrf_token" type="hidden" value="{{csrf_token}}">
+                  <input type="text" name="ctcae" id="ctcae" class="form-control" placeholder="Code , CTCAE Term" value="{{searchKey}}">
+                  <a class="add-on searchCtcae"><i class="fa fa-search"></i></a>
+                </form>
+            </div>
+            <div class="widget-content">        
+                <table class="footable" style="opacity: 0;" data-limit-navigation="5">
+                    <thead>
+                        <tr>
+                            <th >
+                                MedDRA v12.0 Code
+                            </th>
+                            <th >
+                                CTCAE v4.0 SOC
+                            </th>
+                            <th >
+                                CTCAE v4.0 Term
+                            </th>
+                            <th data-hide="all">
+                                Grade 1   
+                            </th>
+                            <th data-hide="all">
+                                Grade 2   
+                            </th>
+                            <th data-hide="all">
+                                Grade 3   
+                            </th>
+                            <th data-hide="all">
+                                Grade 4   
+                            </th>
+                            <th data-hide="all">
+                                CTCAE v4.0 AE Term Definition
+                            </th>
+                            <th data-hide="all">
+                                pt_CTCAE v4.0 Term
+                            </th>
+                            <th data-hide="all">
+                                pt_Grade 1   
+                            </th>
+                            <th data-hide="all">
+                                pt_Grade 2   
+                            </th>
+                            <th data-hide="all">
+                                pt_Grade 3
+                            </th>
+                            <th data-hide="all">
+                                pt_Grade 4
+                            </th>
+                            <th data-hide="all">
+                                pt_CTCAE v4.0 AE Term Definition
+                            </th>
+                            <th data-hide="all"></th>
+                        </tr>
+
+                    </thead>
+                    <tbody>
+                        {% for se in page.object_list %}
+                        <tr>
+                            <td>{{se.MedDRA_Code}}</td>
+                            <td>{{se.SOC|default:'-'}}</td>
+                            <td>{{se.sideeffect|default:'-'}}</td>
+                            <td>{{se.doc_grade1|default:'-'}}</td>
+                            <td>{{se.doc_grade2|default:'-'}}</td>
+                            <td>{{se.doc_grade3|default:'-'}}</td>
+                            <td>{{se.doc_grade4|default:'-'}}</td>
+                            <td>{{se.doc_termdefinition|default:'-'}}</td>
+                            <td><input type="text" class="span12 patTerm" value="{{se.pat_term|default:''}}"></td>
+                            <td><input type="text" class="span12 patGrade1" value="{{se.grade1|default:''}}"></td>
+                            <td><input type="text" class="span12 patGrade2" value="{{se.grade2|default:''}}"></td>
+                            <td><input type="text" class="span12 patGrade3" value="{{se.grade3|default:''}}"></td>
+                            <td><input type="text" class="span12 patGrade4" value="{{se.grade4|default:''}}"></td>
+                            <td><textarea class="span12 patTermDef">{{se.pat_termdefinition|default:''}}</textarea></td>
+                            <td colspan="2"><button class="btn btn-info pull-right ctcaeUpdateBtn" medcode="{{se.MedDRA_Code}}">Update</button></td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="alert alert-info">No SideEffects!!</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                    {% if paginator.num_pages > 1 %}
+                    <tfoot>
+                        <tr>
+                            <td colspan="5">
+                                <div class="pagination pagination-centered">
+                                    <ul>
+                                        <li class="footable-page-arrow {% if page.number == 1 %} disabled {% endif %}">
+                                            <a data-page="first" href="{% if url %}{{url}}&{% else %}?{% endif %}page=1">«</a>
+                                        </li>
+
+                                        <li class="footable-page-arrow {% if page.number == 1 %} disabled {% endif %}">
+                                            {% if page.previous_page_number == 0 %}
+                                            <a data-page="prev" href="{% if url %}{{url}}&{% else %}?{% endif %}page=1">‹</a>
+                                            {% else %}                                       
+                                            <a data-page="prev" href="{% if url %}{{url}}&{% else %}?{% endif %}page={{ page.previous_page_number }}">‹</a>
+                                            {% endif %}
+                                        </li>
+
+                                        {% if page.number > 3 and paginator.num_pages > 5 %}
+                                        <li>
+                                            <a> ... </a>
+                                        </li>
+                                        {% endif %}
+
+                                        {% for pg in paginator.page_range|pagination:page.number %}
+                                        {% if pg == page.number %}
+                                        <li class="footable-page active">
+                                            <a data-page="0" href="{% if url %}{{url}}&{% else %}?{% endif %}page={{ pg }}">{{ pg }}</a>
+                                        </li>
+                                        {% else %}
+                                        <li class="footable-page">
+                                            <a data-page="0" href="{% if url %}{{url}}&{% else %}?{% endif %}page={{ pg }}">{{ pg }}</a>
+                                        </li>
+                                        {% endif %}
+
+                                        {% endfor %}
+
+                                        {% if page.number < paginator.num_pages|add:'-2' and paginator.num_pages > 5 %}
+                                        <li> 
+                                            <a> ... </a>
+                                        </li>
+                                        {% endif %}
+
+                                        <!--Ends-->
+                                        <li class="footable-page-arrow {% if page.number == paginator.num_pages %} disabled {% endif %}">
+                                            <a data-page="next" href="{% if url %}{{url}}&{% else %}?{% endif %}page={{ page.next_page_number }}">›</a></li>
+                                        <li class="footable-page-arrow {% if page.number == paginator.num_pages %} disabled {% endif %}">
+                                            <a data-page="last" href="{% if url %}{{url}}&{% else %}?{% endif %}page={{ paginator.num_pages }}">»</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    </tfoot>
+                    {% endif %}
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div> 
+{% endblock %}      
+
+{% block bottomScripts %}
+<script src="{{ STATIC_URL }}js/FooTable-2/js/footable.js"></script>
+<script src="{{ STATIC_URL }}js/FooTable-2/js/footable.sort.js" type="text/javascript"></script>
+<script type="text/javascript">
+                            $(function() {
+                                $('table').footable();
+                                $('table').trigger('footable_initialized');
+                            });
+</script>
+
+<script type="text/javascript">
+    function getFile() {
+        if (!$("#upBtn").hasClass("disabled"))
+        {
+            document.getElementById("upfile").click();
+        }
+    }
+    function sub(obj) {
+        var file = obj.value;
+        var fileName = file.split("\\");
+        document.getElementById("upBtn").innerHTML = "Uploading..." + fileName[fileName.length - 1];
+        $("#upBtn, #upfile").addClass("disabled");
+        document.uploadForm.submit();
+        event.preventDefault();
+    }
+    $(document).ready(function() {
+        $(".footable").css("opacity", "1");
+    });
+    $('.searchCtcae').click(function(e) {
+        e.preventDefault();
+        if($('#ctcae').val() === ''){
+            bootbox.alert('Nebenwirkungen sollte nicht leer sein');
+            return;
+        }
+        $('#ctcaeform').submit();
+    });
+    $('.ctcaeUpdateBtn').live('click', function(e) {
+        e.preventDefault();
+        var footable = $('.footable').data('footable');
+        var btn = $(this); 
+        btn.attr('disabled', true);
+        btn.html('Updating..')
+        var id = btn.attr('medcode');
+        var patTerm = btn.parents('tr').find('.patTerm').val();
+        var grade1 = btn.parents('tr').find('.patGrade1').val();
+        var grade2 = btn.parents('tr').find('.patGrade2').val();
+        var grade3 = btn.parents('tr').find('.patGrade3').val();
+        var grade4 = btn.parents('tr').find('.patGrade4').val();
+        var patTermDef = btn.parents('tr').find('.patTermDef').val();
+        $.post('/admin/edit/sideeffect/'+ id +'/', {csrfmiddlewaretoken: $('#csrf_token').val(), pat_term: patTerm,grade1: grade1, grade2: grade2, grade3 : grade3, grade4: grade4, pat_termdefinition: patTermDef})
+        .done(function(data) {
+            if(data.status === true){
+                bootbox.alert('Updated successfully', function(){
+                    $('table').trigger('footable_collapse_all');
+                });
+            }
+            else{
+                bootbox.alert('An error occured, please try again!!');
+            }
+            btn.removeAttr('disabled');
+            btn.html('Update');
+        })
+        .fail(function() {
+            btn.removeAttr('disabled');
+            btn.html('Update');
+            bootbox.alert('An error occured, please try again!!');
+        })     
+    });
+</script>
+{% endblock %} 

@@ -1,0 +1,147 @@
+{% load i18n %}
+{% language user_language %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title> Cankado Dashboard {{user_language}}</title>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <meta name="apple-mobile-web-app-capable" content="yes">    
+
+        <!-- CSS files -->
+
+        <link href="{{ STATIC_URL }}css/bootstrap.min.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}css/bootstrap-responsive.min.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}css/alveolae.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}css/fa/css/font-awesome.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}css/conkado/style.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}css/main.css" rel="stylesheet">
+         <!-- favicon -->
+		<link rel="apple-touch-icon-precomposed" sizes="144x144" href="{{ STATIC_URL }}img/apple-touch-icon-144-precomposed.png">
+        <link rel="shortcut icon" href="{{ STATIC_URL }}img/favicon.ico">   
+        <!--[if lt IE 9]>
+         <script src="{{ STATIC_URL }}/js/html5.js"></script>
+         <script src="{{ STATIC_URL }}/js/selectivizr.js"></script>
+         <script src="{{ STATIC_URL }}/js/css3-mediaqueries.js"></script> 
+         <script type="text/javascript" src="{{ STATIC_URL }}/js/PIE.js"></script>         
+       <![endif]-->
+
+    </head>
+
+    <body>
+        <div id="wrap"> 	
+            <!-- Navbar -->
+            <div class="navbar navbar-fixed-top">
+                <div class="navbar-inner">
+                    <div class="container">
+                        <a class="brand" href="/"><img src="{{ STATIC_URL }}img/logo.png" height="21" style="height:21px; margin-left: 25px">Can<strong>Kado</strong></a>
+                        <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </a>
+
+                        <div class="nav-collapse collapse">
+                            <ul class="nav pull-right" style="margin-right: 25px">
+                                <li><a  href="/accounts/login" ><strong>Anmelden</strong> </a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /Navbar -->
+            {% load url from future %}
+
+            <!-- Login content -->
+
+            <div class="row-fluid" style="padding-top:60px; ">
+                <div class="span4"></div>
+
+                <div id="login-content" class="span4">
+                    <h3 style="text-align:center;">
+                        {%blocktrans%}CANKADO Anmeldung{%endblocktrans%}
+                    </h3>
+                    <form action="{% url 'login-view' %}" method="post">{% csrf_token %}
+
+                        <div class="control-group">
+                            <label class="control-label " for="username"><i class="icon-user"></i>&nbsp;&nbsp;{%blocktrans%}Benutzername{%endblocktrans%}</label>
+                            <input  class="input input-block-level"type="text" name="username" placeholder="user name" id="username">
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label " for="password"><i class="icon-lock"></i>&nbsp;&nbsp;{%blocktrans%}Passwort{%endblocktrans%}</label>
+                            <input class="input input-block-level" type="password" name="password" id="password" placeholder="password">
+
+                        </div>
+                        <div class="pull-left">
+                            <input style="display:none;" name="next" value="/loginComplete/">
+                        </div>
+                        <div class="control-group ">
+                            <div class="controls" >
+                                <button class="btn btn-success span6" type="submit"><i class="fa fa-magic"></i>&nbsp;&nbsp;{%blocktrans%}Anmelden{%endblocktrans%}</button>
+                                <a href="/password/reset/" class="span6 pull-right" style="text-align: right;" >{%blocktrans%}Kennwort vergessen{%endblocktrans%}</a>
+                            </div>
+                        </div>
+                        
+                        {% if error %}
+                        <div class="pull-left" style="margin-top:5px;">
+                            <div class="alert alert-error alert-block">
+                                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                Ihr Benutzername oder wenn Ihr Kennwort  sind nicht richtig.
+                                Bitte versuchen sie es nochmal.
+                            </div>
+                        </div>
+
+                        {% endif %}
+                    </form>
+                </div>
+                <div class="span4"></div>
+            </div>
+
+            <!-- /Login content -->
+
+            <div id="push"></div>
+        </div><!-- wrap end -->
+        <!-- Footer -->
+        <div id="footer" style="padding-top:6px;">
+            <p class="pull-right"  style="margin-right:100px;">Cankado &copy; 2014</p>
+        </div>
+        <!-- Javascript files -->
+
+        <!-- Translation file -->
+        {% include 'translation.html' %}
+        
+        <script  src="{{ STATIC_URL }}js/jquery.min.js"></script>
+        <script src="{{ STATIC_URL }}js/bootstrap.js"></script>
+        <script>
+$(function() {
+    if (window.PIE) {
+        $('#login-content').each(function() {
+            PIE.attach(this);
+        });
+    }
+});
+$(function() {
+    if (window.PIE) {
+        $('.btn').each(function() {
+            PIE.attach(this);
+        });
+    }
+});
+$(function() {
+    if (window.PIE) {
+        $('input').each(function() {
+            PIE.attach(this);
+        });
+    }
+});
+        </script>
+
+        <!-- DUMMY SCRIPT FOR TESTING JS TRANSLATION -->
+        <script>
+//            alert('The following text will be translated according to the language selected by user:\n\n\n' + JS_LOCALE.getTrans('CANKADO Anmeldung') + '\n\n\nThe following text will not be translated as it dont have an entry in translation.html:\n\n\n' + JS_LOCALE.getTrans('This will not be translated.'));
+        </script>
+
+    </body>
+</html>
+{% endlanguage %}

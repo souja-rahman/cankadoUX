@@ -1,0 +1,128 @@
+{% extends "dashboard/adminLayout.html" %}  
+{% block page_id %}userlist{% endblock %}
+{% load templateUtils %} 
+{% block content %}
+<div class="span9">
+    <div class="row-fluid ">
+        <div class=" span12" style="padding-top:27px;border-radius:5px;">
+            <div class="row-fluid">
+                <div class="newbreadcrumb flat">
+                    <a href="/admin/treatment/list/">Admin</a>
+                    <a href="#" class="active">UserList</a>
+                </div>
+                <a href="/adminadduser/" class="btn btn-info btn-small pull-right" ><i class="fa fa-plus"></i> Add User</a>
+            </div>
+        </div>
+    </div>
+    {% if deleted %}
+    <br>
+    <div class="alert alert-success">
+        <button class="close" data-dismiss="alert">&times;</button>
+        User deleted successfully <img src="{{STATIC_URL}}img/accept.png" alt="">
+    </div>
+    {% endif %}
+    <input type="hidden" id="list" value="{{userlist}}">
+    <div class="widget">
+        <div class="widget-header">
+            <h3>
+                {{userlist|default:'User'}} List 
+            </h3>
+        </div>
+        <div class="widget-content">
+            <div class="page-title filterbar">
+                <div class="row-fluid">
+                    <form class="form-inline" style="margin-top: 10px;margin-bottom: 10px;">
+
+                        <label >
+                            <strong>
+                                Filter By
+                            </strong>
+                        </label>
+                        <select id="userFilter">
+                            <option value="all">All Users</option>
+                            <option value="Auditor">Auditor</option>
+                            <option value="Patient">Patient</option>
+                            <option value="Physician">Physician</option>
+                        </select>
+                    </form>
+
+                </div>
+            </div>
+            <table class="footable">
+                <thead>
+                    <tr>
+
+                        <th data-sort-initial="true">
+                            Username
+                        </th>
+                        <th data-sort-initial="true">
+                            Email
+                        </th>
+                        <th {% if userlist %}data-sort-ignore="true"{% endif %}>
+                            Role
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in page.object_list %}
+                    <tr >
+
+                        <td> <a href="/adminedituser/{{user.id}}/">{{user.username}}</a></td>
+                        <td>{{user.userprofile.email|default:''}}</td>
+                        <td>{{ user.groups.all.0.name|getGroupName }}</td>
+
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                {% if paginator.num_pages > 1 %}
+                <tfoot>
+                    <tr>
+                        <td colspan="3">
+                            {% include 'dashboard/pagination.html' %}
+                        </td>
+                    </tr>
+                </tfoot>
+                {% endif %}
+            </table>
+
+        </div>
+    </div>
+</div>		
+{% endblock %}      
+
+{% block bottomScripts %}
+
+<script src="{{ STATIC_URL }}js/FooTable-2/js/footable.js"></script>
+<script src="{{ STATIC_URL }}js/FooTable-2/js/footable.sort.js" type="text/javascript"></script>
+<script>
+$(document).ready(function($) {
+    var selected = $('#list').val();
+    if (selected === '') {
+        selected = 'all'
+    }
+    $('#userFilter').attr('value', selected);
+});
+$('#userFilter').change(function(e) {
+    if ($(this).val() === 'Auditor') {
+        window.location = '/adminauditorlist/';
+    }
+    else if ($(this).val() === 'Patient') {
+        window.location = '/adminpatientlist/';
+    }
+    else if ($(this).val() === 'Physician') {
+        window.location = '/adminphysicianlist/';
+    }
+    else {
+        window.location = '/adminuserlist/';
+    }
+});
+</script>
+<!---<script src="{{ STATIC_URL }}js/FooTable-2/js/footable.paginate.js"></script>--->
+<script type="text/javascript">
+    $(function() {
+        $('table').footable();
+        //$('table').data('page-size', 12);
+        $('table').trigger('footable_initialized');
+    });
+</script>
+{% endblock %} 

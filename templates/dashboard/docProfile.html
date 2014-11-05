@@ -1,0 +1,661 @@
+{% extends "dashboard/docLayout.html" %} 
+{% load i18n %}
+{% block custom_css %}
+<style>
+#time-range p {
+    font-family:"Arial", sans-serif;
+    font-size:14px;
+    color:#333;
+}
+.ui-slider-horizontal {
+    height: 8px;
+    background: #D7D7D7;
+    border: 1px solid #BABABA;
+    box-shadow: 0 1px 0 #FFF, 0 1px 0 #CFCFCF inset;
+    clear: both;
+    margin: 8px 0;
+    -webkit-border-radius: 6px;
+    -moz-border-radius: 6px;
+    -ms-border-radius: 6px;
+    -o-border-radius: 6px;
+    border-radius: 6px;
+}
+.ui-slider {
+    position: relative;
+    text-align: left;
+}
+.ui-slider-horizontal .ui-slider-range {
+    top: -1px;
+    height: 100%;
+}
+.ui-slider .ui-slider-range {
+    position: absolute;
+    z-index: 1;
+    height: 8px;
+    font-size: .7em;
+    display: block;
+    border: 1px solid #5BA8E1;
+    box-shadow: 0 1px 0 #AAD6F6 inset;
+    -moz-border-radius: 6px;
+    -webkit-border-radius: 6px;
+    -khtml-border-radius: 6px;
+    border-radius: 6px;
+    background: #81B8F3;
+    background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgi…pZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JhZCkiIC8+PC9zdmc+IA==');
+    background-size: 100%;
+    background-image: -webkit-gradient(linear, 50% 0, 50% 100%, color-stop(0%, #A0D4F5), color-stop(100%, #81B8F3));
+    background-image: -webkit-linear-gradient(top, #A0D4F5, #81B8F3);
+    background-image: -moz-linear-gradient(top, #A0D4F5, #81B8F3);
+    background-image: -o-linear-gradient(top, #A0D4F5, #81B8F3);
+    background-image: linear-gradient(top, #A0D4F5, #81B8F3);
+}
+.ui-slider .ui-slider-handle {
+    border-radius: 50%;
+    background: #F9FBFA;
+    background-image: url('data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgi…pZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JhZCkiIC8+PC9zdmc+IA==');
+    background-size: 100%;
+    background-image: -webkit-gradient(linear, 50% 0, 50% 100%, color-stop(0%, #C7CED6), color-stop(100%, #F9FBFA));
+    background-image: -webkit-linear-gradient(top, #C7CED6, #F9FBFA);
+    background-image: -moz-linear-gradient(top, #C7CED6, #F9FBFA);
+    background-image: -o-linear-gradient(top, #C7CED6, #F9FBFA);
+    background-image: linear-gradient(top, #C7CED6, #F9FBFA);
+    width: 22px;
+    height: 22px;
+    -webkit-box-shadow: 0 2px 3px -1px rgba(0, 0, 0, 0.6), 0 -1px 0 1px rgba(0, 0, 0, 0.15) inset, 0 1px 0 1px rgba(255, 255, 255, 0.9) inset;
+    -moz-box-shadow: 0 2px 3px -1px rgba(0, 0, 0, 0.6), 0 -1px 0 1px rgba(0, 0, 0, 0.15) inset, 0 1px 0 1px rgba(255, 255, 255, 0.9) inset;
+    box-shadow: 0 2px 3px -1px rgba(0, 0, 0, 0.6), 0 -1px 0 1px rgba(0, 0, 0, 0.15) inset, 0 1px 0 1px rgba(255, 255, 255, 0.9) inset;
+    -webkit-transition: box-shadow .3s;
+    -moz-transition: box-shadow .3s;
+    -o-transition: box-shadow .3s;
+    transition: box-shadow .3s;
+}
+.ui-slider .ui-slider-handle {
+    position: absolute;
+    z-index: 2;
+    width: 22px;
+    height: 22px;
+    cursor: default;
+    border: none;
+    cursor: pointer;
+}
+.ui-slider .ui-slider-handle:after {
+    content:"";
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    top: 50%;
+    margin-top: -4px;
+    left: 50%;
+    margin-left: -4px;
+    background: #30A2D2;
+    -webkit-box-shadow: 0 1px 1px 1px rgba(22, 73, 163, 0.7) inset, 0 1px 0 0 #FFF;
+    -moz-box-shadow: 0 1px 1px 1px rgba(22, 73, 163, 0.7) inset, 0 1px 0 0 white;
+    box-shadow: 0 1px 1px 1px rgba(22, 73, 163, 0.7) inset, 0 1px 0 0 #FFF;
+}
+.ui-slider-horizontal .ui-slider-handle {
+    top: -.5em;
+    margin-left: -.6em;
+}
+.ui-slider a:focus {
+    outline:none;
+}
+.input-block-level.add-on{
+    width: 100%;
+    border-radius: 5px;
+}
+#map img { max-width: none; }
+</style>
+{% endblock %}
+
+{% load url from future %}
+{% load templateUtils %}
+{% block content %}
+
+<div class="span9">
+    <h1 class="page-title">{%blocktrans%}Profil Details{%endblocktrans%}</h1>
+    <div class="widget">
+        <div class="widget-content">
+
+            <div class="row-fluid">
+                {% if image_empty %}
+                <div class="alert alert-info">{%blocktrans%}Please select an image to upload{%endblocktrans%}</div>
+                {% endif %}
+
+                {% if not_image %}
+                <div class="alert alert-danger">{%blocktrans%}The file you selected is not an image, please select an image.{%endblocktrans%}</div>
+                {% endif %}
+
+                {% if image_type_error %}
+                <div class="alert alert-danger">{%blocktrans%}Image should be jpg/png.{%endblocktrans%}</div>
+                {% endif %}
+
+                {% if image_size_error %}
+                <div class="alert alert-danger">{%blocktrans%}Die Bildgröße sollte weniger als 2 MB sein{%endblocktrans%}</div>
+                {% endif %}
+
+                {% if email_error %}
+                    <div class="alert alert-danger">
+                        <button type="button" class="close" data-dismiss="alert">&times;</button>
+                        {%blocktrans%}Diese E-Mail -ID ist bereits registriert , nutzen Sie bitte ein anderes E-Mail{%endblocktrans%}
+                    </div>
+                {% endif %}
+
+
+                <!--<form action="/doctor/upload/profile-pic/" enctype="multipart/form-data" method="POST">{% csrf_token %}  
+                    <img src="{% if user.docprofile.profile_pic %}{{user.docprofile.profile_pic}}{% else %}{{ STATIC_URL }}img/doctor.png{% endif %}" alt="Profile" style="height:100px;max-width:100px;box-shadow: 0px 0px 3px 2px rgba(0, 0, 0, 0.2);border: 5px solid #FFF;"><br><br>
+                    <input type="file" name="image" >
+                    <button class="btn btn-info pull-left" type="submit"><i class="fa fa-upload"></i> Upload</button>
+                </form>
+                <hr>-->
+            </div>
+
+            <form action="{% url 'doctor:profile' %}" enctype="multipart/form-data" method="POST" onSubmit="return fileValidation();">{% csrf_token %}
+
+                {% if form_error %} 
+                <div class="alert alert-error">{%blocktrans%}Bitte korrigieren Sie die folgenden Fehler.{%endblocktrans%}</div> 
+                {% endif %}
+
+                {% if success %} 
+                <div class="alert alert-success">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    {%blocktrans%}Profil erfolgreich aktualisiert.{%endblocktrans%}
+                </div> 
+                {% endif %}
+
+                {% if form.prefix.errors %}
+                <div class="row-fluid"> <!-- first row start -->
+                    <div class="span6">
+                        <div class="control-group error">
+                            <label for="prefix">{%blocktrans%}Anrede{%endblocktrans%}</label>
+                            <select name="prefix" id="prefix" class="input-block-level">
+                                <option value="Mr">{%blocktrans%}Herr{%endblocktrans%}</option>
+                                <option value="Mrs">{%blocktrans%}Frau{%endblocktrans%}</option>
+                            </select>
+                            <span class="help-inline">{% for error in form.prefix.errors %}{{error}}{% endfor %}</span>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="row-fluid"><!-- first row start -->
+                        <div class="span6">
+                            <label for="prefix">{%blocktrans%}Anrede{%endblocktrans%}</label>
+                            <select name="prefix" id="prefix" class="input-block-level">
+                                <option value="Mr">{%blocktrans%}Herr{%endblocktrans%}</option>
+                                <option value="Mrs">{%blocktrans%}Frau{%endblocktrans%}</option>
+                            </select>
+                        </div>
+                        {% endif %}
+
+
+                        {% if form.qualification.errors %}
+                        <div class="span6">
+                            <div class="control-group error">
+                                <label for="qualification">{%blocktrans%}Tite{%endblocktrans%}l</label>
+                                <input type="text" name="qualification" value="" class="input-block-level" id="qualification">
+                                <span class="help-inline">{% for error in form.qualification.errors %}{{error}}{% endfor %}</span>
+                            </div>  
+                        </div>
+                    </div> <!-- row1 end -->
+                    {% else %}
+                    <div class="span6">
+                        <label for="qualification">{%blocktrans%}Titel{%endblocktrans%}</label>
+                        <input type="text" name="qualification" value="{% if form.fName.value %}{{form.qualification.value}}{% else %}{{user.docprofile.qualification}}{% endif %}" class="input-block-level" id="fName">
+                    </div>
+                </div> <!-- row1 end -->
+                {% endif %}
+
+                {% if form.fName.errors %}
+                <div class="row-fluid"> <!-- Second row start -->
+                    <div class="span6">
+                        <div class="control-group error">
+                            <label for="fName">{%blocktrans%}Vorname{%endblocktrans%}</label>
+                            <input type="text" name="fName" value="" class="input-block-level" id="fName">
+                            <span class="help-inline">{% for error in form.fName.errors %}{{error}}{% endfor %}</span>
+                        </div>  
+                    </div>
+                    {% else %}
+                    <div class="row-fluid"> <!-- second row start -->
+                        <div class="span6">
+                            <label for="fName">{%blocktrans%}Vorname{%endblocktrans%}</label>
+                            <input type="text" name="fName" value="{% if user.userprofile.first_name %}{{user.userprofile.first_name}}{% endif %}" class="input-block-level" id="fName">
+                        </div>
+                    
+                        {% endif %}
+                        <div class="span6">
+                            <label for="lName">{%blocktrans%}Nachname{%endblocktrans%}</label>
+                            <input type="text" name="lName" value="{% if user.userprofile.last_name %}{{user.userprofile.last_name}}{% endif %}" class="input-block-level" id="lName">
+                        </div>
+                    </div> <!-- second row end -->
+                    {% if form.hospital.errors %}
+                    <div class="row-fluid"> <!-- third row start -->
+                        <div class="span6">
+                            <div class="control-group error">
+                                <label for="hospital">{%blocktrans%}Einrichtung{%endblocktrans%}</label>
+                                <input type="text" name="hospital" value="" class="input-block-level" id="hospital">
+                                <span class="help-inline">{% for error in form.hospital.errors %}{{error}}{% endfor %}</span>
+                            </div>  
+                        </div>
+                        {% else %}
+                        <div class="row-fluid"> <!-- third row start -->
+                            <div class="span6">
+                                <label for="hospital">{%blocktrans%}Einrichtung{%endblocktrans%}</label>
+                                <input type="text" name="hospital" value="{% if form.hospital.value %}{{form.hospital.value}}{% else %}{{user.docprofile.hospital}}{% endif %}" class="input-block-level" id="hospital">
+                            </div>
+                            {% endif %}
+
+                            {% if form.department.errors %}
+                            <div class="span6">
+                                <div class="control-group error">
+                                    <label for="department">{%blocktrans%}Abteilung{%endblocktrans%}</label>
+                                    <input type="text" name="department" value="" class="input-block-level" id="department">
+                                    <span class="help-inline">{% for error in form.department.errors %}{{error}}{% endfor %}</span>
+                                </div>  
+                            </div>
+                        </div> <!-- third row end -->
+                        {% else %}
+                        <div class="span6">
+                            <label for="department">{%blocktrans%}Abteilung{%endblocktrans%}</label>
+                            <input type="text" name="department" value="{% if form.department.value %}{{form.department.value}}{% else %}{{user.docprofile.department}}{% endif %}" class="input-block-level" id="hospital">
+                        </div>
+                    </div> <!--third row end -->
+                    {% endif %}
+
+                    {% if form.address1.errors %}
+                    <div class="row-fluid"> <!-- fourth row start -->
+                        <div class="span6">
+                            <div class="control-group error">
+                                <label for="address1">{%blocktrans%}Adresse 1{%endblocktrans%}</label>
+                                <textarea  row="3" type="text" name="address1" value="" class="input-block-level" id="address1"></textarea>
+                                <span class="help-inline">{% for error in form.address1.errors %}{{error}}{% endfor %}</span>
+                            </div>
+                        </div>
+
+                        {% else %}
+                        <div class="row-fluid"> <!-- fourth row start -->
+                            <div class="span6">
+                                <label for="address1">{%blocktrans%}Adresse 1{%endblocktrans%}</label>
+                                <textarea row="3" type="text" name="address1" class="input-block-level">{{user.userprofile.address1}}</textarea>
+                            </div>
+                            {% endif %}
+                            <div class="span6">
+                                <label for="address2">{%blocktrans%}Adresse 2{%endblocktrans%}</label>
+                                <textarea row="3" type="text" name="address2" class="input-block-level" id="address2">{% if form.address2.value %}{{form.address2.value}}{% else %}{{user.userprofile.address2}}{% endif %}</textarea>
+                            </div>
+                        </div> <!-- fourth row end -->
+                        <div class="row-fluid"> <!-- fifth row start -->
+                            <div class="span6">
+                                <label for="postalcode">{%blocktrans%}Postleitzahl{%endblocktrans%}</label>
+                                <input type="text" name="postalcode" value="{% if form.postalcode.value %}{{form.postalcode.value}}{% else %}{{user.userprofile.postal_code}}{% endif %}" class="input-block-level pcode" id="address2">
+                            </div>
+                            <div class="span6">
+                                <label for="city">{%blocktrans%}Ort{%endblocktrans%}</label>
+                                <input type="text" name="city" value="{% if form.city.value %}{{form.city.value}}{% else %}{{user.userprofile.city}}{% endif %}" class="input-block-level" id="city">
+                            </div>
+                        </div><!-- fifth row end -->
+                        {% if form.dob.errors %}
+                        <div class="row-fluid"> <!-- sixth row start -->
+                            <div class="span6">
+                                <div class="control-group error datepicker " >
+                                    <label for="dob">{%blocktrans%}Geburtsdatum{%endblocktrans%}</label>
+                                    <div class="input-append">
+                                    <input type="text" data-format="dd.MM.yyyy" placeholder='' name="dob" id="dob" class="input-block-level  date">
+                                     <span class="add-on" style="position: relative;z-index:4;margin-left: -28px;">
+                                        <i class="fa fa-calendar"></i>
+                                     </span>
+                                    </div>
+                                    <span class="help-inline">{% for error in form.dob.errors %}{{error}}{% endfor %}</span>
+                                </div>
+                            </div>
+                            {% else %}
+                            <div class="row-fluid"> <!-- sixth row start -->
+                                <div class="span6">
+                                    <div class="datepicker">
+                                        <label for="dob">{%blocktrans%}Geburtsdatum{%endblocktrans%}</label>
+                                          <div class=" input-append ">
+                                        <input type="text" data-format="dd.MM.yyyy" placeholder='' name="dob" id="dob" value="{% if user.userprofile.dob %}{{user.userprofile.dob|date:'d.m.Y'}}{% endif %}" class="input-block-level  date" placeholder="dd.mm.yyyy">
+                                           <span class="add-on" style="position: relative;z-index:4;margin-left: -28px;">
+                                             <i class="fa fa-calendar"></i>
+                                             </span>
+                                          </div>
+                                          </div>
+                                </div>
+                                {% endif %}
+
+                                {% if form.gender.errors %}
+                                <div class="span6">
+                                    <div class="control-group error">
+                                        <label>{%blocktrans%}Geschlecht{%endblocktrans%} </label>
+
+                                        <label for="male" class="radio inline">{%blocktrans%}männlich{%endblocktrans%} </label>
+                                        <input type="radio" name="gender" value="male"  id="male">
+
+
+                                        <label for="female" class="radio inline">{%blocktrans%}weiblich{%endblocktrans%} </label>
+                                        <input type="radio" name="gender" value="female"  id="female">
+
+                                        <span class="help-inline">{% for error in form.gender.errors %}{{error}}{% endfor %}</span>
+                                    </div>
+                                </div>
+                            </div> <!-- sixth row end -->
+                            {% else %}
+                            <div class="span6">
+
+                                <label>{%blocktrans%}Geschlecht{%endblocktrans%} </label>
+
+                                <label for="male" class="radio inline" >{%blocktrans%}Männlich{%endblocktrans%} </label>
+                                <input type="radio" name="gender" value="male" id="male">
+
+
+                                <label for="female" class="radio inline" >{%blocktrans%}Weiblich{%endblocktrans%} </label>
+                                <input type="radio" name="gender" value="female" id="female">
+
+                            </div>
+                        </div> <!--sixth row end -->
+                        {% endif %}      
+
+                        <div class="row-fluid"> <!-- fourth row start -->
+                            <div class="span6">
+                                <div class="control-group">
+                                    <label for="address1">{%blocktrans%}E-Mail{%endblocktrans%}</label>
+                                    <input type="email" name="email" value="{% if user.userprofile.email %}{{user.userprofile.email}}{% endif %}" class="input-block-level" id="email" required>
+                                </div>
+                            </div>      
+                        </div>
+                        <div class="row-fluid">
+                            <div class="span6">
+                                <div class="control-group">
+                                    <label for="address1">{%blocktrans%}E-Mail- Benachrichtigungen{%endblocktrans%}</label>
+                                    <label class="radio inline" for="daily">{%blocktrans%}Täglich{%endblocktrans%}</label>
+                                    <input type="checkbox" name="daily" id="daily" {% if user.docprofile.daily_mail %}checked{% endif %}> 
+
+                                    <label class="radio inline" for="se">{%blocktrans%}Nebenwirkungen{%endblocktrans%}</label>
+                                    <input type="checkbox" name="se" id="se" {% if user.docprofile.se_mail %}checked{% endif %}> 
+                                </div>
+                            </div>      
+                        </div>
+                        <div class="row">
+                        <fieldset class="span4">
+
+                            <legend>{%blocktrans%}Kontaktnummern{%endblocktrans%}</legend>
+                            <label for="mobile">{%blocktrans%}Allgemeine Rufnummer{%endblocktrans%}</label>
+                            <input type="text" name="mobile" value="{% if form.mobile.value %}{{form.mobile.value}}{% else %}{{user.userprofile.mobile}}{% endif %}" class="input-block-level mobile" id="mobile"><br>
+
+                            <label for="emergency">{%blocktrans%}Notfall-Nummer{%endblocktrans%}</label>
+                            <input type="text" name="emergency" value="{% if form.emergency.value %}{{form.emergency.value}}{% else %}{{user.docprofile.emergency_num}}{% endif %}" class="input-block-level  mobile" id="emergency"><br>
+
+                            <label for="appointment">{%blocktrans%}Rufnummer zur Terminvereinbarung{%endblocktrans%}</label>
+                            <input type="text" name="appointment" value="{% if form.appointment.value %}{{form.appointment.value}}{% else %}{{user.docprofile.appointment_num}}{% endif %}" class="input-block-level  mobile" id="appointment"><br>
+
+                        </fieldset>
+
+                        <fieldset class="span4">
+
+                          <legend>{%blocktrans%}Arbeitszeit{%endblocktrans%}</legend>
+                          {% for day in daychoices %}
+                              <div class="workday">
+                                <span class="span2">
+                                  <label><input class="day" type="checkbox" {{user|getWorkingDay:day.0}} value="{{day.0}}" name="day{{day.0}}"> {{day.0|getDayLanguage:user.userprofile.language}}</label>
+                                </span> 
+                                <span></span>
+                                <input type="hidden" name="from{{day.0}}" class="span1 timeFromi" placeholder="From" value="{{user|getStartTime:day.0}}">
+                                <input type="hidden" name="to{{day.0}}" class="span1 timeToi" placeholder="To" value="{{user|getEndTime:day.0}}"><br>
+                                <div class="time-range hidden">
+                                    <p>{%blocktrans%}Zeitbereich:{%endblocktrans%} <span class="timeFrom">{{user|getStartTime:day.0}}</span> - <span class="timeTo">{{user|getEndTime:day.0}}</span>
+
+
+                                    </p>
+                                    <div class="sliders_step1">
+                                        <div class="slider-range"></div>
+                                    </div>
+                                </div>
+                              </div>
+                          {% endfor %}
+                          
+                        </fieldset>
+                             </div>
+                       
+                        <hr>
+
+                        <div class="row-fluid">
+                            <div class="span3">
+                                
+                                <label for="">{%blocktrans%}Profil Bild{%endblocktrans%}</label>
+                                <img src="{% if user.docprofile.profile_pic %}{{user.docprofile.profile_pic}}{% else %}{{ STATIC_URL }}img/doctor.png{% endif %}" class="profilePic" alt="Profile" height="150" width="150" style="box-shadow: 0px 0px 1px 0px rgba(0, 0, 0, 0.2);border: 4px solid #FFF;"><br>
+                                <br> 
+                                <input type="file" name="image" id="flUpload" class="hidden" onchange="readURL(this);">
+                                <a class="btn btn-mini pull-left" id="image_alt">{% if user.docprofile.profile_pic %}Change{% else %}Select{% endif %} {%blocktrans%}image{%endblocktrans%}</a> 
+                            </div>
+                   
+                            <div class="span9">
+                                
+                                <label><strong>{%blocktrans%}Lage{%endblocktrans%}</strong></label>
+                            <div id="map" style="width:100%;height:250px;box-shadow: 0px 0px 9px 2px rgba(0,0,0,0.2);"></div>
+                            </div>
+                      
+                        </div>
+
+                        <input type="hidden" name="pk" value="{{user.pk}}"> 
+                        <input type="hidden" name="mapData" id="mapData">
+                        
+                        <br><br>
+                        <button type="submit" class="btn btn-success ">{%blocktrans%}Profil aktualisieren{%endblocktrans%}</button>
+
+                        </form>
+                    </div>
+                </div>
+        </div>      
+
+
+{% endblock %}
+        {% block bottomScripts %}
+<script type="text/javascript" src="{{STATIC_URL}}js/imageValidation.js"></script>
+
+<script type="text/javascript" src="//maps.google.com/maps/api/js?sensor=false"></script>  
+
+<script>
+  $(document).ready(function() {
+    {% if form %}
+      $('#prefix').val("{{form.prefix.value}}").attr('selected',true);
+      $('input[name=gender][value={{form.gender.value}}]').attr('checked', 'checked');
+      $('#dob').val('{{form.dob.value}}');
+    {% else%}
+      $('#prefix').val("{{user.userprofile.prefix}}").attr('selected',true);
+      $('input[name=gender][value={{user.userprofile.gender}}]').attr('checked', 'checked');
+    {% endif %}
+  });
+</script>
+<script>
+  $(".slider-range").slider({
+    range: true,
+    min: 0,
+    max: 1339,
+    step: 15,
+    values: [540, 900],
+    slide: function (e, ui) {
+        var hours1 = Math.floor(ui.values[0] / 60);
+        var minutes1 = ui.values[0] - (hours1 * 60);
+
+        if (hours1.length == 1) hours1 = '0' + hours1;
+        if (minutes1.length == 1) minutes1 = '0' + minutes1;
+        if (minutes1 == 0) minutes1 = '00';
+
+
+        $(this).parents('.workday').find('.timeFrom').html(hours1 + ':' + minutes1);
+        $(this).parents('.workday').find('.timeFromi').val(hours1 + ':' + minutes1);
+
+        var hours2 = Math.floor(ui.values[1] / 60);
+        var minutes2 = ui.values[1] - (hours2 * 60);
+
+        if (hours2.length == 1) hours2 = '0' + hours2;
+        if (minutes2.length == 1) minutes2 = '0' + minutes2;
+        if (minutes2 == 0) minutes2 = '00';
+        
+
+        $(this).parents('.workday').find('.timeTo').html(hours2 + ':' + minutes2);
+        $(this).parents('.workday').find('.timeToi').val(hours2 + ':' + minutes2);
+    }
+});
+
+  $('.day').change(function(event) {
+    /* Act on the event */
+    if( $(this).is(':checked'))
+    {
+      $(this).parents('.workday').find('.time-range').removeClass('hidden');
+    }
+    else{
+      $(this).parents('.workday').find('.time-range').addClass('hidden');
+    }
+  });
+</script>
+<script>
+  $('input[type=checkbox]:checked').map(function(){
+    $(this).parents('.workday').find('.time-range').removeClass('hidden');
+    $(this).parents('.workday').find('.slider-range').addClass('select');
+  }); 
+  
+  $(".slider-range").each(function(index) {
+    var min = $(this).parents('.workday').find('.timeFromi').val();
+    var max = $(this).parents('.workday').find('.timeToi').val();
+    max = hrtoMinutes(String(max));
+    min = hrtoMinutes(String(min));
+     /* iterate through array or object */
+     $(this).slider({
+    range: true,
+    min: 0,
+    max: 1339,
+    step: 15,
+    values: [min, max],
+    slide: function (e, ui) {
+        var hours1 = Math.floor(ui.values[0] / 60);
+        var minutes1 = ui.values[0] - (hours1 * 60);
+
+        if (hours1.length == 1) hours1 = '0' + hours1;
+        if (minutes1.length == 1) minutes1 = '0' + minutes1;
+        if (minutes1 == 0) minutes1 = '00';
+
+
+        $(this).parents('.workday').find('.timeFrom').html(hours1 + ':' + minutes1);
+        $(this).parents('.workday').find('.timeFromi').val(hours1 + ':' + minutes1);
+
+        var hours2 = Math.floor(ui.values[1] / 60);
+        var minutes2 = ui.values[1] - (hours2 * 60);
+
+        if (hours2.length == 1) hours2 = '0' + hours2;
+        if (minutes2.length == 1) minutes2 = '0' + minutes2;
+        if (minutes2 == 0) minutes2 = '00';
+        
+
+        $(this).parents('.workday').find('.timeTo').html(hours2 + ':' + minutes2);
+        $(this).parents('.workday').find('.timeToi').val(hours2 + ':' + minutes2);
+    }
+});
+  });
+
+function hrtoMinutes(time){
+  var hoursDotMinutes = time;
+var fieldArray = hoursDotMinutes.split(":");
+var minutes = parseInt(fieldArray[0]) * 60 + parseInt(fieldArray[1]);
+return minutes;
+}
+</script>
+<script type="text/javascript">
+        var map = null;
+        var latitude;
+        var longitude;
+        {% if user.docprofile.map_location %}
+            var mapData = '{{user.docprofile.map_location}}';
+            mapData = mapData.replace(/[{()}]/g, '');
+            mapData = mapData.split(',');
+            latitude = mapData[0];
+            longitude = mapData[1];
+        {% else %}
+            latitude = 51;
+            longitude = 9;
+        {% endif %}
+        $(document).ready(function () {
+            var myOptions = {
+                    center: new google.maps.LatLng(latitude, longitude),
+                    zoom: 6,
+                    mapTypeId: google.maps.MapTypeId.ROADMAP
+                };
+                map = new google.maps.Map(document.getElementById("map"), myOptions);
+                google.maps.event.addListener(map, 'click', function(event) {
+                    setAllMap(null);
+                    placeMarker(event.latLng);
+                });
+                setupMarker(latitude, longitude)
+            //});
+        });
+        var markerAdded = false;
+        var marker;
+        var markers = [];
+        // Loads the maps
+        function placeMarker(location) {
+                if (markerAdded == false) {
+                    marker = new google.maps.Marker({
+                        position: location,
+                        map: map,
+                        icon: '{{ STATIC_URL }}img/map_marker.png'
+                    });
+                    markerAdded = true;
+                }
+                else {
+                    marker.setMap(null);
+                    marker = new google.maps.Marker({
+                        position: location,
+                        map: map,
+                        icon: '{{ STATIC_URL }}img/map_marker.png'
+                    });
+                }
+                map.setCenter(location);
+                document.getElementById("mapData").value = location.toString();
+            }
+        setupMarker = function(latitude, longitude) {
+            // Generate the position from the given latitude and longitude values
+            var pos = new google.maps.LatLng(latitude, longitude);
+            // Define the marker on the map in the specified location
+            marker = new google.maps.Marker({
+                        position: pos,
+                        map: map,
+                        icon: '{{ STATIC_URL }}img/map_marker.png'
+                    });
+            markers.push(marker);
+            // Add a listener to this marker to display the information window on click
+            var info = "This is a marker for the following co-ordinates:<br />latitude: " + latitude + "<br/>longitude: " + longitude;
+            google.maps.event.addListener(marker, 'click', function () {
+                var infowindow = new google.maps.InfoWindow({
+                    content: info
+                });
+                infowindow.open(map, marker);
+            });
+        }
+        function setAllMap(map) {
+          for (var i = 0; i < markers.length; i++) {
+            markers[i].setMap(map);
+          }
+        }
+        $(document).ready(function(){
+
+  
+});
+</script>
+<script>
+    $('#image_alt').click(function(e) {
+        e.preventDefault();
+        $('#flUpload').click();
+    });
+    function readURL(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                $('.profilePic')
+                    .attr('src', e.target.result)
+            };
+
+            reader.readAsDataURL(input.files[0]);
+            $('#preview').show();
+        }
+    }
+</script>
+{% endblock %}

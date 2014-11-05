@@ -1,0 +1,414 @@
+{% extends "dashboard/adminLayout.html" %}  
+{% block page_id %}Tassign{% endblock %}
+{% load templateUtils %}
+{% block content %}
+<style>
+    table.drugDalTab {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+    td.drugDalTd {
+        height: 40px;
+        width: 40px;
+        text-align: center;
+        background: #fff;
+        border: 1px solid #B8B8B8;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    td.drugDalTd:hover
+    {
+        background: #E2F0FA;
+    }
+    td.checked:hover 
+    {
+        background: #0099cc;
+    }
+    td.checked
+    {
+        background: #0099cc;
+    }
+    .drugDalTab td.disabled{
+        background: #ddd;
+        cursor: default;
+
+    }
+    #selectBtn{
+        margin-bottom: 10px;
+    }
+    .daycheckbox
+    {
+        position: absolute;
+        opacity: 0;
+    }
+</style>
+<div class="span9">
+    <div class="row-fluid" style="padding-top:27px;">
+        <div class="span12" >
+            <div class="newbreadcrumb flat">
+                <a href="/admin/treatment/list/" >Admin</a>
+                <a href="/admin/treatment/list/" >Treatments</a>
+                <a href="/admin/view/treatment/{{treatment.id}}/" > {{treatment}}</a>
+                {% if drug %}
+                <a href="#" class="active"> {{drug.drugname}}</a>
+                {% else %}
+                <a href="#" class="active"> Add Drug</a>
+                {% endif %}
+            </div>
+
+            <a class="btn btn-info pull-right btn-small" href="/admin/view/treatment/{{treatment.id}}/"> <i class="fa fa-reply"></i>  Back To Treatment</a>
+        </div>
+    </div>            
+    <div class="row-fluid ">
+        <div class="widget" style="margin-top:10px;">
+            <div class="widget-header">
+                <h3>{{treatment}}</h3>
+            </div>
+            <div class="widget-content">
+                <form class="form-horizontal" action="/admin/add/treatment/drug/" method="POST" onsubmit="return validate();">{% csrf_token %}
+
+                    {% if form_error %}
+
+                    {% if days_error %}
+                    <div class="alert alert-danger">Please select days.</div>
+                    {% else %}
+                    <div class="alert alert-danger">Please select drug.</div>
+                    {% endif %}
+                    {% endif %}  
+
+                    {% if not_image %}
+                    <div class="alert alert-danger">The file you selected is not an image, please check.</div>                  
+                    {% endif %}
+
+                    {% if image_type_error %}
+                    <div class="alert alert-danger">Only jpg/png images allowed.</div>                  
+                    {% endif %}
+
+                    {% if image_size_error %}
+                    <div class="alert alert-danger">Image size should be less than 2 mb.</div>                  
+                    {% endif %}
+
+                    {% if exist %}
+                    <div class="alert alert-danger">Same Drug with same time already exist for this treatment.</div>                  
+                    {% endif %}
+                    <div class="control-group">
+                        <label class="control-label"> Drug Name</label>
+                        <div class="controls">
+                            <select class="input span5 drugList" id="drugName">
+                                <option value="">Select Drug</option>
+                                {% for drug in druglist %}
+                                <option value="{{drug.id}}">{{drug}}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div id="loading"></div>
+                    <div class="control-group" style="display:none;" id="drugDetails">
+                        <div class="controls">
+                            <img id="drugImage" class="drugImage" src="{% if drug.drugname.image %}{{drug.drugname.image}}{% else %}{{STATIC_URL}}img/drug.png{% endif %}" alt="Drug" height="128" width="128"><br><br>
+                        </div>
+
+                        <div class="control-group">
+                            <label class="control-label"> Unit</label>
+                            <div class="controls">
+                                <input type="text" id="drugunit" name="unit" class="input span5" readonly value="{% if drug %}{{drug.value|getUnit:drug.drugname.unit}}{% endif %}">
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <label class="control-label"> Annotation</label>
+                            <div class="controls">
+                                <textarea name="annotation" class="span5" rows="5" placeholder="Annotation" required>{% if form.annotation.value %}{{form.annotation.value}}{% else %}{{drug.annotation}}{% endif %}</textarea>
+                            </div>
+                        </div>
+
+
+                        <div class="control-group">
+                            <label class="control-label"> Value</label>
+                            <div class="controls">
+                                <input class="input span5" name="value" id="value" value="{% if form.value.value %}{{form.value.value}}{% else %}{{drug.value|floatformat}}{% endif %}" type="number" placeholder="Value" min="0" required>
+                                <span class="help-inline">{% for error in form.value.errors %}{{error}}{% endfor %}</span>
+                            </div>
+                        </div>
+
+
+
+                        <div class="control-group">
+                            <div class="controls">
+                                <label class="checkbox">
+                                    <input type="checkbox" name="editByDoc" id="editByDoc" value="true">Editable by Doctor 
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <div class="controls">
+                                <label class="checkbox">
+                                    <input type="checkbox" name="noTime" id="noTime" value="true"> No Time  
+                                </label>
+                            </div>
+                        </div>
+
+
+                        <div class="control-group" id="time">
+                            <label class="control-label"> Time</label>
+                            <div class="controls">
+                                <select name="questTime" id="questTime">
+                                    <option value="0">Fixed Time</option>
+                                    {% for key, value in times.items %}
+                                    <option value="{{key}}">{{value.en}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="input-append controls" id="datetimepicker" style="display:block;">
+                                <br>
+                                <input data-format="hh:mm" readonly type="text" name="time" value="{% if form.time.value %}{{form.time.value|default:'08:00'}}{% else %}{% if drug %}{{drug.time|time:'H:i'}}{% else %}00:00{% endif %}{% endif %}" class="input span4 add-on">
+                                <span class="add-on ">
+                                    <i class="">
+                                    </i>
+                                </span>
+                                <p class="help-inline">{% for error in form.time.errors %}{{error}}{% endfor %}</p>
+                            </div>
+                        </div>
+
+
+                        <div class="control-group">
+                            <label class="control-label"> Drug Days</label>
+                            <div class="controls">
+
+                                <div id="selectBtn">
+                                    <a class="btn btn-mini " id="selectAll">Select all</a>
+                                </div>
+                                <table class="drugDalTab">
+                                    <tr class="drugDalTr">
+                                        {% for i in "1234567890123456789012345678"%}
+
+                                        <td class="drugDalTd {% if forloop.counter > treatment.days %}disabled{% endif %}"><span class="drugDal">{{forloop.counter}}
+                                                {% if forloop.counter <= treatment.days %}
+                                                <input class="daycheckbox" type="checkbox" name="day{{forloop.counter}}" id="day{{forloop.counter}}" value="true">
+                                                {% endif %}
+                                            </span>
+                                        </td>
+                                        {% if forloop.counter|divisibleby:"7" %}
+                                    </tr><tr>
+                                        {% endif %}
+
+                                        {% endfor %}
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="control-group">
+                            <div class="controls">
+                                <button type="submit" class="btn btn-info  btn-small">Save Drug</button>
+                            </div>
+                        </div>
+                        <input type="hidden" name="treatment" value="{{treatment.id}}">
+                        <input type="hidden" id="drug_id" name="drug_id" value="{{drug_id}}">
+                        <input type="hidden" name="days" id="days" value="{{treatment.days}}">
+                        <input type="hidden" name="edit" id="edit" value="{{edit}}">
+                        <input type="hidden" name="tdrug_id" value="{{drug.id}}">
+                        </form>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block bottomScripts %}
+
+<script>
+    if ($('#edit').val() == "True")
+    {
+        $('#drugDetails').show();
+        $('#drugName').attr('value', '{{drug.drugname.id}}');
+        $('#edit').val('1');
+        $('#questTime').val('{{drug.drugTime}}');
+        if ($('#questTime').val() !== '0'){
+            $('#datetimepicker').hide();
+        }
+    }
+</script>
+
+{% if editByDoc %}
+<script>
+    $('#editByDoc').attr('checked', true);
+    $('#value').attr('readonly', true);
+</script>
+{% endif %}
+
+{% if noTime %}
+<script>
+    $('#noTime').attr('checked', true);
+    $('#time').hide();
+</script>
+{% endif %}
+
+{% if form %}
+<script>
+    $('#drugDetails').show();
+    $('#drugName').attr('value', '{{drug.drugname.id}}');
+    $('#unit').val('{{form.unit.value}}').attr('selected', true);
+</script>       
+{% else %}
+{% if drug %}
+<script>
+    $('#unit').val('{{drug.unit}}').attr('selected', true);
+</script>
+{% endif %}
+{% endif %}
+{% if drug.timeNotRequired %}
+<script>
+    $('#noTime').attr('checked', true);
+    $('#time').hide();
+</script>
+{% endif %}
+{% if drug.editableByDoc %}
+<script>
+    $('#editByDoc').attr('checked', true);
+    $('#value').attr('readonly', true);
+</script>
+{% endif %}
+
+{% for day in selectedDays %}
+<script>
+    $('#day{{day}}').prop('checked', true);
+</script>
+{% endfor %}
+
+{% if drugDays %}
+{% for day in drugDays %}
+<script>
+    $('#day{{day}}').prop('checked', true);
+</script>
+{% endfor %}
+{% endif %}
+
+<script>
+    $('#selectAll').bind('click', function(e) {
+        e.preventDefault();
+        $('.daycheckbox').each(function(index, el) {
+            $(this).prop('checked', true);
+        });
+        $('.daycheckbox').trigger('change');
+    });
+
+    $('.daycheckbox').change(function() {
+        if ($(this).is(':checked')) {
+            $(this).parents('.drugDalTd').addClass('checked');
+        }
+        else
+        {
+            $(this).parents('.drugDalTd').removeClass('checked');
+        }
+    });
+    $('.daycheckbox').trigger('change')
+
+    $('.drugDalTd').click(function() {
+
+        if ($(this).find('.daycheckbox').length)
+        {
+            if ($(this).find('.daycheckbox').is(':checked'))
+            {
+                $(this).find('.daycheckbox').prop('checked', false);
+            }
+            else
+            {
+                $(this).find('.daycheckbox').prop('checked', true);
+            }
+            $('.daycheckbox').trigger('change')
+        }
+
+    })
+
+    $(function() {
+        $('#datetimepicker').datetimepicker({
+            pickDate: false
+        });
+    });
+    $("#noTime").click(function() {
+        if ($(this).is(':checked')) {
+            $('#time').fadeOut('slow');
+        }
+        else {
+            $('#time').fadeIn('slow');
+        }
+    });
+    $("#editByDoc").click(function() {
+        if ($(this).is(':checked')) {
+            $('#value').attr('readonly', true);
+            $('#value').val('0');
+        }
+        else {
+            $('#value').removeAttr('readonly');
+            $('#value').focus();
+        }
+    });
+    $('.drugList').change(function(e) {
+        e.preventDefault();
+        var id = $(this).val();
+        if (!id)
+        {
+            return
+        }
+        $('#loading').html("<center><span style='color:white;font-size:20px;'><br><img src='{{ STATIC_URL }}img/bar.gif' ></span></center>")
+
+
+        $.ajax({
+            url: '/admin/drugDetails/' + id + '/',
+            type: 'GET',
+        })
+                .done(function(data) {
+                    $('#loading').html('');
+                    $('#drugDetails').show();
+                    $('#drug_id').val(data.id);
+                    if (data.image === null || data.image === '') {
+                        $('#drugImage').attr('src', '{{STATIC_URL}}img/drug.png');
+                    }
+                    else {
+                        $('#drugImage').attr('src', data.image);
+                    }
+                    $('#drugunit').attr('value', data.unit)
+                })
+                .fail(function() {
+                    $('#loading').html('');
+                    bootbox.alert('An error occured, please try again!');
+                })
+
+    });
+    function validate() {
+        var checked_num = $('input[class="daycheckbox"]:checked').length;
+        if (checked_num === 0) {
+            bootbox.alert('Please select days');
+            return false;
+        }
+        else {
+            return true;
+        }
+    }
+
+    $('.add-on').click(function() {
+        $('.table-condensed i').css('display', 'inline-block');
+    })
+    $('#questTime').change(function(e) {
+        e.preventDefault();
+        var value = $(this).val();
+        if(value === '0'){
+            $('#datetimepicker').show();
+        }
+        else{
+            $('#datetimepicker').hide();   
+        }
+    });
+</script>
+
+<script type="text/javascript" src="{{STATIC_URL}}js/imageValidation.js"></script>
+<script src="{{ STATIC_URL }}js/bootstrap-datetimepicker.min.js"></script>
+<script src="{{ STATIC_URL }}js/bootstrap-typeahead.js"></script>
+{% endblock %}

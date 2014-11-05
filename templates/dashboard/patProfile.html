@@ -1,0 +1,282 @@
+{% extends "dashboard/patLayout.html" %} 
+
+{% load url from future %}
+{% block custom_css %}
+<style>
+	.input-block-level.add-on{
+		width: 100%;
+		border-radius: 5px;
+	}
+	#mobile::-webkit-outer-spin-button,
+	#mobile::-webkit-inner-spin-button {
+		/* display: none; <- Crashes Chrome on hover */
+		-webkit-appearance: none;
+		margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+	}
+</style>
+{% endblock %}
+{% load i18n %}
+{% block content %}
+
+<div class="span9">
+
+	<h1 class="page-title">{%blocktrans%}Profil Details{%endblocktrans%}</h1>
+	<div class="widget">
+		<div class="widget-content">
+
+			<form id="patform" action="{% url 'patient:profile' %}" method="POST" style="padding:3%; ">{% csrf_token %}
+				{% if form_error %} 
+				<div class="alert alert-error">{%blocktrans%}Bitte korrigieren Sie die folgenden Fehler.{%endblocktrans%}</div> 
+				{% endif %}
+
+				{% if success %} 
+				<div class="alert alert-success">{%blocktrans%}Profil erfolgreich aktualisiert.{%endblocktrans%}</div> 
+				{% endif %}
+
+				{% if password_changed %} 
+				<div class="alert alert-success">{%blocktrans%}Passwort wurde erfolgreich geändert, bitte bringen Sie Ihr Profil auf den neuesten Stand.{%endblocktrans%}</div> 
+				{% endif %}
+
+				{% if male_error %}
+				<div class="alert alert-error">
+					{%blocktrans%}Sie können nach weiblich mit Vorwahl Herr nicht wählen Bitte wählen Männlich.{%endblocktrans%}
+				</div>
+				{% endif %}
+
+				{% if female_error %}
+				<div class="alert alert-error">
+					{%blocktrans%}Sie können nach männlich mit Vorwahl Frau nicht wählen Bitte wählen Weiblich.{%endblocktrans%}
+				</div>
+				{% endif %}
+
+				{% if email_exist %}
+				<div class="alert alert-error">
+					{%blocktrans%}Diese E-Mail bereits verwendet wird, geben Sie bitte weitere E-Mail-ID.{%endblocktrans%}
+				</div>
+				{% endif %}
+
+				{% if form.prefix.errors %}
+				<div class="row-fluid"> <!-- first row -->
+					<div class="span6">
+						<div class=" control-group error">
+							<label for="prefix">{%blocktrans%}Titel{%endblocktrans%}</label>
+							<select name="prefix" id="prefix" class="input span12">
+								<option value="Mr">{%blocktrans%}Herr{%endblocktrans%}</option>
+								<option value="Mrs">{%blocktrans%}Frau{%endblocktrans%}</option>
+							</select>
+							<span class="help-inline">{% for error in form.prefix.errors %}{{error}}{% endfor %}</span>
+						</div>
+					</div>
+					{% else %}
+					<div class="row-fluid"><!--first row -->
+						<div class="span6">
+							<label for="prefix">{%blocktrans%}Titel{%endblocktrans%}</label>
+							<select name="prefix" id="prefix" class="input span12">
+								<option value="Mr">{%blocktrans%}Herr{%endblocktrans%}</option>
+								<option value="Mrs">{%blocktrans%}Frau{%endblocktrans%}</option>
+							</select>
+						</div>
+
+
+						{% endif %}
+						{% if form.dob.errors %}
+						<div class="span6">
+							<div class="datepicker">
+								<label for="dob">{%blocktrans%}Geburtstag{%endblocktrans%}</label>
+								<div class="input-append">
+									<input type="text" data-format="dd.MM.yyyy"  name="dob" id="dob" value="{% if user.userprofile.dob %}{{user.userprofile.dob|date:'d.m.Y'}}{% endif %}" class="input-block-level add-on" readonly>
+									<span class="add-on"  style="position: relative;z-index:4;margin-left: -28px;">
+										<i data-time-icon="fa fa-clock-o" data-date-icon="fa fa-calendar"></i>
+									</span>
+								</div>
+							</div>
+						</div>
+					</div><!--first row end -->
+					{% else %}
+
+					<div class="span6 datepicker ">
+						<label for="dob">{%blocktrans%}Geburtstag{%endblocktrans%}</label>
+						<div class="input-append">
+							<input type="text" data-format="dd.MM.yyyy"  name="dob" id="dob" value="{% if user.userprofile.dob %}{{user.userprofile.dob|date:'d.m.Y'}}{% endif %}" autocomplete="off" class="input-block-level date add-on" style="background: #fff;text-align: left;">
+							<!--							<span class="add-on"  style="position: relative;z-index:4;margin-left: -28px;">
+															<i data-time-icon="fa fa-clock-o" data-date-icon="fa fa-calendar"></i>
+														</span>-->
+						</div>                        
+					</div>
+				</div><!--first row end -->
+				{% endif %}
+
+				{% if form.fName.errors %}
+				<div class="row-fluid"><!--second row  -->
+					<div class="span6">
+						<div class=" control-group error">
+							<label for="fName">{%blocktrans%}Vorname{%endblocktrans%}</label>
+							<input type="text" name="fName" value="" class="input span12" id="fName" placeholder="{% for error in form.fName.errors %}{{error}}{% endfor %}">
+						</div>  
+					</div>
+					{% else %}
+					<div class="row-fluid"><!--second row -->
+						<div class="span6">
+							<label for="fName">{%blocktrans%}Vorname{%endblocktrans%}</label>
+							<input type="text" name="fName" value="{% if form.fName.value %}{{form.fName.value}}{% else %}{{user.userprofile.first_name|default:''}}{% endif %}" class="input span12" id="fName">
+						</div>
+
+						{% endif %}
+
+						<div class="span6">
+							<label for="lName">{%blocktrans%}Familienname{%endblocktrans%}</label>
+							<input type="text" name="lName" value="{% if form.lName.value %}{{form.lName.value}}{% else %}{{user.userprofile.last_name|default:''}}{% endif %}" class="input span12" id="lName">
+						</div>
+					</div><!--second row end -->
+					<!-- {% if form.address1.errors %}-->
+					<!--<div class="row-fluid">--><!--third row -->
+					<!-- <div class="span6">
+					     <div class="control-group error">
+						 <label for="address1">Address 1</label>
+						 <textarea type="text" row="3" name="address1" value="" class="input span12" id="address1" placeholder="{% for error in form.address1.errors %}{{error}}{% endfor %}"></textarea>
+					     </div>
+					 </div>
+					 {% else %}
+					 <div class="row-fluid">--><!--third row -->
+					<!--    <div class="span6">
+						<label for="address1">Address 1</label>
+						<textarea type="text" row="3" name="address1" class="input span12" id="address1">{% if form.address1.value %}{{form.address1.value}}{% else %}{{user.userprofile.address1}}{% endif %}</textarea>
+					    </div>               
+					    {% endif %}
+		
+		
+					    <div class="span6">
+						<label for="address2">Address 2</label>
+						<textarea type="text" row="3" name="address2" class="input span12" id="address2">{% if form.address2.value %}{{form.address2.value}}{% else %}{{user.userprofile.address2}}{% endif %}</textarea>
+					    </div>
+					</div>--><!--third row end -->
+					<!--  {% if form.mobile.errors %}
+					  <div class="row-fluid">--><!--fourth row -->
+					<!--<div class="span6 ">
+					    <div class="control-group error">
+						<label for="mobile">Mobile</label>
+						<input type="text" name="mobile" value="" class="input span12" id="mobile" placeholder="{% for error in form.mobile.errors %}{{error}}{% endfor %}">
+					    </div>
+					</div>
+					{% else %}
+					<div class="row-fluid">--><!--fourth row -->
+					<!--   <div class="span6 ">
+					       <label for="mobile">Mobile</label>
+					       <input type="text" name="mobile" value="{% if form.mobile.value %}{{form.mobile.value|default:''}}{% else %}{{user.userprofile.mobile}}{% endif %}" class="input span12" id="mobile"><br>
+					   </div>
+	   
+					   {% endif %}-->
+
+					{% if form.gender.errors %}
+					<div class="row-fluid">
+						<div class="span6">
+							<div class="control-group error">
+
+								<label>{%blocktrans%}Geschlecht{%endblocktrans%}</label>
+
+								<label for="male" class="radio inline">{%blocktrans%}Männlich{%endblocktrans%}</label>
+								<input type="radio" name="gender" value="male" id="male">
+
+
+								<label for="female" class="radio inline">{%blocktrans%}Weiblich{%endblocktrans%}</label>
+								<input type="radio" name="gender" value="female" id="female">
+
+								<span class="help-inline">{% for error in form.gender.errors %}{{error}}{% endfor %}</span>
+							</div>
+						</div>
+
+						{% else %}
+						<div class="row-fluid">
+							<div class="span6">
+								<label>{%blocktrans%}Geschlecht{%endblocktrans%}</label>
+
+								<label for="male" class="radio inline">{%blocktrans%}Männlich{%endblocktrans%}</label>
+								<input type="radio" name="gender" value="male"  id="male">
+
+
+								<label for="female" class="radio inline">{%blocktrans%}Weiblich{%endblocktrans%}</label>
+								<input type="radio" name="gender" value="female"  id="female">
+							</div>
+
+							{% endif %} 
+							<div class="span6">
+								<label>{%blocktrans%}Patienten ID{%endblocktrans%}</label>
+								<input type="text" style="background: #6683AD;color: #F8F8F8;font-weight: bold;" readonly value="{{user.username}}" class="span12">
+							</div>
+						</div>
+
+						<div class="row-fluid">
+							<div class="span6">
+								<label for="email">{%blocktrans%}Email{%endblocktrans%} *</label>
+								<input type="email" name="email" value="{% if form.email.value %}{{form.email.value}}{% else %}{{user.userprofile.email|default:''}}{% endif %}" class="input span12" id="email" required>
+							</div>
+							<div class="span6">
+								<label for="mobile">{%blocktrans%}Telefon{%endblocktrans%}</label>
+								<input type="text" name="mobile" value="{% if form.mobile.value %}{{form.mobile.value}}{% else %}{{user.userprofile.mobile|default:''}}{% endif %}" class="input span12  mobile" id="mobile">
+							</div>
+						</div>
+						<div class="row-fluid">
+							<div class="span6">
+								<div class="control-group">
+									<label class="radio inline" for="sms">{%blocktrans%}SMS- Benachrichtigungen{%endblocktrans%}</label>
+									<input type="checkbox" name="sms" id="sms" {% if user.userprofile.sms_notification %} checked {% endif %}> 
+								</div>
+							</div>      
+						</div>
+						<br><br>
+						<div class="row-fluid"><!--fifth row -->
+							<input type="hidden" name="pk" value="{{user.pk}}"> 
+							<button type="submit" class="btn btn-info ">{%blocktrans%}save{%endblocktrans%}</button>
+							<button type="reset" class="btn rebtn" >{%blocktrans%}cancel{%endblocktrans%}</button>
+						</div><!--fifth row end -->
+						</form>
+					</div>
+				</div>
+		</div>
+	</div>
+</div>
+
+{% endblock %}
+
+{% block bottomScripts %}
+
+
+{% if form %}
+<script>
+
+	$(document).ready(function() {
+		$('#prefix').val("{{form.prefix.value}}").attr('selected', true);
+		$('input[name=gender][value={{form.gender.value}}]').attr('checked', 'checked');
+		$('#dob').val('{{form.dob.value}}');
+	});
+</script>
+{% else %}
+<script>
+	$(document).ready(function() {
+		var gender = "{{user.userprofile.gender}}";
+		if (gender.toLowerCase() === "male") {
+			$('#prefix').val('Mr').attr('selected', true);
+		}
+		else {
+			$('#prefix').val('Mrs').attr('selected', true);
+		}
+		gender = gender.toLowerCase();
+		//$('#prefix').val("{{user.userprofile.prefix}}").attr('selected', true);
+		$('input[name=gender][value=' + gender + ']').attr('checked', 'checked');
+	});
+	$(".rebtn").click(function() {
+		$("#patform.frm")[0].reset();
+	});
+
+	$('input[name=gender]').change(function(e) {
+		e.preventDefault();
+		if ($(this).attr('value') === "male") {
+			$('#prefix').val('Mr').attr('selected', true);
+		}
+		else {
+			$('#prefix').val('Mrs').attr('selected', true);
+		}
+	});
+</script>
+{% endif %}
+{% endblock %}

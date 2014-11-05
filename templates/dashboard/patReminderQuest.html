@@ -1,0 +1,47 @@
+{% load i18n %}
+{% if not hide %}
+<div class="row-fluid questBox ALQ" time="0" kados="{{kado}}">
+	<div class="BOX-CONT">
+		<div class="TBOX">
+			<div class="LBOX dialBOX orgLBOX">
+				<img class="questKadoLogo" src="{{ STATIC_URL }}kadoLogos/newLogo.png">
+				<div class="questKado">
+					<input class="dial" value="{{kado}}" type="text" data-width="100" data-height="100" data-skin="tron" data-thickness=".3" data-fgColor="#4a7089" data-readOnly="true"  data-min="0" data-max="{{kado}}">
+				</div>
+			</div>
+			<div class="RBOX rb"></div>
+			<div class="RBOXc rb v1scroll">
+				<div class="questMediName">
+					<span class="..subQuestion preLineWhiteSpace" style="font-weight: normal;">{% autoescape off %}{% if reminder.recommendation %}{{reminder.recommendation}}{% else %}{{reminder.reminder.reminder}}{% endif %}{% endautoescape %}</span>
+				</div>
+				<p class="questMediAbrt"><button class="btn abtrtBtn btn-mini">{%blocktrans%}Abbrechen{%endblocktrans%}</button></p>
+			</div>
+		</div>
+
+		<div class="BBOX bb aCOlor"></div>
+		<div class="BBOXlc"> <span class="BBOXlcSpan">
+				<!--Einnahme-->
+			</span> </div>
+		<div class="BBOXrc ">
+			<div class="row-fluid" style="height: 100%">
+
+				<div class="questionP Qs Q1">
+					<div class="questionSpan">
+						<p class="question v1scroll">{{reminder.reminder.getQuestionDe}}</p>
+						<p class="questionBtns">
+							<button class="btn questBtn singleBtn closeBtn reminderUpdateBtn" reminderId="{{reminder.id}}">{%blocktrans%}Bestätigen{%endblocktrans%}</button>
+							<!--									<button class="btn questBtn NoBtn">Nein</button>-->
+						</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</div>
+
+<script>
+	$(".dial").knob();
+</script>
+<!--DO NOT ADD content AFTER END IF-->
+{% endif %}

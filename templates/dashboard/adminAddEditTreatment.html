@@ -1,0 +1,483 @@
+{% extends "dashboard/adminLayout.html" %}  
+{% block page_id %}Tassign{% endblock %}
+{% block content %}
+<link href="{{ STATIC_URL }}css/patmytask.css" rel="stylesheet">
+<div class="span9">
+    <div class="container-fluid">
+        <div class="row-fluid" style="padding-top:27px;">
+            <div class="span12">
+                <div class="newbreadcrumb flat">
+                    <a href="#" >Admin</a>
+                    <a href="/admin/treatment/list/" >Treatments</a>
+                    {% if t %}
+                    <a href="#" class="active">{{t}} {% if revision %}(Revision){% endif %}</a>
+                    {% else %}
+                    <a href="#" class="active"> Add Treatment</a>
+                    {% endif %}
+                </div>
+
+                <a class="btn btn-info btn-small  pull-right" href="/admin/treatment/list/"><i class="fa fa-list-ul"></i> Treatment List</a>
+            </div>
+        </div>
+        <div class="row-fluid tlist">
+
+            <input id="csrf_token" type="hidden" value="{{csrf_token}}">
+            <div class="span12" style="padding:20px;margin-left:0px;">
+                <form class="form-horizontal" action="/admin/assign/drug/" method="POST">{% csrf_token %}
+                    {% if form_error %}
+                    {% if day_error %}
+                    <div class="alert alert-danger">
+                        Treatment cycle.
+                    </div>
+                    {% else %}
+                    {% if day_limit_error %}
+                    <div class="alert alert-danger">
+                        Max days should be 28.
+                    </div>
+                    {% else %}
+                    <div class="alert alert-danger">
+                        Please fill all the fields.
+                    </div>
+                    {% endif %}
+                    {% endif %}
+                    {% endif %}
+
+                    <div class="control-group">
+                        <label class="control-label"> Treatment Name</label>
+                        <div class="controls">
+                            <input class="span8" id="treatment_name" name="treatment" type="text" placeholder="Treatment Name" value="{% if treatment %}{{treatment}}{% else %}{{t.getRevisionName}}{% endif %}" required {% if t.approved and not revision %}readonly{% endif %}>
+                        </div>
+                    </div>
+                    <div class="control-group numparent">
+                        <label class="control-label"> Treatment Cycle</label>
+                        <div class="controls">
+                            <input class="span8" id="days" type="number" min="1" max="28" step="1" name="days" value="{% if t.days %}{{t.days}}{% else %}{{days|default:'28'}}{% endif %}" type="text" placeholder="Number of Days" required {% if t.approved %}readonly{% endif %}>
+                        </div>
+                    </div>
+
+
+                    <div class="control-group">
+                        <label class="control-label">  Auditor</label>
+                        <div class="controls">
+                            {% if t %}
+                                {% if t.draft and not revision %}
+                                <select name="pharmacist" id="pharmacist" class="span8">
+                                    {% for pharmacist in pharmacists %}
+                                    <option value="{{pharmacist.id}}">
+                                        {% if pharmacist.pharma.company %}{{pharmacist.pharma.company}}{% else %}{{pharmacist.userprofile.first_name|default:pharmacist.username}}{% endif %}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                {% else %}
+                                <input type="text" class="span8" readonly value="{{t.getPharmacistTreatment.username}}">
+                                {% endif %}
+                            {% else %}
+                                <select name="pharmacist" id="pharmacist" class="span8">
+                                    {% for pharmacist in pharmacists %}
+                                    <option value="{{pharmacist.id}}">{% if pharmacist.pharma.company %}{{pharmacist.pharma.company}}{% else %}{{pharmacist.userprofile.first_name|default:pharmacist.username}}{% endif %}</option>
+                                    {% endfor %}
+                                </select>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <input type="hidden" name="id" value="{{t.pk}}">
+
+                    <div class="control-group">
+                        <div class="controls">
+                            <button id="updateTreatment" treatment="{{t.pk}}" class="btn btn-info btn-small" {{t.approved|yesno:"disabled=\"\"," }}><i class="fa fa-edit"></i> Save</button>
+
+                            <button type="submit" class="btn btn-small btn-inverse" {{t.approved|yesno:"disabled=\"True\"," }} {{ t.pk|yesno:",disabled=\"True\"" }} ><i class="fa fa-plus"></i> Add Drugs</button>
+                            <a {% if t %}href="/admin/assign/sideeffect/{{t.id}}/"{% endif %} class="btn btn-small btn-inverse {{t.approved|yesno:"disabled," }}{{ t.pk|yesno:",disabled" }}"><i class="fa fa-plus"></i> Add SideEffects</a>
+
+
+
+                        </div>
+                    </div>
+                    {% if t.approved %}
+                    <div class="control-group">
+                        <div class="controls">
+                            {% if revision or t.getRevisionStatus == None %}
+                            <a id="saveRevision" class="btn btn-small btn-warning" {% if t.getRevisionStatus %}{% if not t.getRevisionStatus.draft %}{% if t.getRevisionStatus.approved == None %}disabled disable='true'{% endif %}{% endif %}{% endif %}><i class="fa fa-edit"></i> Save Revision</a>
+                            {% if t.getRevisionStatus %}
+                            <!--<a {% if t.getRevisionStatus.draft %}href="/admin/send/revision/{{t.id}}/"{% endif %} id="sendRevision" class="btn btn-small btn-primary" {% if not t.getRevisionStatus.draft %}disabled{% endif %} ><i class="fa fa-mail-forward"></i> Send Revision</a>-->
+                            {% endif %}
+
+                            {% else %}
+                            {% if t.getRevisionStatus and not t.getRevisionStatus.approved%}
+                            <a id="saveRevision" class="btn btn-small btn-warning" {% if t.getRevisionStatus %}{% if not t.getRevisionStatus.draft %}{% if t.getRevisionStatus.approved == None %}disabled disable='true'{% endif %}{% endif %}{% endif %}><i class="fa fa-edit"></i> Save Revision</a>
+                            {% else %}
+                            <a href="/admin/create/revision/{{t.id}}/" class="btn btn-small btn-info"><i class="fa fa-mail-forward"></i> Create Revision</a>
+                            {% endif %}
+                            {% endif %}
+
+                        </div>
+                    </div>
+                    {% endif %}
+                    <div class="control-group">
+                        <div class="controls">
+                            {% if t.approved %}
+                            {% if revision %}
+                            <a {% if t.getRevisionStatus.draft %}href="/admin/send/revision/{{t.id}}/"{% endif %} id="sendRevision" class="btn btn-small btn-primary" {% if not t.getRevisionStatus.draft %}disabled{% endif %} ><i class="fa fa-check-square-o"></i> Request Approval</a>
+                            {% endif %}
+                            {% endif %}
+                            {% if not revision %}
+                            <a href="/admin/treatment/send/approval/{{t.id}}/"  class="btn btn-primary btn-small {{t.approved|yesno:"disabled," }}{{ t.pk|yesno:",disabled" }}"><i class="fa fa-check-square-o"></i> Request Approval</a>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                </form>
+                <hr>        
+
+                {% if revision or t.getRevisionStatus  %}
+                <div class="control-group">
+                    <label class="control-label"> Wiki For Physician</label>
+                    <div class="controls">
+                        <textarea class="span5 wiki" name="physicianwiki" id="physicianwiki" rows="3" required>{{t.getPhysicianWiki}}</textarea>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label"> Wiki For Patient</label>
+                    <div class="controls">
+                        <textarea class="span5 wiki" name="patientwiki" id="patientwiki" rows="3" required>{{t.getPatientWiki}}</textarea>
+                    </div>
+                </div>
+                {% else %}
+
+                {% if t %}
+                    <form style="margin-bottom: 0px;" action="/admin/treatment/wiki/" method="POST">{% csrf_token %}
+                    <div class="row-fluid">
+
+                        <h4>Physician Wiki</h4>
+                        {% autoescape off %}
+                        <div  class="span11 " id="physicianwiki{{t.pk}}" > 
+                            <textarea class="wiki" name="physician_wiki" rows="9">{{t.getPhysicianWiki}}</textarea>
+                            
+                            {% if not t.approved %}<button type="submit" style="margin-top:5px;" class="btn btn-info pull-right"><i class="fa fa-globe"></i> Update Wiki</button>{% endif %}               
+                        </div>
+                        {% endautoescape %} 
+                    </div> 
+                    <input type="hidden" name="treatment" value="{{t.id}}">
+                    </form> 
+                   
+
+                    <form  style="margin-bottom: 0px;" action="/admin/treatment/wiki/" method="POST">{% csrf_token %}
+                    <div class="row-fluid">
+                        <h4>Patient Wiki</h4>
+                        {% autoescape off %}
+                        <div  class="span11 " id="patientwiki{{t.pk}}" > 
+                            <textarea class="wiki" name="patient_wiki" rows="9">{{t.getPatientWiki}}</textarea> 
+                            
+                            {% if not t.approved %}<button type="submit" style="margin-top:5px;" class="btn btn-info pull-right"><i class="fa fa-globe"></i> Update Wiki</button>{% endif %}               
+                        </div>
+                        {% endautoescape %}
+                    </div>
+                    <input type="hidden" name="treatment" value="{{t.id}}">
+                    </form>
+                    <hr>
+                {% endif %}
+
+            {% endif %}
+
+
+            {% if t.pk %}
+            <h4>Drugs</h4>
+            {% if not drugs %}
+            <p>* No drugs related to this treatment.</p>
+            {% endif %}
+            {% endif %}
+            <div class="container-fluid drugsList vscroll" style="">
+                {% for drug in drugs %}
+                <div class="row-fluid" id="drug{{drug.1}}">
+                    <div class="span10">
+                        {{drug.0}} 
+                    </div>
+                    <div class="span2">
+                        <a class="btn btn-info btn-mini drugEdit {% if t.approved %}disabled{% endif %}" href="/admin/edit/treatment/{{t.pk}}/drug/{{drug.1}}/"><i class="fa fa-file-text"></i> Edit</a>
+                        <button class="btn btn-danger btn-mini drugDelete {% if t.approved %}disabled{% endif %}" drug="{{drug.1}}"><i class="fa fa-trash-o"></i> Delete</button>
+                    </div >
+
+                </div>
+                <hr>
+                {% endfor %}
+
+            </div>
+
+            {% if t %}
+            <h4>Side Effects</h4>
+            {% if not t.sideeffect_set.all %}
+            <p>* No sideeffects added in this treatment.</p>
+            {% endif %}
+            <div class="container-fluid drugsList vscroll" style="">
+                {% for se in t.sideeffect_set.all %}
+                <div class="row-fluid" id="drug{{drug.1}}">
+                    <div class="span10">
+                        {{se.sideeffect}} 
+                    </div>
+                    <div class="span2">
+                        <a class="btn btn-info btn-mini  drugEdit {% if t.approved %}disabled{% endif %}" href="/admin/sideeffect/wiki/{{se.id}}/"><i class="fa fa-file-text"></i> Wiki</a>
+                        <a class="btn btn-danger btn-mini {% if t.approved %}disabled{% endif %}" href="/admin/sideeffects/sideeffect/{{se.id}}/delete/"><i class="fa fa-trash-o"></i> Delete</a>
+                    </div >
+
+                </div>
+                <hr>
+                {% endfor %}
+
+            </div>
+            {% endif %}
+            
+            {% if t %}
+            <h4>News for Physician</h4>
+            <form style="margin-bottom: 0px;" action="/admin/treatment/description/{{t.id}}/" method="POST">{% csrf_token %}
+                <div class="row-fluid">
+                    <div class="control-group">
+                        <div class="controls">
+                            <div class="span12">
+                                <input type="text" class="input-xxlarge" name="description" value="{{t.description|default:''}}">
+                            </div>
+                        </div>
+                        {% if not t.approved %}<button type="submit" style="margin-top:5px;" class="btn btn-info"><i class="fa fa-globe"></i> Update Description</button>{% endif %}
+                    </div>
+                </div>
+            </form>
+            <hr>
+
+            <h4>Auditor Message</h4>
+            {% if t.pharmacist_message %}
+                {{t.pharmacist_message}}
+            {% else %}
+            <p>* No message.</p>
+            {% endif %}
+
+
+            {% endif %}
+
+
+        </div>
+        <input type="hidden" id="physicianWiki" value='{{t.getPhysicianWiki}}'>
+        <input type="hidden" id="patientWiki" value='{% autoescape off %}{{t.getPatientWiki}}{% endautoescape %}'>
+    </div>
+</div>
+</div>
+{% endblock %}
+{% block bottomScripts %}
+<script src="{{ STATIC_URL }}js/tinymce/tinymce.min.js"></script>
+<script>
+                    tinymce.init({
+                        selector: '.wiki',
+                        plugins: [
+                            "advlist autolink lists link image charmap print preview anchor",
+                            "searchreplace visualblocks fullscreen",
+                        ],
+                        toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image",
+                        statusbar: false
+                    });
+                    $(document).on('focusin', function(e) {
+                        if ($(e.target).closest(".mce-window").length) {
+                            e.stopImmediatePropagation();
+                        }
+                    });
+                    $('.addPhysicianWiki').click(function(event) {
+                        $('#treatment').val($(this).attr('treatment'));
+                        $('#ttype').val('physician');
+                        var content = $(this).attr('content');
+                        tinyMCE.get('wiki').setContent(content);
+                    });
+
+                    $('.addPatientWiki').click(function(event) {
+                        $('#treatment').val($(this).attr('treatment'));
+                        $('#ttype').val('patient');
+                        var content = $(this).attr('content');
+                        tinyMCE.get('wiki').setContent(content);
+                    });
+
+                    $('.showPhysicianWiki').click(function(e) {
+                        e.preventDefault();
+                        var preview = $(this).attr('treatment');
+                        $('#physicianwiki' + preview).slideToggle();
+                    });
+
+                    $('.showPatientWiki').click(function(e) {
+                        e.preventDefault();
+                        var preview = $(this).attr('treatment');
+                        $('#patientwiki' + preview).slideToggle();
+                    });
+                    $('.disabled').on('click', function(e) {
+                        e.preventDefault();
+                    });
+
+                    $(function() {
+                        $('#error_msg').hide();
+                        var value = readCookie('error');
+                        function readCookie(name) {
+                            var nameEQ = name + "=";
+                            var ca = document.cookie.split(';');
+                            for (var i = 0; i < ca.length; i++) {
+                                var c = ca[i];
+                                while (c.charAt(0) == ' ')
+                                    c = c.substring(1, c.length);
+                                if (c.indexOf(nameEQ) == 0)
+                                    return c.substring(nameEQ.length, c.length);
+                            }
+                            return null;
+                        }
+                        if (value === 'true') {
+                            $('#myModal').modal('show');
+                            $('#treatment').val('{{t.pk}}');
+                            $('#error_msg').show();
+                            var physician = readCookie('physician');
+                            var patient = readCookie('patient');
+                            if (patient === 'true') {
+                                var content = $('#patientWiki').val();
+                                $('#ttype').val('patient');
+                                $('#wiki').html(content);
+                            }
+                            else {
+                                var content = $('#physicianWiki').val();
+                                $('#ttype').val('physician');
+                                $('#wiki').html(content);
+                            }
+                        }
+                    });
+
+                    $('.drugDelete').bind('click', function(e) {
+                        e.preventDefault();
+                        var btn = $(this);
+                        var drug = btn.attr('drug');
+                        $.post("/admin/delete/drug/", {
+                            csrfmiddlewaretoken: $('#csrf_token').val(),
+                            drug: drug
+                        })
+                                .done(function(data) {
+                                    $('#drug' + drug).fadeOut('slow');
+                                })
+                                .fail(function() {
+                                    bootbox.alert("Ein Fehler ist aufgetreten beim Löschen Drogen versuchen Sie es erneut!! <img src='{{STATIC_URL}}img/delete.png' alt=''>");
+                                });
+                    });
+                    $('#updateTreatment').click(function(e) {
+
+                        e.preventDefault();
+                        if ($(this).attr('disable') == 'true') {
+                            return;
+                        }
+                        var btn = $(this);
+                        btn.html('Saving...');
+                        btn.attr('disabled', true);
+                        var treatment = btn.attr('treatment');
+                        var days = $('#days').val();
+                        var name = $('#treatment_name').val();
+                        var pharmacist = $('#pharmacist').val();
+                        $.post("/admin/update/treatment/", {
+                            csrfmiddlewaretoken: $('#csrf_token').val(),
+                            treatment: treatment,
+                            name: name,
+                            days: days,
+                            pharmacist: pharmacist
+                        })
+                                .done(function(data) {
+                                    btn.removeAttr('disabled');
+                                    btn.html('<i class="fa fa-edit"></i> Save');
+                                    if (data.status) {
+                                        bootbox.alert("Behandlung erfolgreich aktualisiert <img src='{{STATIC_URL}}img/accept.png' alt=''>", function() {
+                                            window.location = '/admin/view/treatment/' + data.id + '/';
+                                        });
+                                    }
+                                    else {
+                                        bootbox.alert(data.message);
+                                    }
+
+                                })
+                                .fail(function() {
+                                    bootbox.alert("Ein Fehler ist aufgetreten beim Löschen Drogen versuchen Sie es erneut!! <img src='{{STATIC_URL}}img/delete.png' alt=''>");
+                                    btn.removeAttr('disabled');
+                                    btn.html('<i class="fa fa-edit"></i> Update Treatment');
+                                });
+                    });
+
+                    function delCookie() {
+                        createCookie('error', "", -1);
+                    }
+
+                    $('#saveRevision').click(function(e) {
+                        e.preventDefault();
+                        if ($(this).attr('disable') == 'true') {
+                            return;
+                        }
+                        var treatment = $('#treatment_name').val();
+                        var physician_wiki = tinyMCE.get('physicianwiki').getContent();
+                        var patient_wiki = tinyMCE.get('patientwiki').getContent();
+                        if (treatment === '') {
+                            bootbox.alert('Treatment Name can\'t be empty <img src="{{STATIC_URL}}img/delete.png">');
+                            return;
+                        }
+                        $.ajax({
+                            url: '/admin/save/revision/{{t.id}}/',
+                            type: 'POST',
+                            data: {treatment: treatment, physician_wiki: physician_wiki, patient_wiki: patient_wiki, csrfmiddlewaretoken: '{{csrf_token}}'},
+                        })
+                                .done(function(data) {
+                                    if (data.status == false) {
+                                        bootbox.alert(data.message + '<img src="{{STATIC_URL}}img/delete.png">', function() {
+                                            window.location = '/admin/create/revision/{{t.id}}/';
+                                        });
+                                    }
+                                    else {
+                                        bootbox.alert('Revision saved successfully <img src="{{STATIC_URL}}img/accept.png">', function() {
+                                            window.location = '/admin/create/revision/{{t.id}}/';
+                                        });
+                                    }
+                                })
+                                .fail(function(data) {
+                                    console.log("An error occured wile saving revision, please try again <img src='{{STATIC_URL}}img/delete.png'>");
+                                })
+                    });
+                    $('').click(function() {
+
+
+
+                        $.ajax({
+                            url: '/admin/save/revision/{{t.id}}/',
+                            type: 'POST',
+                            data: {treatment: treatment, physician_wiki: physician_wiki, patient_wiki: patient_wiki, csrfmiddlewaretoken: '{{csrf_token}}'},
+                        })
+                                .done(function(data) {
+                                    if (data.status == false) {
+                                        bootbox.alert(data.message + '<img src="{{STATIC_URL}}img/delete.png">', function() {
+                                            window.location = '/admin/create/revision/{{t.id}}/';
+                                        });
+                                    }
+                                    else {
+                                        bootbox.alert('Revision saved successfully <img src="{{STATIC_URL}}img/accept.png">', function() {
+                                            window.location = '/admin/create/revision/{{t.id}}/';
+                                        });
+                                    }
+                                })
+                                .fail(function(data) {
+                                    console.log("An error occured wile saving revision, please try again <img src='{{STATIC_URL}}img/delete.png'>");
+                                })
+                    })
+
+</script>
+{% if success %}
+<script type="text/javascript">
+    bootbox.alert('Treatment sent for revision approval <img src="{{STATIC_URL}}img/accept.png">');
+</script>
+{% endif %}
+{% if noPharmacist %}
+<script type="text/javascript">
+    bootbox.alert('Please assign pharmacist before creating revision <img src="{{STATIC_URL}}img/delete.png">');
+</script>
+{% endif %}
+{% if approval_sent %}
+<script type="text/javascript">
+    bootbox.alert('Treatment sent for approval <img src="{{STATIC_URL}}img/accept.png">');
+</script>
+{% endif %}
+{% if t.getPharmacistTreatment %}
+<script type="text/javascript">
+    $('#pharmacist').val('{{t.getPharmacistTreatment.id}}')
+</script>
+{% endif %}
+{% endblock %}

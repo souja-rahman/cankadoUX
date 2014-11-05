@@ -1,0 +1,219 @@
+{% load i18n %}
+{% load templateUtils %}
+{% load poll_extras %}
+{% load url from future %}
+<style>
+	.terapyclone{
+		display: none;
+	}
+	.Tselected{
+		background-color: #6683AD;
+		color: #FFF;
+		font-weight: bold
+	}
+	.Tselected:hover,.Tselected td:hover
+	{
+		background-color: #426CA8;
+	}
+	.theader{
+		background: #F7F7F7;
+	}
+	.footable>tbody>tr>td {
+
+		padding:2px;
+	}
+	.tcontain{
+		margin-bottom: 10px;
+		height: 170px;
+		overflow: hidden;
+
+	}
+	.tinner{
+		max-height: 160px;
+		overflow-y: auto;
+		display: block;
+		overflow-x: hidden;
+		-moz-user-select: none; -webkit-user-select: none; -ms-user-select:none; user-select:none;
+	}
+	.tinner td, .tinner tr{
+		display: block;
+		width: 100%;
+	}
+	.tinner tr
+	{
+		cursor: pointer
+	}
+	.tinner td{
+		padding-left: 10px !important;
+	}
+	.footable>thead>tr>th:first-child {
+		border-left:0px; 
+	}
+	.footable>tbody>tr>td:first-child {
+		border-left:0px; 
+	}
+	.Titem td{
+		padding: 4px !important;
+	}
+	.tips
+	{
+		margin-bottom:-2px; 
+	}
+	.footable>tbody>tr>td{
+		border-bottom: 1px solid #ccc;
+	}
+
+</style>
+<div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="width:800px;margin-left:-400px;margin-top: -280px;">
+	<div class="modal-header">
+		<button type="button" class="close btn-asignTreament-close" data-dismiss="modal" aria-hidden="true">×</button>
+		<h3 id="myModalLabel">{%blocktrans%}Behandlungen{%endblocktrans%}</h3>
+	</div>
+	<div class="modal-body" style="max-height:433px;">
+		<div class="row-fluid">
+			<table class="footable table-condensed  " style="border-radius: 0px; border-color: #B3B3B3; min-height: 200px;">
+				<thead>
+					<tr>
+						<th >{%blocktrans%}Therapien{%endblocktrans%}</th>
+					</tr>
+				</thead>
+				<tbody class="tinner">
+					{% for treatment in treatments %}
+					<tr class="Titem" tname="{{treatment.name}}" tid="{{treatment.id}}">
+						<td>
+							{{treatment.name}}
+							{% for drug in treatment|getDrugs %}
+							<div >
+								<div class="editableDrugs control-group" tid="{{treatment.id}}">
+									<label class="control-label" style="font-weight: bold">{{drug.0.drugname}}</label>
+									<div class="controls ">
+										<label><input class="input editableDrugInputModal" type="text" name="ED{{drug.0.id}}" {% if currentTreatment.0 != treatment %}value="{{drug.0.value|floatformat}}"{% else %}value="{% if patient %}{% if drug.0|drugValueEditable:patient == 'null' %}{{drug.0.value|floatformat}}{% else %}{{drug.0|drugValueEditable:patient}}{% endif %}{% else %}{{drug.0.value|floatformat}}{% endif %}" id="editableDrugInput" drug="{{drug.0.id}}"{% endif %} maxValue="{{drug.0.value|floatformat}}" drugname="{{drug.0.drugname}}" tid="{{treatment.id}}"> </label>
+										<p class="tips"><strong>{%blocktrans%}Annotation{%endblocktrans%}</strong> : {{drug.0.annotation}}</p>
+										<p class="tips"><strong>{%blocktrans%}Zeit{%endblocktrans%}</strong> : {% if drug.0.timeNotRequired %}{%blocktrans%}Ganzer Tag{%endblocktrans%}{% elif drug.0.drugTime != '0' %}{{drug.0.drugTime|getDrugTimeStatus:user_language}}{% else %}{{drug.0.time|time:'H:i'}}{% endif %}</p>
+									</div>
+								</div>
+
+							</div>
+
+							{% endfor %}
+							<table class="footable table table-bordered table-striped  editableDrugs" tid="{{treatment.id}}">
+								<thead>
+									<tr>
+										<th>{%blocktrans%}Medikamente{%endblocktrans%}</th>
+										<th>{%blocktrans%}Menge{%endblocktrans%}</th>
+										<th data-hide="phone,tablet">{%blocktrans%}Zeit{%endblocktrans%}</th>
+										<th data-hide="phone,tablet">{%blocktrans%}Tage{%endblocktrans%}</th>
+										<th data-hide="phone,tablet">{%blocktrans%}Anmerkung{%endblocktrans%}</th>
+									</tr>
+								</thead>
+								<tbody>
+
+									{% for drug in treatment|getDrugs %}
+									{% with value=drug.0|drugValue %}
+									<tr>
+										<td>{{drug.0.drugname}}</td>
+										<td>{% if currentTreatment.0 == treatment %}{{drug.0|drugValueEditable:patient}} {{drug.0|drugValueEditable:patient|getUnit:drug.0.drugname.unit}} {% else %}{{value}} {{value|getUnitLanguage:drug.0.drugname.unit|language:user_language}} {% endif %}</td> 
+										<td>
+											{% if drug.0.timeNotRequired %}
+											Ganzer Tag
+											{% elif drug.0.drugTime != '0' %}
+											{{drug.0.drugTime|getDrugTimeStatus:user_language}}
+											{% else %}
+											{{drug.0.time|time:'H:i'}}
+											{% endif %}
+										</td>
+										<td>{{drug.1|join:', '}}</td>
+										<td>{{drug.0.annotation}}</td>
+									</tr> 
+									<!--                                    {% if drug.0.editableByDoc %}
+													<div class="editableDrugs control-group" tid="{{t.id}}">
+													    <label class="control-label" style="font-weight: bold">{{drug.0.drugname}}</label>
+													    <div class="controls ">
+														<label><input class="input " type="text" name="ED{{drug.0.drugname.id}}" value="{{drug.0.value|floatformat:"-3"}}"> {{drug.0.get_unit_display}}</label>
+													    </div>
+													</div>
+													{% endif %}-->
+									{% endwith %}
+									{% empty %}
+
+									{% endfor %}
+
+
+								</tbody>
+							</table>
+						</td>
+					</tr>
+					{% endfor %}
+				</tbody>
+
+			</table>
+			<hr>
+
+		</div>   
+		<div class="row-fluid">
+			<h4 style="">{%blocktrans%}Behandlungsmöglichkeiten{%endblocktrans%}</h4>
+			<br>
+			<form class="form-horizontal  editableDrugsModel" id="frm-asignTreament">{% csrf_token %}
+				<input type="hidden" name="tid" class="inpTID">
+<!--				<div class="control-group">
+					<label class="control-label"><strong>Startdatum</strong></label>
+					<div class="controls">
+						<div class="controls datepicker" style="margin-left: 0px;">
+							<input type="text" readonly name="startDate" id="startDate" data-format="dd.MM.yyyy" class=" add-on">
+						</div>
+					</div>
+				</div>-->
+				<div class="control-group  datepicker input-append">
+					<label class="control-label"><strong>{%blocktrans%}Startdatum{%endblocktrans%}</strong></label>
+					<div class="controls">
+						<div class="controls datepicker" style="margin-left: 0px;">
+							<input  data-format="dd.MM.yyyy" type="text" name="startDate" id="startDate" class="input-block-level date" style="width: 100%;border-radius:5px;">
+							<span class="add-on" style="position: relative;z-index:4;margin-left: -28px;">
+								<i class="fa fa-calendar"></i>
+							</span>
+						</div>
+					</div>
+				</div>
+				<h5 id="mmh">{%blocktrans%}Medikament Menge{%endblocktrans%}</h5>
+
+
+
+
+			</form>
+		</div>
+	</div>
+	<div class="modal-footer">
+
+		<button class="btn btn-asignTreament-close btn-small" data-dismiss="modal" id="btn-closeTreament">{%blocktrans%}Close{%endblocktrans%}</button>
+		<button class="btn btn-inverse btnResetTreat btn-small" data-dismiss="modal" id="btn-resetTreament">{%blocktrans%}Reset{%endblocktrans%}</button>
+		<button class="btn btn-info btnSaveTreat btn-small" id="btn-asignTreament">{%blocktrans%}Save{%endblocktrans%}</button>
+	</div>
+</div> 
+<!--===============================model ends=======================-->
+<script type="text/javascript">
+	$(function() {
+		$('.footable').footable();
+	});
+	$('.editableDrugs').appendTo('.editableDrugsModel');
+	$('.editableDrugs,#mmh').hide();
+
+	$(".tinner tr").click(function() {
+		$('#frm-asignTreament')[0].reset();
+		$('.inpTID').val('');
+		$('.inpTName').val('');
+		$(".terapyclone").html('');
+		$(".tinner tr").removeClass("Tselected");
+
+		$(this).addClass("Tselected");
+		$('.editableDrugs,#mmh').hide();
+		if ($('.editableDrugs[tid="' + $(this).attr('tid') + '"]').show().length)
+		{
+			$('#mmh').show();
+		}
+		$(window).trigger('resize');
+	});
+	$('#btn-asignTreament').click(function() {
+	})
+
+
+</script>

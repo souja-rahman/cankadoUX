@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title> Cankado Dashboard</title>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <meta name="apple-mobile-web-app-capable" content="yes">    
+
+        <!-- CSS files -->
+
+        <link href="{{ STATIC_URL }}css/bootstrap.min.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}css/bootstrap-responsive.min.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}css/alveolae.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}css/fa/css/font-awesome.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}css/conkado/style.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}css/main.css" rel="stylesheet">
+         <!-- favicon -->
+		<link rel="apple-touch-icon-precomposed" sizes="144x144" href="{{ STATIC_URL }}img/apple-touch-icon-144-precomposed.png">
+        <link rel="shortcut icon" href="{{ STATIC_URL }}img/favicon.ico">   
+        <!--[if lt IE 9]>
+         <script src="{{ STATIC_URL }}/js/html5.js"></script>
+         <script src="{{ STATIC_URL }}/js/selectivizr.js"></script>
+         <script src="{{ STATIC_URL }}/js/css3-mediaqueries.js"></script> 
+         <script type="text/javascript" src="{{ STATIC_URL }}/js/PIE.js"></script>         
+       <![endif]-->
+       
+    <link href="{{ STATIC_URL }}css/farbtastic/farbtastic.css" rel="stylesheet" type="text/css" />
+    <link href="{{ STATIC_URL }}css/freshereditor.css" rel="stylesheet" type="text/css" />
+    <style type="text/css">
+        #content-editor {
+            margin: 10px 10px 10px 10px;
+            padding: 10px;
+            border-radius: 5px;
+  
+        }
+        #toolbar {
+            margin:10px;
+        }
+        body{
+            height: auto;
+            background: #fff;
+        }
+        #toolbar i{
+            display: block;
+        }
+    </style>
+    </head>
+
+    <body >
+       	
+            <!-- Navbar -->
+            <div class="navbar navbar-fixed-top">
+                <div class="navbar-inner">
+                    <div class="container">
+                        <a class="brand" href="/"><img src="{{ STATIC_URL }}img/logo.png" height="21" style="height:21px; margin-left: 25px">Can<strong>Kado</strong></a>
+                        <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                            <span class="icon-bar"></span>
+                        </a>
+
+                        <div class="nav-collapse collapse">
+                            <ul class="nav pull-right" style="margin-right: 25px">
+                                <li><a  href="/accounts/login" ><strong>Anmelden</strong> </a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div id="toolbar"></div>
+            </div>
+            <div class='row-fluid' style='padding-top:12px;'>
+                <a href='#' style='padding-left:12px;'>Admin /</a>
+                <a href='/admin/treatment/list/'> Treatments /</a>
+                <a href='#' class='active'> Edit Treatment /</a>
+                <a href='#' class='active'> wiki</a>
+            >
+            </div>
+            <!-- /Navbar -->
+           <div id="wrapper" style="background:#fff;margin-top:102px;overflow:auto;" >
+      <div id="content-editor" class="clear" style="height:98%;">
+        {% autoescape off %}{{wiki}}{% endautoescape %}
+    </div>
+    <form id="wikiSaveFrm" action="/admin/{% if revision %}revision/{% endif %}wiki/{% if se %}se/{% elif treatment %}treatment/{% endif %}{% if patient %}patient/{% else %}physician/{% endif %}{{id}}/" method="POST">{% csrf_token %}
+    <textarea name="wiki" style="display:none;">{% autoescape off %}{{wiki}}{% endautoescape %}</textarea>
+    </form>
+    </div>
+            <div class="btn-group customAppend pull-right">
+                
+              
+            </div>
+            <div class="btn-group customAppend pull-right">
+                
+                <a href="/admin/view/treatment/{{cancel}}/" class="btn btn-small">Back</a>
+                <button id="cancel" class="btn btn-small btn-danger">Cancel</button>
+                <button class="btn btn-small btn-info wikisave">save</button>
+                
+            </div>
+       <!-- wrap end -->
+        <!-- Footer -->
+        <div id="footer" style="padding-top:6px;">
+            <p class="pull-right"  style="margin-right:100px;">Cankado &copy; 2014</p>
+        </div>
+        <!-- Javascript files -->
+        
+        <script  src="{{ STATIC_URL }}js/jquery.min.js"></script>
+        <script src="{{ STATIC_URL }}js/bootstrap.js"></script>       
+    <script src="{{ STATIC_URL }}js/shortcut.js" type="text/javascript"></script>
+    <script src="{{ STATIC_URL }}js/farbtastic.js" type="text/javascript"></script>   
+    <script src="{{ STATIC_URL }}js/freshereditor.js" type="text/javascript"></script>
+    <script type="text/javascript">
+    var wheight = $(window).height();
+    var new_height = wheight-139;
+    $(document).ready(function() {
+        $('#content-editor').freshereditor({toolbar_selector: "#toolbar", excludes: ['removeFormat', 'insertheading4']});
+        $("#content-editor").freshereditor("edit", true);
+        $('#wrapper').css('height',new_height);
+        $('.customAppend').appendTo(".btn-toolbar");
+        $.urlParam = function(name){
+    var results = new RegExp('[\?&amp;]' + name + '=([^&amp;#]*)').exec(window.location.href);
+    return results[1] || 0;
+    };
+    var p = $.urlParam('preview');
+    if (p === 'True'){
+        $("#toolbar").remove();
+        $("#content-editor").attr('contenteditable','false');
+        $("#content-editor").css('background','#ddd');
+        $('.navbar').append("<div class='row-fluid' style='padding-top:12px;'><a href='#' style='padding-left:12px;'>Admin /</a><a href='/admin/treatment/list/'> Treatments /</a><a href='#' class='active'> Edit Treatment /</a><a href='#' class='active'> wiki</a><a class='btn btn-info pull-right' href='' style='margin-right:10px;'>edit</a></div>");
+        
+    }else{
+         $('#toolbar').append("");
+    }      
+    }); 
+    $('.wikisave').click(function(){
+         $('textarea[name="wiki"]').html($('#content-editor').html());
+         $('#wikiSaveFrm').submit();
+    });
+
+    $('#cancel').click(function(e) {
+        e.preventDefault();
+        $('#content-editor').html($('textarea[name="wiki"]').html());        
+    });
+    </script>
+
+         </body>
+</html>

@@ -1,0 +1,66 @@
+{% extends "dashboard/docLayout.html" %} 
+{% load i18n %}
+{% block page_id %}therapies{% endblock %}
+{% load templateUtils %}
+{% load poll_extras %}
+{% block content %}
+<input id="csrf_token" type="hidden" value="{{csrf_token}}">
+<!-- Content -->
+<div class="span9">
+    <h1 class="page-title"><i class="icon-syringe"></i>&nbsp;&nbsp;{%blocktrans%}Therapien{%endblocktrans%}</h1>
+
+    <!-- ==========================================================Treatment list widget==================================== -->
+    <div class="widget">
+        <div class="widget-content">
+            {% if page.object_list %}
+            <table class="footable unitblock">
+                <thead>
+                    <tr>
+                        <th>{%blocktrans%}Therapien{%endblocktrans%}</th>
+                        <th data-sort-ignore="true">{%blocktrans%}Aktion{%endblocktrans%}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for t in page.object_list %} 
+                    <tr>
+                        <td>
+                            <h4>{{t.name}}</h4>
+                            {{t.short_description|default:''}}
+                        </td>
+                        <td><a href="/doctor/treatment/details/{{t.id}}/" class="btn btn-info btn-mini">{%blocktrans%}Details{%endblocktrans%}</a></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+                {% if paginator.num_pages > 1 %}
+                <tfoot>
+                    <tr>
+                        <td colspan="2">
+                            {% include 'dashboard/pagination.html' %}
+                        </td>
+                    </tr>
+                 </tfoot>
+                 {% endif %}
+            </table>
+            {% else %}
+            <p style="color:#0088cc;"> {%blocktrans%}* Keine Behandlungen zur Verfügung.{%endblocktrans%}</p>
+            {% endif %}
+        </div>
+    </div>
+    <!-- ==========================================================Treatment list widget end==================================== -->
+
+</div>
+<!-- /Content -->
+{% endblock %}
+{% block bottomScripts %}
+
+<script src="{{ STATIC_URL }}js/FooTable-2/js/footable.js"></script>
+<script src="{{ STATIC_URL }}js/FooTable-2/js/footable.sort.js" type="text/javascript"></script>
+<script type="text/javascript">
+$(function() {
+    $('table').footable();
+    $('table').data('page-size', 12);
+    $('table').trigger('footable_initialized');
+})
+</script>
+
+{% endblock %}

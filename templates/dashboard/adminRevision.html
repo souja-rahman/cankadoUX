@@ -1,0 +1,85 @@
+{% extends "dashboard/adminLayout.html" %}  
+{% block page_id %}Tassign{% endblock %}
+{% block content %}
+
+<div class="span9">
+    <div class="row-fluid" style="padding-top:27px;">
+        <div class="span12" >
+            <div class="newbreadcrumb flat">
+                <a href="#" >Admin</a>
+                <a href="/admin/treatment/list/" >Treatments</a>
+                <a href="/admin/view/treatment/{{treatment.id}}/" > {{treatment}}</a>
+                <a class="active">Revision</a>
+            </div>
+        </div>
+    </div>
+    <div class="row-fluid tlist">
+        <div class="span12" style="padding:20px;margin-left:0px;">
+            {% if form_error %}
+                <div class="alert alert-danger">Patient/Physician Wiki can't be blank.</div>
+            {% endif %}
+            {% if success %}
+                <div class="alert alert-success">Revision sent to {{treatment.getPharmacistTreatment}} successfully<img src="{{STATIC_URL}}img/accept.png"></div>
+            {% endif %}
+            <form class="form-horizontal" action="/admin/revision/{{treatment.id}}/" method="POST">{% csrf_token %}
+                <div class="control-group">
+                    <label class="control-label"> Treatment</label>
+                    <div class="controls">
+                        <input class="input span5" name="name" type="text" value="{{treatment.name}}" required>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label"> Physician Wiki</label>
+                    <div class="controls">
+                        <textarea class="span5" name="physicianwiki" id="physicianwiki" rows="3" required>{{treatment.getPhysicianWiki}}</textarea>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label"> Patient Wiki</label>
+                    <div class="controls">
+                        <textarea class="span5" name="patientwiki" id="patientwiki" rows="3" required>{{treatment.getPatientWiki}}</textarea>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <div class="controls">
+                        <button type="submit" class="btn btn-info  btn-small"><i class="fa fa-plus" required></i>Send Revision</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+{% block bottomScripts %}
+<script src="{{ STATIC_URL }}js/tinymce/tinymce.min.js"></script>
+<script>
+        tinymce.init({
+        selector: '#physicianwiki',
+                plugins: [
+                        "advlist autolink lists link image charmap print preview anchor",
+                        "searchreplace visualblocks fullscreen",
+                ],
+                toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image",
+                statusbar: false,
+                });
+
+        tinymce.init({
+        selector: '#patientwiki',
+                plugins: [
+                        "advlist autolink lists link image charmap print preview anchor",
+                        "searchreplace visualblocks fullscreen",
+                ],
+                toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image",
+                statusbar: false,
+                });
+        $(document).on('focusin', function(e) {
+            if ($(e.target).closest(".mce-window").length) {
+                e.stopImmediatePropagation();
+            }
+        });
+</script>
+{% endblock %}

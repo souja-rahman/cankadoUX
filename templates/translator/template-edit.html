@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title> Cankado Transilation Dashboard</title>
+
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">    
+
+		<!-- CSS files -->
+
+		<link href="{{ STATIC_URL }}css/bootstrap.min.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/bootstrap-responsive.min.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/alveolae.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/fa/css/font-awesome.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/conkado/style.css" rel="stylesheet">
+		<link href="{{ STATIC_URL }}css/main.css" rel="stylesheet">
+		<!-- favicon -->
+		<link rel="apple-touch-icon-precomposed" sizes="144x144" href="{{ STATIC_URL }}img/apple-touch-icon-144-precomposed.png">
+		<link rel="shortcut icon" href="{{ STATIC_URL }}img/favicon.ico">   
+		<!--[if lt IE 9]>
+		 <script src="{{ STATIC_URL }}/js/html5.js"></script>
+		 <script src="{{ STATIC_URL }}/js/selectivizr.js"></script>
+		 <script src="{{ STATIC_URL }}/js/css3-mediaqueries.js"></script> 
+		 <script type="text/javascript" src="{{ STATIC_URL }}/js/PIE.js"></script>         
+	       <![endif]-->
+		<style>
+			.status
+			{
+				font-weight: bold;
+			}
+		</style>
+
+	</head>
+
+	<body>
+		{% load url from future %}
+		{% load templateUtils %}
+		<div id="wrap"> 	
+			<!-- Navbar -->
+			<div class="navbar navbar-fixed-top">
+				<div class="navbar-inner">
+					<div class="container">
+						<a class="brand" href="/"><img src="{{ STATIC_URL }}img/logo.png" height="21" style="height:21px; margin-left: 25px">Can<strong>Kado</strong> Transilations</a>
+						<a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+							<span class="icon-bar"></span>
+						</a>
+
+						<div class="nav-collapse collapse">
+							<ul class="nav pull-right" style="margin-right: 25px">
+								<li><a href="#" data-toggle="dropdown" class="dropdown-toggle"><i class="fa fa-user"></i>&nbsp;&nbsp;{% if user.userprofile.last_name %}{{ user.userprofile.last_name }}{% else %}Leer{% endif %}, {% if user.userprofile.first_name %}{{ user.userprofile.first_name }}{% else %}Leer{% endif %}{% if not user.userprofile.first_name and not user.userprofile.last_name %}{{user}}{% endif %}</b></a>
+								</li>
+								<li class="divider-vertical"></li>
+								<li><a href="{% url 'django.contrib.auth.views.logout_then_login' %}"><i class="fa fa-sign-out"></i>&nbsp;&nbsp;Logout</a></li>
+								<li class="divider-vertical"></li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div id="main-content">
+				<!-- Container -->
+				<div class="container" >
+					<div class="row-fluid">
+
+
+						<div class="span10 offset1">
+
+							{% for p in poe %}
+							{% if not p.is_adminTemplate %}
+							<div class="row-fluid tMSGID">
+
+								<h3>{{p.msgid}}</h3>
+								<div class="span3">Language: <span class="badge badge-info">{{p.lang}}</span></div>
+								<div class="span7">Files :<br> 
+									{% for f in p.getTemplates %}
+									<span class="badge ">{{f.0}}:{{f.1}}</span><br>
+									{% endfor %}
+								</div>
+								<div class="span12">
+									<textarea name="" id="trans-text-{{p.pk}}" style="width: 100%;height: 150px" class="trans-text form-control">{{p.msgstr}}</textarea>
+								</div>
+								<div class="span12">
+									<button class="btn btn-primary btn-small tran-save" data-pk="{{p.pk}}">Save</button>
+									<span class="status pull-right"></span>
+									<hr>
+								</div>
+
+							</div>
+							{% endif %}
+							{% endfor %}
+
+						</div>
+
+					</div>
+
+				</div>
+
+			</div>
+
+		</div>
+	</body>
+	<script src="/static/js/jquery.min.js"></script>
+
+	<!-- This should be stripped out of html and put in another js file -->
+	<script>
+
+$(document).ready(function() {
+
+	$('.tran-save').on('click', function(e) {
+		e.preventDefault();
+		var tMSGID = $(this).parents('.tMSGID');
+		$(tMSGID).find('.status').html('Saving...')
+
+		var pk = $(this).data('pk');
+		var trans = $('#trans-text-' + pk).val();
+		if (!trans) {
+			window.alert('Hey there! I need a translated string to save!');
+			return;
+		}
+
+// TODO: CSRF should be enabled!
+
+		$(this).attr('disabled', true);
+		var self = this;
+
+// Fire the ajax request
+		$.ajax({
+			type: 'post',
+			data: {
+				pk: pk,
+				trans: trans
+			},
+			url: '/translator/ajax/add_translation/',
+			success: function(d, txt) {
+				$(self).attr('disabled', false);
+				$(tMSGID).find('.status').html('Saved')
+			},
+			error: function(txt) {
+				console.log(txt);
+				$(self).attr('disabled', false);
+
+				$(tMSGID).find('.status').html('Save Failed')
+			}
+
+		});
+
+	});
+
+});
+
+
+$('.tMSGID .trans-text').on('keypress', function() {
+	var tMSGID = $(this).parents('.tMSGID');
+	$(tMSGID).find('.status').html('Edited')
+})
+
+	</script>
+
+
+</html>

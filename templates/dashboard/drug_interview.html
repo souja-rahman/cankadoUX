@@ -1,0 +1,58 @@
+{% load i18n %}
+{% load templateUtils %}
+<div class="modal fade InterviewModal" id="drugInterviewModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title" id="myModalLabel">
+					{%blocktrans%}Interview{%endblocktrans%}
+					<span class="pull-right">
+						<button class="btn btn-danger closeBtn" type="button"  data-dismiss="modal" aria-hidden="true">{%blocktrans%}Schließen{%endblocktrans%}</button>
+					</span>
+				</h4>
+			</div>
+			<div class="modal-body">
+				<h4>
+					{%blocktrans%}Medizin mit demselben Wirkstoff in verschiedenen Namen bekannt, können Sie einen Namen für jedes Medikament unten wählen.{%endblocktrans%}
+				</h4>
+
+				{% with drugs=user|getInterviewDrugs %}
+				{% if drugs.status %}
+				{% for drug in drugs.druglist %}
+				{% if drug.drugname_set.all %}
+				<div class="InterviewQuestion">
+					<p>
+						{%blocktrans%}Medikamente mit Wirkstoff{%endblocktrans%} {{drug}}
+					</p>
+					<ul>
+						{% for name in drug.drugname_set.all %}
+						<!--						<li>
+													<input type="radio" class="drugInterviewBtn" drug="{{name.drug.id}}" name="{{name.name}}"> {{name.name}}
+												</li> -->
+						<li class="DIdrugOptions">
+
+							<div class="switch tiny">
+								<input type="radio" class="drugInterviewBtn" drug="{{name.id}}" name="{{name.drug.id}}" {% if user|drugNameSaved:name %}checked{% endif %}>
+								       <label ></label>
+							</div> 
+							<span class="drugoption">{{name.name}}</span>
+						</li>
+
+						{% endfor %}
+					</ul>
+				</div>
+
+				{% endif %}
+				{% endfor %}
+				{% endif %}
+				{% endwith %}
+
+
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-danger closeBtn" type="button" data-dismiss="modal" aria-hidden="true">{%blocktrans%}Schließen{%endblocktrans%}</button>
+				<!--<button class="btn btn-info drugInterviewBtnSmt">Sparen</button>-->
+			</div>
+		</div>
+	</div>
+</div>

@@ -1,0 +1,62 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title> Cankado</title>
+
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <meta name="apple-mobile-web-app-capable" content="yes">    
+
+        <!-- CSS files -->
+        <link href="{{ STATIC_URL }}css/bootstrap.min.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}css/bootstrap-responsive.min.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}css/alveolae.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}css/fa/css/font-awesome.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}css/conkado/style.css" rel="stylesheet">
+        <link href="{{ STATIC_URL }}css/main.css" rel="stylesheet">
+        <!--[if lt IE 9]>
+        <script src="{{ STATIC_URL }}/js/html5.js"></script>
+         <script src="{{ STATIC_URL }}/js/selectivizr.js"></script>
+         <script src="{{ STATIC_URL }}/js/css3-mediaqueries.js"></script>          
+        <![endif]-->
+
+    </head>
+    <body style='background-color:#D0E0EB; '>
+        <div id="wrap">    
+            <!-- navbar -->
+            <div class="navbar navbar-fixed-top">
+                <div class="navbar-inner">
+                    <div class="container">
+                        <a class="brand" href="/"><img src="{{ STATIC_URL }}img/logo.png" style="height:21px;" height="21" alt="logo">Can<strong>Kado</strong></a>
+                        <div class="nav-collapse collapse">
+                            <ul class="nav pull-right">
+                                <li>
+
+                                <li><a href="/accounts/login" ><strong>Anmelden</strong> </a></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /navbar -->
+            <div class="container-fluid">
+                <div class='row-fluid' style="background:none;background-size:100% 100%;background-repeat: no-repeat;height:500px;border-radius:10px;margin-top:50px;">
+
+                    <img src="{{ STATIC_URL }}img/logo.png" style="margin:auto;display:block;max-height: 292px;">
+                    <h2 style="text-align:center; text-transform: uppercase; letter-spacing: 3px">
+                        Can<strong>Kado</strong>
+                    </h2>
+                    <h3 style="text-align:center;">
+                        <a class="btn btn-info"  href="/accounts/login" ><strong>Anmelden</strong></a>
+                    </h3>
+                </div><!-- background -image -->
+            </div><!-- container -->
+            <div id="push"></div>
+        </div><!-- wrap end -->
+        <!-- Footer -->
+        <div id="footer" style="padding-top:6px;">
+            <p class="pull-right"  style="margin-right:100px;">Cankado &copy; 2014</p>
+        </div>
+  
+    </body>
+</html>

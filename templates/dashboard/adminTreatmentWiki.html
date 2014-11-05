@@ -1,0 +1,97 @@
+{% extends "dashboard/adminLayout.html" %}  
+{% block content %}
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">{% csrf_token %}
+  <div class="modal-dialog">
+    <div class="modal-content">
+    	<form action="/admin/treatment/wiki/" method="POST">{% csrf_token %}
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="myModalLabel">Add Wiki</h4>
+      </div>
+      <div class="modal-body">
+      	{% if wiki_error %}
+      	<div class="alert alert-info">
+      		Wiki can't be empty.
+      	</div>
+      	{% endif %}
+        <textarea id="wiki" rows="10" name="wiki"></textarea><br>
+      </div>
+      <div class="modal-footer">
+      		<input type="hidden" name="treatment" id="treatment">
+        	<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        	<button type="submit" class="btn btn-primary" id="submit">Submit</button>
+      </div>
+      </form>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div class="row-fluid " style="padding-top:25px">
+
+    <div class="offset2 span8" style="padding:20px;border-radius:5px;">
+        <div class="row-fluid">
+            <h6 class="well-message">Admin > Treatments</h6>
+            <h4 class="well-message">Add Wiki</h4>
+        </div>
+        <input id="csrf_token" type="hidden" value="{{csrf_token}}">
+        {% for t in treatList %}
+
+        <div class="row-fluid tlist">
+
+            <h4 style="margin-left: 10px">{{t.name}}<a class="btn btn-info btn-mini pull-right addWiki" data-toggle="modal" data-target="#myModal" treatment="{{t.pk}}" content='{% for wiki in t.treatmentwiki_set.all %}{{wiki.wiki}}{% endfor %}'  style="margin-right: 20px"><i class="fa fa-globe"></i> Add Wiki</a><a class="btn btn-warning btn-mini pull-right showWiki" treatment="{{t.pk}}" style="margin-right: 20px"><i class="fa fa-globe"></i> Show Wiki</a></h4>
+            {% autoescape off %}
+            <br>
+            <div  class="span10 drugsListItem" id="wiki{{t.pk}}" style="display:none;"> 
+              <strong>Wiki</strong><hr>
+            	{% for wiki in t.treatmentwiki_set.all %}
+            		{{wiki.wiki}}
+              {% empty %}
+              <div class="alert alert-info">No Wiki added.</div>
+            	{% endfor %}
+            </div>
+            {% endautoescape %}
+        </div>	
+        {% endfor%}
+
+
+    </div>
+    <div class="span2">
+
+    </div>
+</div>
+{% endblock %}      
+
+{% block bottomScripts %}
+<script src="{{ STATIC_URL }}js/tinymce/tinymce.min.js"></script>
+<script>
+tinymce.init({
+    selector: '#wiki',
+    plugins: [
+        "advlist autolink lists link image charmap print preview anchor",
+        "searchreplace visualblocks fullscreen",
+    ],
+    toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image",
+});
+$(document).on('focusin', function(e) {
+    if ($(e.target).closest(".mce-window").length) {
+        e.stopImmediatePropagation();
+    }
+});
+$('.addWiki').click(function(event) {
+	$('#treatment').val($(this).attr('treatment'));
+  var content = $(this).attr('content');
+  tinyMCE.get('wiki').setContent(content);
+});
+{% if wiki_error %}
+$('#myModal').modal('show');
+$('#treatment').val('{{treatment}}');
+{% endif %}
+
+$('.showWiki').click(function(e) {
+  e.preventDefault();
+  var preview = $(this).attr('treatment');
+  $('#wiki'+preview).slideToggle();
+});
+</script>
+{% endblock %}

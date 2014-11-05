@@ -1,0 +1,162 @@
+{% extends "dashboard/adminLayout.html" %}  
+{% block page_id %}Seupload{% endblock %}
+{% load templateUtils %} 
+{% block content %}
+<style>
+    textarea{
+        resize: none;
+        width:98%;
+    }
+</style>
+<div class="span9">
+    <div class="row-fluid ">
+        <div class=" span12" style="padding-top:27px;border-radius:5px;">
+            <div class="row-fluid">
+                <div class="newbreadcrumb flat">
+                    <a href="/admin/treatment/list/">Admin</a>
+                    <a href="/admin/add/CTCAE/" >Side Effect CTCAE </a>
+                    <a href="#" class="active">Side Effect Edit</a>
+                </div>
+                
+            </div>
+        </div>
+        </div>
+    <div class="widget" >
+        {% if empty %}
+        <div class="alert alert-danger">
+            <button type="button" class="close" data-dismiss="alert"><span aria-hidden="true">&times;</span></button>
+            This sideffect is already assigned, Grade can't be empty!!
+        </div>
+        {% endif %}
+        <div class="widget-header">
+        <h3> {{se.MedDRA_Code}}</h3>
+        </div>
+        <div class="widget-content">
+        <form class="form-horizontal" action="/admin/edit/sideeffect/{{se.MedDRA_Code}}/" method="POST">{% csrf_token %}
+            <div class="control-group">
+                <label class="control-label" >MedDRA v12.0 Code</label>
+                <div class="controls">
+                    <input type="text" value="{{se.MedDRA_Code}}" placeholder="" disabled class="disback">
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">CTCAE v4.0 SOC</label>
+                <div class="controls">
+                    <textarea rows="3"  placeholder="" disabled>{{se.SOC|default:'--'}}</textarea>
+                </div>
+            </div>
+             <div class="control-group">
+                <label class="control-label" >CTCAE v4.0 Term</label>
+                <div class="controls">
+                    <textarea rows="3"  placeholder="" disabled>{{se.sideeffect|default:'--'}}</textarea>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">Grade 1 </label> 
+                <div class="controls">
+                    <textarea rows="3"  placeholder="" disabled>{{se.doc_grade1|default:'--'}}</textarea>
+                </div>
+            </div>
+             <div class="control-group">
+                <label class="control-label" >Grade 2 </label>
+                <div class="controls">
+                    <textarea rows="3"  placeholder="" disabled>{{se.doc_grade2|default:'--'}}</textarea>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">Grade 3 </label>
+                <div class="controls">
+                    <textarea rows="3"  placeholder="" disabled>{{se.doc_grade3|default:'--'}}</textarea>
+                </div>
+            </div>
+             <div class="control-group">
+                <label class="control-label" >Grade 4 </label>
+                <div class="controls">
+                    <textarea rows="3"  placeholder="" disabled>{{se.doc_grade4|default:'--'}}</textarea>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label" >CTCAE v4.0 AE Term Definition</label>
+                <div class="controls">
+                    <textarea rows="3"  placeholder="" disabled>{{se.doc_termdefinition|default:'--'}}</textarea>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">pt_CTCAE v4.0 Term</label>
+                <div class="controls">
+                    <textarea rows="3"  name="pat_term" placeholder="">{{se.pat_term|default:''}}</textarea>
+                </div>
+            </div>
+             <div class="control-group">
+                <label class="control-label" >pt_Grade 1</label>
+                <div class="controls">
+                    <textarea rows="3" name="grade1" placeholder="">{{se.grade1.sideeffecttype|default:''}}</textarea>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">pt_Grade 2</label>
+                <div class="controls">
+                    <textarea rows="3" name="grade2" placeholder="">{{se.grade2.sideeffecttype|default:''}}</textarea>
+                </div>
+            </div>
+             <div class="control-group">
+                <label class="control-label" >pt_Grade 3</label>
+                <div class="controls">
+                    <textarea rows="3" name="grade3" placeholder="">{{se.grade3.sideeffecttype|default:''}}</textarea>
+                </div>
+            </div>
+            <div class="control-group">
+                <label class="control-label">pt_Grade 4</label>
+                <div class="controls">
+                    <textarea rows="3" name="grade4" placeholder="">{{se.grade4.sideeffecttype|default:''}}</textarea>
+                </div>
+            </div> 
+            <div class="control-group">
+                <label class="control-label" > pt_CTCAE v4.0 AE Term Definition</label>
+                <div class="controls">
+                    <textarea rows="3" name="pat_termdefinition" placeholder="">{{se.pat_termdefinition|default:''}}</textarea>
+                </div>
+            </div>     
+
+            <!--<div class="control-group">
+                <label class="control-label" > Physician Wiki</label>
+                <div class="controls">
+                    <textarea rows="3" class="wiki" name="physician_wiki" placeholder="">{{se.getPhysicianWiki}}</textarea>
+                </div>
+            </div>  
+
+            <div class="control-group">
+                <label class="control-label" > Patient Wiki</label>
+                <div class="controls">
+                    <textarea rows="3" class="wiki" name="patient_wiki" placeholder="">{{se.getPatientWiki}}</textarea>
+                </div>
+            </div>  -->
+
+            <div class="control-group">
+                <div class="controls">                    
+                    <button type="submit" class="btn btn-info">Save</button>
+                    <button type="reset" class="btn">Cancel</button>
+                </div>
+            </div>
+        </form>
+        </div>
+    </div>
+</div>
+{% endblock %}      
+
+{% block bottomScripts %}
+
+<script src="{{ STATIC_URL }}js/tinymce/tinymce.min.js"></script>
+<script>
+ tinymce.init({
+     selector: '.wiki',
+     plugins: [
+         "advlist autolink lists link image charmap print preview anchor",
+         "searchreplace visualblocks fullscreen",
+     ],
+     toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image",
+     statusbar: false
+ });
+ </script>
+{% endblock %}      
+

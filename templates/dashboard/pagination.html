@@ -1,0 +1,47 @@
+{% load templateUtils %} 
+<div class="pagination pagination-centered">
+    <ul>
+        <li class="footable-page-arrow {% if page.number == 1 %} disabled {% endif %}">
+            <a data-page="first" href="?page=1">«</a>
+        </li>
+
+        <li class="footable-page-arrow {% if page.number == 1 %} disabled {% endif %}">
+            {% if page.previous_page_number == 0 %}
+            <a data-page="prev" href="?page=1">‹</a>
+            {% else %}                                       
+            <a data-page="prev" href="?page={{ page.previous_page_number }}">‹</a>
+            {% endif %}
+        </li>
+
+        {% if page.number > 3 and paginator.num_pages > 5 %}
+        <li>
+            <a> ... </a>
+        </li>
+        {% endif %}
+
+        {% for pg in paginator.page_range|pagination:page.number %}
+            {% if pg == page.number %}
+            <li class="footable-page active">
+                <a data-page="0" href="?page={{ pg }}">{{ pg }}</a>
+            </li>
+            {% else %}
+            <li class="footable-page">
+                <a data-page="0" href="?page={{ pg }}">{{ pg }}</a>
+            </li>
+            {% endif %}
+
+        {% endfor %}
+
+        {% if page.number < paginator.num_pages|add:'-2' and paginator.num_pages > 5 %}
+        <li>
+            <a> ... </a>
+        </li>
+        {% endif %}
+
+        <!--Ends-->
+        <li class="footable-page-arrow {% if page.number == paginator.num_pages %} disabled {% endif %}">
+            <a data-page="next" href="?page={{ page.next_page_number }}">›</a></li>
+        <li class="footable-page-arrow {% if page.number == paginator.num_pages %} disabled {% endif %}">
+            <a data-page="last" href="?page={{ paginator.num_pages }}">»</a></li>
+    </ul>
+</div>

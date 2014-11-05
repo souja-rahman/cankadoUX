@@ -1,0 +1,188 @@
+body{
+	background:url("../img/noise.png");
+	background-color: #B9B6B6;
+}
+
+hr{
+	border: 0;
+	height: 0;
+	border-top: 1px solid rgba(0, 0, 0, 0.1);
+	border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+	margin: 10px 0px; 
+}
+.input.add-on{
+	border-bottom-left-radius:5px;
+	border-top-left-radius:5px;       
+}
+.tlist{
+	border: 0px solid #A09999;
+	background: #D8D8D8;
+	border-radius: 5px; 
+	margin: 10px 0px 20px 0px; 
+	padding-bottom: 12px;
+	box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.2) inset;
+}
+.drugsListItem
+{
+	*background: #FFF;
+	padding: 15px 0px 0px 16px;
+	margin: 9px 40px 5px 14px;
+	*border: 1px solid #DDD;
+	border-radius: 5px;
+	padding-bottom: 16px;
+	box-shadow: 0px 0px 2px 2px rgba(0, 0, 0, 0.2) inset;
+}
+.drugsList
+{
+	max-height: 230px;
+	overflow: auto;
+	*margin-right: auto;
+	padding-left: 10px;
+	padding-right: 10px;
+}
+#sidebar.nav-tabs.nav-stacked {
+	margin-top: 25px;
+}
+.newbreadcrumb {
+
+	display: inline-block;
+	overflow: hidden;
+	border-radius: 5px;
+	counter-reset: flag; 
+	text-align: center;
+	box-shadow: 0 0 2px 2px rgba(0, 0, 0, 0.25) ;
+}
+
+.newbreadcrumb a {
+	text-decoration: none;
+	outline: none;
+	display: block;
+	float: left;
+	font-size: 12px;
+	line-height: 36px;
+	color: white;
+	padding: 0 10px 0 60px;
+	background: #666;
+	background: linear-gradient(#666, #333);
+	position: relative;
+}
+.newbreadcrumb a:first-child {
+	padding-left: 46px;
+	border-radius: 5px 0 0 5px; 
+}
+.newbreadcrumb a:first-child:before {
+	left: 14px;
+}
+.newbreadcrumb a:last-child {
+	border-radius: 0 5px 5px 0;
+	padding-right: 20px;
+}
+
+
+.newbreadcrumb a.active, .newbreadcrumb a:hover{
+	background: #333;
+	background: linear-gradient(#333, #000);
+}
+.newbreadcrumb a.active:after, .newbreadcrumb a:hover:after {
+	background: #333;
+	background: linear-gradient(135deg, #333, #000);
+}
+
+
+.newbreadcrumb a:after {
+	content: '';
+	position: absolute;
+	top: 0; 
+	right: -18px; 
+	width: 36px; 
+	height: 36px;
+
+	transform: scale(0.707) rotate(45deg);
+	-webkit-transform: scale(0.707) rotate(45deg);
+	z-index: 1;
+
+	background: #666;
+	background: linear-gradient(135deg, #666, #333);               
+	box-shadow: 2px -2px 0 2px rgba(0, 0, 0, 0.4),3px -3px 0 2px rgba(255, 255, 255, 0.1);               
+	border-radius: 0 5px 0 50px;
+}
+
+.newbreadcrumb a:last-child:after {
+	content: none;
+}
+
+.newbreadcrumb a:before {
+	content: counter(flag);
+	counter-increment: flag;
+	/*some styles now*/
+	border-radius: 100%;
+	width: 20px;
+	height: 20px;
+	line-height: 20px;
+	margin: 8px 0;
+	position: absolute;
+	top: 0;
+	left: 30px;
+	background: #444;
+	background: linear-gradient(#444, #222);
+	font-weight: bold;
+}
+
+
+.flat a, .flat a:after {
+	background: white;
+	color: black;
+	transition: all 0.5s;
+}
+.flat a:before {
+	background: white;
+	box-shadow: 0 0 0 1px #ccc;
+}
+.flat a:hover, .flat a.active, 
+.flat a:hover:after, .flat a.active:after{
+	background:  #D8D8D8;
+}
+.lchild{
+	padding-left: 21px !important;
+}
+span.add-on{
+	position: relative;
+	z-index: 2;
+	left: -24px;
+}
+.paticon{
+	*width: 50px;
+	*height: 50px;
+	border-radius: 3px;
+	background: white;
+	float: left;
+	*margin: 5px;
+	margin-bottom: 0px;
+	text-align: center;
+	padding-top: 2px;
+	color: darkgrey;
+
+}
+.disback{
+	background: #4A515B !important;
+	color: #F8F8F8 !important;
+	font-weight: bold;
+}
+.phywiki{
+	background: #fff;
+	border: 1px;
+	border-style: solid;
+	border-color: #E5E6E9 #DFE0E4 #D0D1D5;
+	border-radius: 3px;
+	padding: 10px;
+	margin-top: 5px;
+}
+
+
+.wikiIFrame{
+
+	width: 100%;
+	border: none;
+	display: block;
+	height: 700px;
+}

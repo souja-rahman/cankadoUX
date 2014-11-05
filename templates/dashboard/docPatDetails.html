@@ -1,0 +1,169 @@
+{% extends "dashboard/docLayout.html" %} 
+{% load i18n %}
+{% block custom_css %}
+<link href="{{ STATIC_URL }}css/timeline.css" rel="stylesheet" >
+<style>
+    .timeline .event-taken {
+        background-color: #468847;
+    }
+    .timeline .event-notaken {
+        background-color:#b94a48;
+    }
+    .timeline .event-future {
+        background-color:#3a87ad;
+    }
+    .timeline .event-side-taken {
+        background-color: #c09853;
+    }
+    .timeline .event-hidden {
+        display: none;
+    }
+    .timeline .year{
+        font-size: 20px;
+        margin-bottom: 30px;
+        list-style: none;
+        background-color: #F5F5F5;
+        color: #49708A;
+        margin-top: 20px !important;
+        max-width: 100%;
+    }
+</style>
+{% endblock %}
+{% load i18n %}
+
+{% block content %}
+<input id="csrf_token" type="hidden" value="{{csrf_token}}">
+<div class="span9">
+    <div class="widget">
+        <div class="widget-header">
+            <h3> {%blocktrans%}Patientendaten {%endblocktrans%}</h3>
+        </div>
+        <div class="widget-content">
+            <div class="row-fluid">
+                <div class="span6">
+                    {%blocktrans%}Patienten ID :{%endblocktrans%}
+                </div>
+                <div class="span6">
+                    {%blocktrans%}Dummy Id{%endblocktrans%}
+                </div>
+            </div>
+            <div class="row-fluid">
+                <div class="span6">
+                    {%blocktrans%}Vorname :{%endblocktrans%}
+                </div>
+                <div class="span6">
+                    {%blocktrans%}Dummy name{%endblocktrans%}
+                </div>
+            </div>
+            <div class="row-fluid">
+                <div class="span6">
+                    {%blocktrans%}Nachname :{%endblocktrans%}
+                </div>
+                <div class="span6">
+                    {%blocktrans%}Dummy lastname{%endblocktrans%}
+                </div>
+            </div>
+            <div class="row-fluid">
+                <div class="span6">
+                    {%blocktrans%}Geschlecht :{%endblocktrans%}
+                </div>
+                <div class="span6">
+                    {%blocktrans%}Dummy gender{%endblocktrans%}
+                </div>
+            </div>
+            <div class="row-fluid">
+                <div class="span6">
+                    {%blocktrans%}Geburtsdatum :{%endblocktrans%}
+                </div>
+                <div class="span6">
+                    {%blocktrans%}Dummy date of birth{%endblocktrans%}
+                </div>
+            </div>
+            <div class="row-fluid">
+                <div class="span6">
+                    {%blocktrans%}diagnostizieren:{%endblocktrans%}
+                </div>
+                <div class="span6">
+                    {%blocktrans%}Dummy diagnosis{%endblocktrans%}
+                </div>
+            </div>
+            <div class="row-fluid">
+                <div class="span6">
+                    {%blocktrans%}Therapie :{%endblocktrans%}
+                </div>
+                <div class="span6">
+                    {%blocktrans%}Dummy Therapy{%endblocktrans%}
+                </div>
+            </div>
+            <div class="row-fluid">
+                <div class="span6">
+                    {%blocktrans%}Alarmstufe :{%endblocktrans%}
+                </div>
+                <div class="span6">
+                    {%blocktrans%}Dummy Alert{%endblocktrans%}
+                </div>
+            </div>
+            <div class="row-fluid">
+                <div class="span6">
+                    {%blocktrans%}Telefon :{%endblocktrans%}
+                </div>
+                <div class="span6">
+                    {%blocktrans%}Dummy phone number{%endblocktrans%}
+                </div>
+            </div>
+            <div class="row-fluid">
+                <div class="span6">
+                    {%blocktrans%}E-Mail Adresse :{%endblocktrans%}
+                </div>
+                <div class="span6">
+                    {%blocktrans%}Dummy email adress{%endblocktrans%}
+                </div>
+            </div>
+            <div class="row-fluid">
+                <div class="row-fluid">
+                    <div class="timeline">
+                        <ul class="posts" id ="TimeLinePAT">
+                            <li class="year " >{%blocktrans%}Medicine intake details{%endblocktrans%} </li>
+                            
+                        </ul>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Content -->
+{% endblock %}
+{% block bottomScripts %}
+<script>
+	
+$(document).ready(function() {             
+                $.post(
+                    "/doctor/getPatientTimeLine/",{
+						 csrfmiddlewaretoken: $('#csrf_token').val(),
+						 pid : 64                   
+                    })
+                    .done(function(data) {                   
+                    dataType: "json";
+                    for (var i=0;i<= data.Intakes.length;i++){
+					var ttime = new Date(data.Intakes[i].takenTime * 1000).toLocaleString();
+                    $('.year').after('<li class="event event-taken">'+data.Intakes[i].name +' taken on '+ttime+'</li>'
+                    +'<li class="event event-hidden"></li>'
+                    );
+                       
+                   }
+                })
+                .fail(function() {
+            	bootbox.alert(JS_LOCALE.getTrans("Ein Fehler ist aufgetreten beim Abrufen von Patientendaten, versuchen Sie es!"));
+        		//TASK do someting 
+        						})
+        		.always(function() {
+        
+            	});
+           
+        });
+        </script>
+        
+{% endblock %}

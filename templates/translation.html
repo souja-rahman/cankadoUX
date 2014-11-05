@@ -1,0 +1,98 @@
+{% load i18n %}
+{% language user_language %}
+
+<script>
+
+	var JS_LOCALE = JS_LOCALE || {};
+
+	(function() {
+
+		JS_LOCALE.userLanguage = '{{ user_language }}';
+		JS_LOCALE.getTrans = function(msg) {
+			return typeof this.msgTable[msg] === 'undefined' ? msg : this.msgTable[msg];
+		};
+
+		// A giant list of msg string table
+		// To access translation of a particular string, 
+		// use JS_LOCALE.getTrans() wherever you need a translated string
+
+		JS_LOCALE.msgTable = {
+			'CANKADO Anmeldung': '{%blocktrans%}CANKADO Anmeldung{%endblocktrans%}',
+			//custom_graph.js
+			'Einnahmetreue': '{%blocktrans%}Einnahmetreue{%endblocktrans%}',
+			'Dokumentation': '{%blocktrans%}Dokumentation{%endblocktrans%}',
+			'Benutzerdokumentation': '{%blocktrans%}Benutzerdokumentation{%endblocktrans%}',
+			'Dokumentationstreue (Abstand zwischen Einnahme und Dokumentation)': '{%blocktrans%}Dokumentationstreue (Abstand zwischen Einnahme und Dokumentation){%endblocktrans%}',
+			'Population (millions)': '{%blocktrans%}Population (millions){%endblocktrans%}',
+			'Einnahmemenge im VerhÃ¤ltnis zur Vorgabe': '{%blocktrans%}Einnahmemenge im VerhÃ¤ltnis zur Vorgabe{%endblocktrans%}',
+			'Ein Fehler ist aufgetreten beim Abrufen der Benutzerdokumentation Diagrammdaten!': '{%blocktrans%}Ein Fehler ist aufgetreten beim Abrufen der Benutzerdokumentation Diagrammdaten!{%endblocktrans%}',
+			'Nebenwirkungen':'{%blocktrans%}Nebenwirkungen{%endblocktrans%}',
+			'Keine Nebenwirkungen !':'{%blocktrans%}Keine Nebenwirkungen !{%endblocktrans%}',
+		
+			//doc.js
+			'Bitte wählen Sie eine Behandlung': '{%blocktrans%}Bitte wählen Sie eine Behandlung{%endblocktrans%}',
+			'Bitte wählen Sie Datum': '{%blocktrans%}Bitte wählen Sie Datum{%endblocktrans%}',
+			'Behandlung erfolgreich zugewiesen': '{%blocktrans%}Behandlung erfolgreich zugewiesen{%endblocktrans%}',
+			'Fehler bei der Zuordnung Behandlung, versuchen Sie es erneut!': '{%blocktrans%}Fehler bei der Zuordnung Behandlung, versuchen Sie es erneut!{%endblocktrans%}',
+			
+			'Behandlung erfolgreich angehalten!': '{%blocktrans%}Behandlung erfolgreich angehalten!{%endblocktrans%}',
+			'Behandlung erfolgreich wieder aufgenommen!': '{%blocktrans%}Behandlung erfolgreich wieder aufgenommen!{%endblocktrans%}',
+			'Sind Sie sicher? Wollen Sie die Behandlung wirklich abbrechen?': '{%blocktrans%}Sind Sie sicher? Wollen Sie die Behandlung wirklich abbrechen?{%endblocktrans%}',
+			'Behandlung erfolgreich beendet!': '{%blocktrans%}Behandlung erfolgreich beendet!{%endblocktrans%}',
+			'Sind Sie sicher? Dies wird die laufende  Behandlung ersetzen!': '{%blocktrans%}Sind Sie sicher? Dies wird die laufende  Behandlung ersetzen!{%endblocktrans%}',
+			'Bitte geben Sie': '{%blocktrans%}Bitte geben Sie{%endblocktrans%}',
+			'Telefon muss eine Zahl nicht String sein.': '{%blocktrans%}Telefon muss eine Zahl nicht String sein.{%endblocktrans%}',
+			'Bitte wählen Sie ein Datum aus dem Kalender.': '{%blocktrans%}Bitte wählen Sie ein Datum aus dem Kalender.{%endblocktrans%}',
+			'Diese E-Mail-ID ist bereits an einen anderen Patienten zugeordnet, wählen Sie bitte ein anderes E-Mail.': '{%blocktrans%}Diese E-Mail-ID ist bereits an einen anderen Patienten zugeordnet, wählen Sie bitte ein anderes E-Mail.{%endblocktrans%}',
+			'Bitte geben Sie eine gültige E-Mail-ID.': '{%blocktrans%}Bitte geben Sie eine gültige E-Mail-ID.{%endblocktrans%}',
+			'Es tut uns leid, können die Daten jetzt nicht aktualisieren, überprüfen pls Ihr Netzverbindung oder versuchen Sie es später noch einmal!': '{%blocktrans%}Es tut uns leid, können die Daten jetzt nicht aktualisieren, überprüfen pls Ihr Netzverbindung oder versuchen Sie es später noch einmal!{%endblocktrans%}',
+			'keine Nebenwirkungen gefunden': '{%blocktrans%}keine Nebenwirkungen gefunden{%endblocktrans%}',
+			'Wählen': '{%blocktrans%}Wählen{%endblocktrans%}',
+			'Ein Fehler aufgetreten bitte versuchen Sie es erneut.': '{%blocktrans%}Ein Fehler aufgetreten bitte versuchen Sie es erneut.{%endblocktrans%}',
+			
+			'Nebeneffekt ist leer': '{%blocktrans%}Nebeneffekt ist leer{%endblocktrans%}',
+			
+			//docPopup.js
+			'Fehler in der Druck Quittung': '{%blocktrans%}Fehler in der Druck Quittung{%endblocktrans%}',
+			
+			//drugInterview.js
+			'Ein Fehler ist aufgetreten, bitte wiederholen.': '{%blocktrans%}Ein Fehler ist aufgetreten, bitte wiederholen.{%endblocktrans%}',
+			
+			//docPrintPwd
+			//docPatDetails.html
+			'Ein Fehler ist aufgetreten beim Abrufen von Patientendaten, versuchen Sie es!': '{%blocktrans%}Ein Fehler ist aufgetreten beim Abrufen von Patientendaten, versuchen Sie es!{%endblocktrans%}',
+			
+			
+			//add-Patient.html
+			'Patienten erstellt, aber die Behandlung nicht begonnen': '{%blocktrans%}Patienten erstellt, aber die Behandlung nicht begonnen{%endblocktrans%}',
+			'E-Mail ist erforderlich.': '{%blocktrans%}E-Mail ist erforderlich.{%endblocktrans%}',
+			'Vorname ist erforderlich.': '{%blocktrans%}Vorname ist erforderlich.{%endblocktrans%}',
+			'Geburtsdatum ist erforderlich.': '{%blocktrans%}Geburtsdatum ist erforderlich.{%endblocktrans%}',
+			'Gender erforderlich.': '{%blocktrans%}Gender erforderlich.{%endblocktrans%}',
+			'Unfähig, Patienten hinzufügen, überprüfen Sie bitte Ihre Internetverbindung oder versuchen Sie es erneut!': '{%blocktrans%}Unfähig, Patienten hinzufügen, überprüfen Sie bitte Ihre Internetverbindung oder versuchen Sie es erneut!{%endblocktrans%}',
+			
+			//quest.js
+			'keine': '{%blocktrans%}keine{%endblocktrans%}',
+			'LEGEN': '{%blocktrans%}LEGEN{%endblocktrans%}',
+			'Bitte geben Sie Datum und Uhrzeit': '{%blocktrans%}Bitte geben Sie Datum und Uhrzeit{%endblocktrans%}',
+			'Sind Sie sicher, ohne irgendwelche Tabletten einreichen möchten Sie': '{%blocktrans%}Sind Sie sicher, ohne irgendwelche Tabletten einreichen möchten Sie{%endblocktrans%}',
+			'Nicht jetzt': '{%blocktrans%}Nicht jetzt{%endblocktrans%}',
+			'Hier finden Sie ihre Therapie-Erinnerung und  andere Benachrichtigungen': '{%blocktrans%}Hier finden Sie ihre Therapie-Erinnerung und  andere Benachrichtigungen{%endblocktrans%}',
+			'Persönliches Tagebuch ist leer': '{%blocktrans%}Persönliches Tagebuch ist leer{%endblocktrans%}',
+			'Bitte wählen Medizin Zeit': '{%blocktrans%}Bitte wählen Medizin Zeit{%endblocktrans%}',
+			'Fehler': '{%blocktrans%}Fehler{%endblocktrans%}',
+			
+			//timeInterview.js
+			'Geben Sie bitte Breakfast Zeit': '{%blocktrans%}Geben Sie bitte Breakfast Zeit{%endblocktrans%}',
+			'Geben Sie bitte Mittagessen Zeit': '{%blocktrans%}Geben Sie bitte Mittagessen Zeit{%endblocktrans%}',
+			'Geben Sie bitte Abendessen Zeit': '{%blocktrans%}Geben Sie bitte Abendessen Zeit{%endblocktrans%}',
+			'Geben Sie bitte Schlaf Zeit': '{%blocktrans%}Geben Sie bitte Schlaf Zeit{%endblocktrans%}',
+			'Geben Sie bitte Frei wählbar': '{%blocktrans%}Geben Sie bitte Frei wählbar{%endblocktrans%}',
+			
+		};
+
+	})();
+
+</script>
+
+{% endlanguage %}

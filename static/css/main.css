@@ -1,0 +1,21 @@
+@font-face {
+    font-family: 'Asap';
+    font-style: normal;
+    font-weight: 400;
+    src: url('fonts/Asap-Regular.eot');
+    src: local('☺'), url('fonts/Asap-Regular.woff') format('woff'), url('fonts/Asap-Regular.ttf') format('truetype'), url('fonts/Asap-Regular.svg') format('svg');
+
+}
+@font-face {
+    font-family: 'Asap';
+    font-style: normal;
+    font-weight: 700;
+    src: url('fonts/Asap-Bold.eot');
+    src: local('☺'), url('fonts/Asap-Bold.woff') format('woff'), url('fonts/Asap-Bold.ttf') format('truetype'), url('fonts/Asap-Bold.svg') format('svg');
+
+}
+
+a
+{
+  cursor : pointer;
+}

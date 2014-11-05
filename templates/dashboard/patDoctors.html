@@ -1,0 +1,247 @@
+{% extends "dashboard/patLayout.html" %} 
+{% block page_id %}mydocs{% endblock %}
+{% load templateUtils %}
+{% load i18n %}
+{% block content %}
+<style>
+    hr {
+        margin:0px;
+    }
+</style>
+<!-- Content -->
+<div class="span9">
+    <h1 class="page-title"><i class="fa fa-user-md"></i>&nbsp;&nbsp;{%blocktrans%}Meine Ärzte{%endblocktrans%}</h1>
+
+    <!-- Table - 4 columns -->
+    <div class="widget widget-table">
+        <div class="widget-header">
+            <h3><i class="fa fa-table"></i>&nbsp;&nbsp;{%blocktrans%}Praxis Informationen{%endblocktrans%}</h3>
+        </div>
+        <div class="widget-content" style="padding:10px;">
+            <div class="container-fluid">
+
+                {% for d in doctors %}
+                <div class="row-fluid">
+                    <div class="span12">    
+                        <h4>{{d.docprofile.qualification}} {{d.userprofile.first_name|default:''}} {{d.userprofile.last_name|default:''}}{% if not d.userprofile.first_name and not d.userprofile.last_name %}{{d}}{% endif %}</h4>
+                    </div>
+                </div>
+                <div class="row-fluid">
+                    <div class="span4">
+                        <div class="span12">
+                            <div style="width:100px;height:100px;margin:10%;border:1px solid lightgray;border-radius:4px;text-align:center;overflow:hidden;">
+                                <img src="{% if d.docprofile.profile_pic %}{{d.docprofile.profile_pic}}{% else %}{{ STATIC_URL }}img/doctor.png{% endif %}" alt="profile" style="height:100px;max-width:100px;">
+                            </div>
+                        </div>
+                        <div class="span12">
+                            <h4>{%blocktrans%}Öffnungzeiten{%endblocktrans%}</h4>
+                            <hr>
+                            {% for day in daychoices %}
+                            <div class="span12">
+                                {% with day=d|getWorkingHours:day.0 %}
+                                 <div class="span12">
+                                     <strong>
+                                         <div class="span6"> {{day.0|getDayLanguage:user.userprofile.language}} :</div>  <div class="span6">{{ day.1 }} {{ day.2|yesno:"-," }}{{ day.2 }}</div>
+                                     </strong>
+                                     </div>
+                            {% endwith %}
+                        </div>
+
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="span8">
+                    <hr>
+                    <div class="row-fluid">
+                        <div class="span6"><p><i class="fa fa-plus-square"></i><strong>&nbsp;{%blocktrans%}Einrichtung{%endblocktrans%}</strong></p></div>
+                        <div class="span6">{{d.docprofile.hospital}}</div>
+                    </div>
+                    <hr>
+                    <div class="row-fluid">
+                        <div class="span6"><p><i class="fa fa-medkit"></i><strong>&nbsp;{%blocktrans%}Fachrichtung{%endblocktrans%}</strong></p></div>
+                        <div class="span6">{{d.docprofile.department}}</div>
+                    </div>
+                    <hr>
+                    <div class="row-fluid">
+                        <div class="span6"><p><i class="fa fa-envelope"></i><strong>&nbsp;{%blocktrans%}Adresse 1{%endblocktrans%}</strong></p></div>
+                        <div class="span6">{{d.userprofile.address1}}</div>
+                    </div>
+                    <hr>
+                    <div class="row-fluid">
+                        <div class="span6"><p><i class="fa fa-envelope"></i><strong>&nbsp;{%blocktrans%}Adresse 2{%endblocktrans%}</strong></p></div>
+                        <div class="span6">{{d.userprofile.address2}}</div>
+                    </div>
+                    <hr>
+                    <div class="row-fluid">
+                        <div class="span6"><p><i class="fa fa-map-marker"></i><strong>&nbsp;{%blocktrans%}Postleitzahl{%endblocktrans%}</strong></p></div>
+                        <div class="span6">{{d.userprofile.postal_code}}</div>
+                    </div>
+                    <hr>
+                    <div class="row-fluid">
+                        <div class="span6"><p><i class="fa fa-hospital-o"></i><strong>&nbsp;{%blocktrans%}Ort{%endblocktrans%}</strong></p></div>
+                        <div class="span6">{{d.userprofile.city}}</div>
+                    </div>
+                    <hr>
+                    <div class="row-fluid">
+                        <div class="span6"><p><i class="fa fa-mobile"></i><strong>&nbsp;{%blocktrans%}Allgemeine Rufnummer{%endblocktrans%}</strong></p></div>
+                        <div class="span6">{{d.userprofile.mobile}}</div>
+                    </div>
+                    <hr>
+                    <div class="row-fluid">
+                        <div class="span6"><p><i class="fa fa-phone"></i><strong>&nbsp;{%blocktrans%}Rufnummer zur Terminvereinbarung{%endblocktrans%}</strong></p></div>
+                        <div class="span6">{{d.docprofile.appointment_num}}</div>
+                    </div>
+                    <hr>
+                    <div class="row-fluid">
+                        <div class="span6"><p><i class="fa fa-phone"></i><strong>&nbsp;{%blocktrans%}Notfall-Nummer{%endblocktrans%}</strong></p></div>
+                        <div class="span6">{{d.docprofile.emergency_num}}</div>
+                    </div>
+                    <hr>
+		    
+
+                    <div class="row-fluid">
+                        <div class="span6"><p><i class="fa fa-envelope"></i><strong>&nbsp;E-Mail</strong></p></div>
+                        <div class="span6">{{d.userprofile.email}}</div>
+                    </div>
+                    <hr>
+		    
+                </div>
+                <div class="row">
+                    {% if d.docprofile.map_location %}
+                        <iframe src="/patient/doctor/address/map/{{d.id}}/" class="span8" height="300"></iframe>
+                    {% endif %}
+                </div>
+            </div>
+
+
+        </div>      
+        <div class="control-group">
+            <div class="controls">
+                <textarea class="docMessage" style="display:none"></textarea>
+                <!--                                    <a href="#" class="btn btn-mini btn-info sendmessage" doctor="{{d.id}}">Send Message</a>
+                                                    <a class="btn btn-mini btn-success viewmessage" id="{{d.id}}">View Message</a>
+                                                    <a class="btn btn-mini btn-warning" id="{{d.id}}">Fix Appointment</a>				-->
+            </div>
+        </div>
+        <div class="row-fluid">
+            <div id="msg_{{d.id}}" class="hidden span12">
+                <div class="widget-content"><br>
+                    {% load DocExtras %}   
+                    <div id="messageBOX" class=" span8" style="overflow-y:auto;overflow-x:hidden;">
+                        <div id="messagestbdy" class="">
+                        </div> <!-- message body <end--><br>
+                    </div> <!-- span 8 end-->
+
+                </div> <!-- widget content -->
+            </div>
+        </div>
+
+
+
+        {% endfor %}
+
+    </div> <!-- container-fluid end -->
+</div>
+</div>
+
+</div>
+
+
+<!-- /Content -->
+{% endblock %}
+
+{% block bottomScripts %}
+<!-- Javascript files -->
+<script type="text/javascript">
+
+    $('.sendmessage').click(function(e) {
+        e.preventDefault();
+        var btn = $(this);
+        var txtArea = $('.docMessage')
+        if ($(txtArea).is(':visible'))
+        {
+            $.post("/quickSendMessage/", {csrfmiddlewaretoken: '{{csrf_token}}', message: txtArea.val(), toId: $(btn).attr('doctor')})
+                    .done(function(data) {
+                        if (data == 'ok')
+                        {
+                            $(txtArea).hide();
+                            $(txtArea).val('');
+                            $(btn).removeClass('btn-info').addClass('btn-success').delay(1000).queue(function() {
+                                $(this).removeClass('btn-success').addClass('btn-info');
+                                $(this).dequeue();
+                            });
+
+                        }
+                        else
+                        {
+                            $(btn).removeClass('btn-info').addClass('btn-danger').delay(1000).queue(function() {
+                                $(this).removeClass('btn-danger').addClass('btn-info');
+                                $(this).dequeue();
+                            });
+                        }
+                    })
+                    .fail(function() {
+                        $(txtArea).hide();
+                        $(txtArea).val('');
+                        $(btn).removeClass('btn-info').addClass('btn-danger').delay(1000).queue(function() {
+                            $(this).removeClass('btn-danger').addClass('btn-info');
+                            $(this).dequeue();
+                        });
+                    });
+
+        }
+        else
+        {
+            $(txtArea).slideDown();
+        }
+    })
+    $('.SaveTreatment').click(function() {
+        var btn = $(this)
+        var tr = $(this).parents('.pList')[0];
+        var pid = $(tr).attr('pid')
+        var treatid = ($(tr).find('select').val());
+
+        $.get("/assignTreatment/", {pid: pid, tid: treatid})
+                .done(function(data) {
+                    if (data == 'ok')
+                    {
+                        $(btn).removeClass('btn-info').addClass('btn-success').delay(1000).queue(function() {
+                            $(this).removeClass('btn-success').addClass('btn-info');
+                            $(this).dequeue();
+                        });
+
+                    }
+                    else
+                    {
+                        $(btn).removeClass('btn-info').addClass('btn-danger').delay(1000).queue(function() {
+                            $(this).removeClass('btn-danger').addClass('btn-info');
+                            $(this).dequeue();
+                        });
+                    }
+
+                })
+                .fail(function() {
+                    bootbox.alert("Error in assigning Error <img src='{{STATIC_URL}}img/delete.png' alt=''>");
+                    $(btn).removeClass('btn-info').addClass('btn-danger').delay(1000).queue(function() {
+                        $(this).removeClass('btn-danger').addClass('btn-info');
+                        $(this).dequeue();
+                    });
+                })
+    });
+    $('.viewmessage').click(function(e) {
+        if ($('#msg_' + this.id).hasClass('hidden')) {
+            $(this).html('Hide Message');
+            $('#msg_' + this.id).removeClass('hidden')
+            $('#msg_' + this.id).hide();
+            $('#msg_' + this.id).fadeIn('slow');
+        }
+        else {
+            $(this).html('View Message');
+            $('#msg_' + this.id).hide();
+            $('#msg_' + this.id).addClass('hidden');
+        }
+    });
+</script>
+
+{% endblock %}
+
