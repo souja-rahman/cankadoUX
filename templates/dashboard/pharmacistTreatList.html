@@ -1,3 +1,4 @@
+<!--This page shows the treatment list for auditor -->
 {% extends "dashboard/pharmacistLayout.html" %}
 {% block page_id %}{% if approved %}approved{% elif pending %}pending{% elif declined%}declined{% elif archived %}archived{% endif %}{% endblock %}
 {% block custom_css %}

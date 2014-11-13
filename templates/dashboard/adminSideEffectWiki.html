@@ -1,9 +1,10 @@
+<!--Shows the description of side effects-->
 {% extends "dashboard/adminLayout.html" %}  
 {% block page_id %}userlist{% endblock %}
 {% load templateUtils %} 
 {% block content %}
 <div class="span9">
-    <div class="row-fluid tlist" style="padding:10px;">
+    <div class="row-fluid tlist" style= "padding:10px;">
         <h4>{{se}}</h4>
         <hr>
         <form class="form-horizontal" action="/admin/sideeffect/wiki/{{se.id}}/" method="POST">{% csrf_token %}
